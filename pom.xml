@@ -9,6 +9,17 @@
     <version>1.0.0</version>
     <packaging>pom</packaging>
 
+    <properties>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <versionAnnotations>15.0</versionAnnotations>
+        <versionMavenClean>3.0.0</versionMavenClean>
+        <versionMavenShade>3.0.0</versionMavenShade>
+        <versionMavenSources>3.0.1</versionMavenSources>
+        <versionMavenJavaDoc>2.10.4</versionMavenJavaDoc>
+    </properties>
+
     <modules>
         <module>CoalesceCoreBukkit</module>
         <module>CoalesceCoreCommon</module>
