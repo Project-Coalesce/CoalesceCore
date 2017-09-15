@@ -3,20 +3,54 @@ package com.coalesce.core.session;
 import com.coalesce.core.plugin.ICoPlugin;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 public final class SessionStore {
 	
-	private static final Set<AbstractSession> MATCHED_SESSIONS;
-	private static final Map<ICoPlugin, List<AbstractSession>> SESSIONS;
+	private final List<AbstractSession> sessions;
 	
-	static {
-		MATCHED_SESSIONS = new HashSet<>();
-		SESSIONS = new HashMap<>();
+	public SessionStore() {
+		sessions = new ArrayList<>();
+	}
+	
+	/**
+	 * Gets all the sessions that belong to this plugin.
+	 * @return THe plugin sessions
+	 */
+	public List<AbstractSession> getSessions() {
+		return sessions;
+	}
+	
+	/**
+	 * Gets all the sessions that are a specific session type.
+	 * @param sessionType The type of session this is.
+	 * @param <T> The type of session to look for and return as
+	 * @return Returns a list of sessions that are the correct type.
+	 */
+	public <T extends AbstractSession> List<? extends AbstractSession> getSessions(Class<T> sessionType) {
+		List<T> correctSessions = new ArrayList<>();
+		sessions.forEach(session -> {
+			if (session.getSessionType().equals(sessionType)) correctSessions.add((T)session);
+		});
+		return correctSessions;
+	}
+	
+	/**
+	 * Gets a session by key. Plugin is not needed with this because it is automatically assumed its the current plugin.
+	 * @param sessionType The session type.
+	 * @param key The session key
+	 * @param <T> The type of session to return.
+	 * @return The session.
+	 */
+	public <T extends AbstractSession> T getSession(Class<T> sessionType, String key) {
+		T correctSession = null;
+		for (AbstractSession session : getSessions(sessionType)) {
+			if (session.getSessionKey().matches(key)) {
+				correctSession = (T)session;
+				break;
+			}
+		}
+		return correctSession;
 	}
 	
 	/**
@@ -25,39 +59,43 @@ public final class SessionStore {
 	 * @return A list of pairs
 	 */
 	public List<AbstractSession> getSessions(ICoPlugin plugin) {
-		return SESSIONS.get(plugin);
+		return plugin.getSessionStore(plugin).getSessions();
+	}
+	
+	public <T extends AbstractSession> List<? extends AbstractSession> getSessions(ICoPlugin plugin, Class<T> sessionType) {
+		List<T> correctSessions = new ArrayList<>();
+		getSessions(plugin).forEach(session -> {
+			if (session.getSessionType().equals(sessionType)) correctSessions.add((T)session);
+		});
+		return correctSessions;
 	}
 	
 	/**
-	 * Gets all the SESSIONS that have the specified key
-	 * @param key The key to look for
-	 * @return A set of SESSIONS
+	 * Gets a session from another plugin
+	 * @param plugin The plugin to get the session from
+	 * @param sessionType The type of session being retrieved
+	 * @param key The session key
+	 * @param <T> The type of session to return
+	 * @return A session from another plugin
 	 */
-	public Set<AbstractSession> getSession(String key) {
-		MATCHED_SESSIONS.clear();
-		SESSIONS.forEach((p, l) -> l.forEach((s) -> {
-				if (s.getSessionKey().equals(key)) MATCHED_SESSIONS.add(s);
-			}));
-		return MATCHED_SESSIONS;
+	public <T extends AbstractSession> T getSession(ICoPlugin plugin, Class<T> sessionType, String key) {
+		T correctSession = null;
+		for (AbstractSession session : getSessions(plugin, sessionType)) {
+			if (session.getSessionKey().matches(key)) {
+				correctSession = (T)session;
+				break;
+			}
+		}
+		return correctSession;
 	}
 	
 	/**
 	 * Adds a session to a plugin
 	 * @param session The session to add
-	 * @param plugin The plugin that owns this session
 	 * @return True if the session was added, false otherwise.
 	 */
-	public boolean addSession(AbstractSession session, ICoPlugin plugin) {
-		if (!SESSIONS.containsKey(plugin)) {
-			SESSIONS.put(plugin, new ArrayList<>());
-		}
-		if (SESSIONS.get(plugin).contains(session)) {
-			return false;
-		}
-		else {
-			SESSIONS.get(plugin).add(session);
-			return true;
-		}
+	public boolean addSession(AbstractSession session) {
+		return sessions.add(session);
 	}
 	
 }
