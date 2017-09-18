@@ -1,0 +1,5 @@
+name: ${project.artifactId}
+version: ${project.version}
+description: An api for both Bukkit and Sponge to allow easier development of plugins
+author: NJDaeger
+main: com.coalesce.core.bukkit.CoreBukkit

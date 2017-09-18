@@ -1,53 +1,52 @@
-package com.coalesce.core.bukkit;
+package com.coalesce.core.sponge;
 
 import com.coalesce.core.plugin.ICoModule;
 import com.coalesce.core.plugin.ICoPlugin;
 import com.coalesce.core.session.SessionStore;
-import org.bukkit.Bukkit;
-import org.bukkit.event.HandlerList;
-import org.bukkit.event.Listener;
-import org.bukkit.plugin.java.JavaPlugin;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.game.state.GameInitializationEvent;
+import org.spongepowered.api.event.game.state.GameStartingServerEvent;
+import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
 
 import java.util.LinkedList;
 import java.util.List;
 
-public abstract class CoPlugin extends JavaPlugin implements ICoPlugin, Listener {
+public abstract class CoPlugin implements ICoPlugin {
 	
 	private final SessionStore sessionStore = new SessionStore();
 	private final List<ICoModule> modules = new LinkedList<>();
 	private static CoPlugin instance;
 	
-	@Override
-	public final void onEnable() {
+	@Listener
+	public final void onEnable(GameStartingServerEvent e) {
 		
 		instance = this;
-		CoreBukkit.addSessionStore(this, sessionStore);
+		CoreSponge.addSessionStore(this, sessionStore);
 		
 		try {
-			this.onPluginEnable();
+			onPluginEnable();
 		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-	
-	@Override
-	public final void onDisable() {
-		try {
-			this.onPluginDisable();
-		}
-		catch (Exception e) {
-			e.printStackTrace();
+		catch (Exception e1) {
+			e1.printStackTrace();
 		}
 	}
 	
-	@Override
-	public final void onLoad() {
+	public final void onDisable(GameStoppingServerEvent e) {
 		try {
-			this.onPluginLoad();
+			onPluginDisable();
 		}
-		catch (Exception e) {
-			e.printStackTrace();
+		catch (Exception e1) {
+			e1.printStackTrace();
+		}
+	}
+	
+	public final void onLoad(GameInitializationEvent e) {
+		try {
+			onPluginLoad();
+		}
+		catch (Exception e1) {
+			e1.printStackTrace();
 		}
 	}
 	
@@ -79,16 +78,16 @@ public abstract class CoPlugin extends JavaPlugin implements ICoPlugin, Listener
 	//Implements access to all plugin's session stores.
 	@Override
 	public final SessionStore getSessionStore(ICoPlugin plugin) {
-		return CoreBukkit.getSessionStores().get(plugin);
+		return CoreSponge.getSessionStores().get(plugin);
 	}
 	
 	@Override
 	public final void registerListener(Object listener) {
-		Bukkit.getPluginManager().registerEvents((Listener)listener, this);
+		Sponge.getEventManager().registerListeners(this, listener);
 	}
 	
 	@Override
 	public final void unregisterListener(Object listener) {
-		HandlerList.unregisterAll((Listener)listener);
+		Sponge.getEventManager().unregisterListeners(listener);
 	}
 }

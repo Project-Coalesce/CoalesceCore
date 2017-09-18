@@ -14,7 +14,7 @@ public class PlayerSession extends AbstractSession<Player> {
 		this.player = player;
 	}
 	
-	public UUID getUuid() {
+	public UUID getUserID() {
 		return player.getUniqueId();
 	}
 	
