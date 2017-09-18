@@ -22,7 +22,7 @@ public abstract class CoPlugin implements ICoPlugin {
 	public final void onEnable(GameStartingServerEvent e) {
 		
 		instance = this;
-		CoreSponge.addSessionStore(this, sessionStore);
+		com.coalesce.core.sponge.CoreSponge.addSessionStore(this, sessionStore);
 		
 		try {
 			onPluginEnable();
@@ -78,7 +78,7 @@ public abstract class CoPlugin implements ICoPlugin {
 	//Implements access to all plugin's session stores.
 	@Override
 	public final SessionStore getSessionStore(ICoPlugin plugin) {
-		return CoreSponge.getSessionStores().get(plugin);
+		return com.coalesce.core.sponge.CoreSponge.getSessionStores().get(plugin);
 	}
 	
 	@Override
