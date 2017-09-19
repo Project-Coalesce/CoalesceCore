@@ -9,11 +9,11 @@ import java.util.Map;
 public class CoreBukkit extends CoPlugin {
 	
 	//Creates a map of all the session stores for each plugin
-	private static Map<ICoPlugin, SessionStore> SESSION_STORES;
+	private static Map<ICoPlugin, SessionStore> SESSION_STORES = new HashMap<>();
 	
 	@Override
 	public void onPluginEnable() throws Exception {
-		SESSION_STORES = new HashMap<>();
+	
 	}
 	
 	@Override

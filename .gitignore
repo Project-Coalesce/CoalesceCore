@@ -70,7 +70,9 @@ hs_err_pid*
 ### Maven ###
 target/
 jars/
-docs/
+CoalesceCoreBukkit/docs
+CoalesceCoreCommon/docs
+CoalesceCoreSponge/docs
 pom.xml.tag
 pom.xml.releaseBackup
 pom.xml.versionsBackup

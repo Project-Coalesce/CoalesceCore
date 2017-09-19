@@ -21,16 +21,14 @@ public abstract class CoPlugin extends JavaPlugin implements ICoPlugin, Listener
 	private final List<ICoModule> modules = new LinkedList<>();
 	private final CoLogger logger = new CoLogger(this);
 	private Color pluginColor = Color.WHITE;
+	private String displayName = getName();
 	private static CoPlugin instance;
-	private String displayName;
 	
 	@Override
 	public final void onEnable() {
 		
 		instance = this;
 		CoreBukkit.addSessionStore(this, sessionStore);
-		
-		this.displayName = getName();
 		
 		try {
 			this.onPluginEnable();
