@@ -2,6 +2,7 @@ package com.coalesce.core;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 public enum Color {
 	
@@ -29,7 +30,8 @@ public enum Color {
 	RESET('r');
 	
 	private char code;
-	private static final char CHAR = '\u00A7';
+	public static final char CHAR = '\u00A7';
+	private static final Pattern STRIP_COLOR_PATTERN = Pattern.compile("(?i)" + String.valueOf(CHAR) + "[0-9A-FK-OR]"); //Bukkit
 	
 	Color(char code) {
 		this.code = code;
@@ -98,6 +100,19 @@ public enum Color {
 			}
 		}
 		return color;
+	}
+	
+	/**
+	 * Strips a string of all color codes
+	 *
+	 * @param input Input String
+	 * @return The input without color codes.
+	 */
+	public static String stripColor(String input) {
+		if (input == null) {
+			return null;
+		}
+		return STRIP_COLOR_PATTERN.matcher(input).replaceAll("");
 	}
 
 }

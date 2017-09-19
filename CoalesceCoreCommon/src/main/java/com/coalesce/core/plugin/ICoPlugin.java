@@ -1,8 +1,11 @@
 package com.coalesce.core.plugin;
 
+import com.coalesce.core.Color;
+import com.coalesce.core.chat.CoFormatter;
 import com.coalesce.core.session.SessionStore;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public interface ICoPlugin {
@@ -40,6 +43,14 @@ public interface ICoPlugin {
 	 * @return The plugins session store
 	 */
 	SessionStore getSessionStore(ICoPlugin plugin);
+	
+	/**
+	 * Adds modules to this plugin
+	 * @param modules The module(s) to add
+	 */
+	default void addModules(ICoModule... modules) {
+		Collections.addAll(getModules(), modules);
+	}
 	
 	/**
 	 * Gets a module by class.
@@ -84,5 +95,41 @@ public interface ICoPlugin {
 	default void registerListeners(Object... listeners) {
 		Arrays.asList(listeners).forEach(this::registerListeners);
 	}
+	
+	/**
+	 * Sets the displayname of the plugin
+	 * @param displayName The plugin displayname.
+	 */
+	void setDisplayName(String displayName);
+	
+	/**
+	 * Gets the display name of the plugin.
+	 * @return The plugin with the correct plugin color.
+	 */
+	String getDisplayName();
+	
+	/**
+	 * Sets the color of this plugin
+	 * @param color The plugin color.
+	 */
+	void setPluginColor(Color color);
+	
+	/**
+	 * Gets the color of the plugin.
+	 * @return Defaults to white if color has not been specified.
+	 */
+	Color getPluginColor();
+	
+	/**
+	 * Gets the plugin logger
+	 * @return The plugin logger.
+	 */
+	CoLogger getCoLogger();
+	
+	/**
+	 * Gets the plugin formatter
+	 * @return Plugin formatter.
+	 */
+	CoFormatter getCoFormatter();
 	
 }
