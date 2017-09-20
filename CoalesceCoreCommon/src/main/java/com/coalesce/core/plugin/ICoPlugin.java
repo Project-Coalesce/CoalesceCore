@@ -1,6 +1,7 @@
 package com.coalesce.core.plugin;
 
 import com.coalesce.core.Color;
+import com.coalesce.core.Platform;
 import com.coalesce.core.chat.CoFormatter;
 import com.coalesce.core.session.SessionStore;
 
@@ -131,5 +132,11 @@ public interface ICoPlugin {
 	 * @return Plugin formatter.
 	 */
 	CoFormatter getCoFormatter();
+	
+	/**
+	 * Gets the server platform this plugin is currently being ran on.
+	 * @return The server platform.
+	 */
+	Platform getPlatform();
 	
 }

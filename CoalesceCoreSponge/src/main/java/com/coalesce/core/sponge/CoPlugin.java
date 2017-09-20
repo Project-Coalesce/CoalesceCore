@@ -1,6 +1,7 @@
 package com.coalesce.core.sponge;
 
 import com.coalesce.core.Color;
+import com.coalesce.core.Platform;
 import com.coalesce.core.chat.CoFormatter;
 import com.coalesce.core.plugin.CoLogger;
 import com.coalesce.core.plugin.ICoModule;
@@ -29,7 +30,7 @@ public abstract class CoPlugin implements ICoPlugin {
 	public final void onEnable(GameStartingServerEvent e) {
 		
 		instance = this;
-		com.coalesce.core.sponge.CoreSponge.addSessionStore(this, sessionStore);
+		CoreSponge.addSessionStore(this, sessionStore);
 		
 		try {
 			onPluginEnable();
@@ -127,7 +128,7 @@ public abstract class CoPlugin implements ICoPlugin {
 	
 	@Override
 	public final SessionStore getSessionStore(ICoPlugin plugin) {
-		return com.coalesce.core.sponge.CoreSponge.getSessionStores().get(plugin);
+		return CoreSponge.getSessionStores().get(plugin);
 	}
 	
 	//
@@ -158,9 +159,17 @@ public abstract class CoPlugin implements ICoPlugin {
 	//
 	//
 	
-	
 	@Override
 	public CoFormatter getCoFormatter() {
 		return formatter;
+	}
+	
+	//
+	//
+	
+	
+	@Override
+	public Platform getPlatform() {
+		return Platform.SPONGE;
 	}
 }

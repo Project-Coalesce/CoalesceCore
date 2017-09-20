@@ -1,6 +1,7 @@
 package com.coalesce.core.bukkit;
 
 import com.coalesce.core.Color;
+import com.coalesce.core.Platform;
 import com.coalesce.core.chat.CoFormatter;
 import com.coalesce.core.plugin.CoLogger;
 import com.coalesce.core.plugin.ICoModule;
@@ -161,5 +162,13 @@ public abstract class CoPlugin extends JavaPlugin implements ICoPlugin, Listener
 	@Override
 	public CoFormatter getCoFormatter() {
 		return formatter;
+	}
+	
+	//
+	//
+	
+	@Override
+	public Platform getPlatform() {
+		return Platform.BUKKIT;
 	}
 }
