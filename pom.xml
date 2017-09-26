@@ -10,14 +10,12 @@
     <packaging>pom</packaging>
 
     <properties>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <versionAnnotations>15.0</versionAnnotations>
         <versionMavenClean>3.0.0</versionMavenClean>
-        <versionMavenShade>3.0.0</versionMavenShade>
+        <versionMavenShade>3.1.0</versionMavenShade>
         <versionMavenSources>3.0.1</versionMavenSources>
-        <versionMavenJavaDoc>2.10.4</versionMavenJavaDoc>
+        <versionMavenJavaDoc>3.0.0-M1</versionMavenJavaDoc>
     </properties>
 
     <modules>
@@ -28,6 +26,16 @@
 
     <build>
         <plugins>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.7.0</version>
+                <configuration>
+                    <source>9</source>
+                    <target>9</target>
+                </configuration>
+            </plugin>
 
             <!--Jar Generation-->
             <plugin>
@@ -67,7 +75,6 @@
                         <id>attach-javadocs</id>
                         <goals>
                             <goal>jar</goal>
-                            <goal>aggregate-jar</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -118,6 +125,7 @@
                     </filesets>
                 </configuration>
             </plugin>
+
         </plugins>
     </build>
 

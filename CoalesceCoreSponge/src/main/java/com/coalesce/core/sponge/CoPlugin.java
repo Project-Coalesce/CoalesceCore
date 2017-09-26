@@ -3,6 +3,7 @@ package com.coalesce.core.sponge;
 import com.coalesce.core.Color;
 import com.coalesce.core.Platform;
 import com.coalesce.core.chat.CoFormatter;
+import com.coalesce.core.command.base.CommandStore;
 import com.coalesce.core.plugin.CoLogger;
 import com.coalesce.core.plugin.ICoModule;
 import com.coalesce.core.plugin.ICoPlugin;
@@ -18,18 +19,20 @@ import java.util.List;
 
 public abstract class CoPlugin implements ICoPlugin {
 	
-	private String displayName = Sponge.getPluginManager().fromInstance(this).get().getName();
-	private final CoFormatter formatter = new CoFormatter(this);
+	private CommandStoreSponge commandStore;
+	private String displayName;
+	private CoFormatter formatter;
 	private final SessionStore sessionStore = new SessionStore();
 	private final List<ICoModule> modules = new LinkedList<>();
-	private final CoLogger logger = new CoLogger(this);
+	private CoLogger logger;
 	private Color pluginColor = Color.WHITE;
-	private static CoPlugin instance;
 	
 	@Listener
 	public final void onEnable(GameStartingServerEvent e) {
-		
-		instance = this;
+		displayName = Sponge.getPluginManager().fromInstance(this).get().getName();
+		logger = new CoLogger(this);
+		formatter = new CoFormatter(this);
+		commandStore = new CommandStoreSponge(this);
 		CoreSponge.addSessionStore(this, sessionStore);
 		
 		try {
@@ -38,6 +41,7 @@ public abstract class CoPlugin implements ICoPlugin {
 		catch (Exception e1) {
 			e1.printStackTrace();
 		}
+		commandStore.registerObjects();
 	}
 	
 	public final void onDisable(GameStoppingServerEvent e) {
@@ -98,13 +102,6 @@ public abstract class CoPlugin implements ICoPlugin {
 	public void setPluginColor(Color pluginColor) {
 		this.pluginColor = pluginColor;
 		this.displayName = pluginColor + displayName + Color.RESET;
-	}
-	
-	//
-	//
-	
-	public static CoPlugin getInstance() {
-		return instance;
 	}
 	
 	//
@@ -171,5 +168,13 @@ public abstract class CoPlugin implements ICoPlugin {
 	@Override
 	public Platform getPlatform() {
 		return Platform.SPONGE;
+	}
+	
+	//
+	//
+	
+	@Override
+	public CommandStore getCommandStore() {
+		return commandStore;
 	}
 }

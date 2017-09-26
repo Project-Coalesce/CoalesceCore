@@ -5,17 +5,22 @@ import com.coalesce.core.plugin.ICoPlugin;
 
 public final class CoFormatter {
 	
-	private String prefix;
+	private final ICoPlugin plugin;
 	
 	//Constants
 	private final static int CENTER_PX = 154;
 	
 	public CoFormatter(ICoPlugin plugin) {
-		this.prefix = GRAY + "[" + WHITE + plugin.getDisplayName() + GRAY + "]" + RESET;
+		this.plugin = plugin;
 	}
 	
+	/**
+	 * Formats a plugin message
+	 * @param message The message to format
+	 * @return The formatted message.
+	 */
 	public String format(String message) {
-		return prefix + " " + message;
+		return GRAY + "[" + RESET + plugin.getDisplayName() + GRAY + "]" + RESET + " " + message;
 	}
 	
 	/**

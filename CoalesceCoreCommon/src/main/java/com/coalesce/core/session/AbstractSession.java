@@ -21,22 +21,42 @@ public abstract class AbstractSession<T> {
 		this.sessionMeta = new HashMap<>();
 	}
 	
+	/**
+	 * Gets the session key for this session
+	 * @return The session key
+	 */
 	public String getSessionKey() {
 		return sessionKey;
 	}
 	
+	/**
+	 * The plugin that owns the session
+	 * @return The session owner
+	 */
 	public ICoPlugin getSessionOwner() {
 		return sessionOwner;
 	}
 	
+	/**
+	 * Returns the session type
+	 * @return The type of this session
+	 */
 	public T get() {
 		return type;
 	}
 	
+	/**
+	 * Get the session meta map
+	 * @return The session meta map
+	 */
 	public Map<?, ?> getSessionMeta() {
 		return sessionMeta;
 	}
 	
+	/**
+	 * Gets the type of session this is
+	 * @return The session type
+	 */
 	public Class<? extends AbstractSession> getSessionType() {
 		return session;
 	}

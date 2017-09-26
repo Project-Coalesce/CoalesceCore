@@ -3,6 +3,7 @@ package com.coalesce.core.bukkit;
 import com.coalesce.core.Color;
 import com.coalesce.core.Platform;
 import com.coalesce.core.chat.CoFormatter;
+import com.coalesce.core.command.base.CommandStore;
 import com.coalesce.core.plugin.CoLogger;
 import com.coalesce.core.plugin.ICoModule;
 import com.coalesce.core.plugin.ICoPlugin;
@@ -17,18 +18,20 @@ import java.util.List;
 
 public abstract class CoPlugin extends JavaPlugin implements ICoPlugin, Listener {
 	
-	private final CoFormatter formatter = new CoFormatter(this);
 	private final SessionStore sessionStore = new SessionStore();
 	private final List<ICoModule> modules = new LinkedList<>();
-	private final CoLogger logger = new CoLogger(this);
+	private CommandStoreBukkit commandStore;
 	private Color pluginColor = Color.WHITE;
-	private String displayName = getName();
-	private static CoPlugin instance;
+	private CoFormatter formatter;
+	private String displayName;
+	private CoLogger logger;
 	
 	@Override
 	public final void onEnable() {
-		
-		instance = this;
+		displayName = getName();
+		logger = new CoLogger(this);
+		formatter = new CoFormatter(this);
+		commandStore = new CommandStoreBukkit(this);
 		CoreBukkit.addSessionStore(this, sessionStore);
 		
 		try {
@@ -37,6 +40,7 @@ public abstract class CoPlugin extends JavaPlugin implements ICoPlugin, Listener
 		catch (Exception e) {
 			e.printStackTrace();
 		}
+		commandStore.registerObjects();
 	}
 	
 	@Override
@@ -78,6 +82,9 @@ public abstract class CoPlugin extends JavaPlugin implements ICoPlugin, Listener
 		return displayName;
 	}
 	
+	//
+	//
+	
 	@Override
 	public void setDisplayName(String displayName) {
 		this.displayName = pluginColor + displayName + Color.RESET;
@@ -98,14 +105,7 @@ public abstract class CoPlugin extends JavaPlugin implements ICoPlugin, Listener
 	@Override
 	public void setPluginColor(Color pluginColor) {
 		this.pluginColor = pluginColor;
-		this.displayName = pluginColor + displayName + Color.RESET;
-	}
-	
-	//
-	//
-	
-	public static CoPlugin getInstance() {
-		return instance;
+		this.displayName = pluginColor + Color.stripColor(displayName) + Color.RESET;
 	}
 	
 	//
@@ -170,5 +170,13 @@ public abstract class CoPlugin extends JavaPlugin implements ICoPlugin, Listener
 	@Override
 	public Platform getPlatform() {
 		return Platform.BUKKIT;
+	}
+	
+	//
+	//
+	
+	@Override
+	public CommandStore getCommandStore() {
+		return commandStore;
 	}
 }

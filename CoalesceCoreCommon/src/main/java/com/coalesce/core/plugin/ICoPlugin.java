@@ -3,6 +3,7 @@ package com.coalesce.core.plugin;
 import com.coalesce.core.Color;
 import com.coalesce.core.Platform;
 import com.coalesce.core.chat.CoFormatter;
+import com.coalesce.core.command.base.CommandStore;
 import com.coalesce.core.session.SessionStore;
 
 import java.util.Arrays;
@@ -138,5 +139,11 @@ public interface ICoPlugin {
 	 * @return The server platform.
 	 */
 	Platform getPlatform();
+	
+	/**
+	 * Gets the command store
+	 * @return The command store.
+	 */
+	CommandStore getCommandStore();
 	
 }

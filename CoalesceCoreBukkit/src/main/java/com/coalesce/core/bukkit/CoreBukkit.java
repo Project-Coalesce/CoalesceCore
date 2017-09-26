@@ -1,5 +1,7 @@
 package com.coalesce.core.bukkit;
 
+import com.coalesce.core.Color;
+import com.coalesce.core.command.TestCommand;
 import com.coalesce.core.plugin.ICoPlugin;
 import com.coalesce.core.session.SessionStore;
 
@@ -13,7 +15,9 @@ public class CoreBukkit extends CoPlugin {
 	
 	@Override
 	public void onPluginEnable() throws Exception {
-	
+		setDisplayName("CoalesceCore");
+		setPluginColor(Color.YELLOW);
+		getCommandStore().registerCommand(new TestCommand());
 	}
 	
 	@Override
