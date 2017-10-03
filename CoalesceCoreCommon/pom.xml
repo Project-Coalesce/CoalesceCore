@@ -12,4 +12,12 @@
     <artifactId>CoalesceCoreCommon</artifactId>
     <version>1.0.0</version>
 
+    <dependencies>
+        <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <version>1.9</version>
+        </dependency>
+    </dependencies>
+
 </project>

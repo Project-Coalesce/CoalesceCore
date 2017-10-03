@@ -2,6 +2,7 @@ package com.coalesce.core.bukkit;
 
 import com.coalesce.core.Color;
 import com.coalesce.core.command.TestCommand;
+import com.coalesce.core.config.YmlConfig;
 import com.coalesce.core.plugin.ICoPlugin;
 import com.coalesce.core.session.SessionStore;
 
@@ -18,6 +19,7 @@ public class CoreBukkit extends CoPlugin {
 		setDisplayName("CoalesceCore");
 		setPluginColor(Color.YELLOW);
 		getCommandStore().registerCommand(new TestCommand());
+		new YmlConfig("groups", this);
 	}
 	
 	@Override

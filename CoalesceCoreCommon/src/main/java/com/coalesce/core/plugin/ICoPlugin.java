@@ -6,6 +6,7 @@ import com.coalesce.core.chat.CoFormatter;
 import com.coalesce.core.command.base.CommandStore;
 import com.coalesce.core.session.SessionStore;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -145,5 +146,11 @@ public interface ICoPlugin {
 	 * @return The command store.
 	 */
 	CommandStore getCommandStore();
+	
+	/**
+	 * Gets either the mods folder or the plugin folder depending on the platform.
+	 * @return plugins folder for bukkit, mods folder for sponge.
+	 */
+	File getPluginFolder();
 	
 }

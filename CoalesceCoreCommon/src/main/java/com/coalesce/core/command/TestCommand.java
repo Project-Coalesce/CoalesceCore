@@ -11,15 +11,10 @@ import com.coalesce.core.command.base.TabContext;
 
 public final class TestCommand {
 	
-	@Command(
-			name = "test",
-			desc = "A test command",
-			usage = "/test",
-			max = 1,
-			min = 0)
+	@Alias({"tst","ts"})
 	@Permission({"core.test", "core.test2"})
 	@Sender({SenderType.PLAYER, SenderType.CONSOLE})
-	@Alias({"tst","ts"})
+	@Command(name = "test", desc = "A test command", usage = "/test", max = 1, min = 0)
 	public void testCommand(CommandContext context) {
 		context.getSender().pluginMessage(context.joinArgs());
 	}
