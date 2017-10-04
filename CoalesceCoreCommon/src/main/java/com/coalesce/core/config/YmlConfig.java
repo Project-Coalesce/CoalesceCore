@@ -1,9 +1,9 @@
 package com.coalesce.core.config;
 
+import com.coalesce.core.config.base.BaseConfig;
 import com.coalesce.core.plugin.ICoPlugin;
 import org.yaml.snakeyaml.Yaml;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -73,9 +73,7 @@ public class YmlConfig extends BaseConfig {
 	private void convertFile(Map<?, ?> input, String key) {
 		input.forEach((k,v) -> {
 			if (v instanceof Map) {
-				if (key != null) {
-					convertFile((Map)v, key + "." + k);
-				}
+				if (key != null) convertFile((Map)v, key + "." + k);
 				else convertFile((Map)v, (String)k);
 			} else keyMap.put(key + "." + k, v);
 		});
@@ -83,12 +81,6 @@ public class YmlConfig extends BaseConfig {
 	
 	private void write(Object data) {
 		yaml.dumpAsMap(data);
-	}
-	
-	private void createObjects(Map<String, Object> input) {
-		input.forEach((k,v) -> {
-		
-		});
 	}
 	
 }

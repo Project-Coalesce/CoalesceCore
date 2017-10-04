@@ -1,4 +1,4 @@
-package com.coalesce.core.config;
+package com.coalesce.core.config.base;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,6 +27,10 @@ public abstract class BaseConfig {
 	 */
 	public void setValue(String key, Object value) {
 		this.keyMap.put(key, value);
+	}
+	
+	public Object getValue(String key) {
+		return keyMap.get(key);
 	}
 
 }
