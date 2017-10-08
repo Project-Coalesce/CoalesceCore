@@ -1,5 +1,8 @@
 package com.coalesce.core.config.base;
 
+import com.coalesce.core.config.common.Section;
+import com.coalesce.core.plugin.ICoPlugin;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -8,16 +11,22 @@ import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public interface IConfig {
 	
 	/**
-	 * Gets an entry from a config.
-	 * @param path The path in the config.
-	 * @return The entry that is at that path.
+	 * Gets the owning plugin
+	 * @return The owning plugin
 	 */
-	IEntry getEntry(String path);
+	ICoPlugin getPlugin();
+	
+	/**
+	 * Gets all the keys (as strings) in this configuration.
+	 * @return The set of keys.
+	 */
+	Set<String> getKeys(boolean deep);
 	
 	/**
 	 * Gets a value from a config entry.
@@ -51,12 +60,6 @@ public interface IConfig {
 	void setEntry(String path, Object value);
 	
 	/**
-	 * Returns this config.
-	 * @return This current config.
-	 */
-	IConfig getConfig();
-	
-	/**
 	 * The name of the config
 	 * @return The name of the current config.
 	 */
@@ -67,6 +70,35 @@ public interface IConfig {
 	 * @return The file of this config.
 	 */
 	File getFile();
+	
+	/**
+	 * Gets a section of the configuration
+	 * @param name The path of this section
+	 * @return The section
+	 */
+	default ISection getSection(String name) {
+		return new Section(name, this, getPlugin());
+	}
+	
+	/**
+	 * Gets an entry from a config.
+	 * @param path The path in the config.
+	 * @return The entry that is at that path.
+	 */
+	default IEntry getEntry(String path) {
+		for (IEntry entry : getEntries()) {
+			if (entry.getPath().matches(path)) return entry;
+		}
+		return null;
+	}
+	
+	/**
+	 * Returns this config.
+	 * @return This current config.
+	 */
+	default IConfig getConfig() {
+		return this;
+	}
 	
 	/**
 	 * Gets a value from a config entry.

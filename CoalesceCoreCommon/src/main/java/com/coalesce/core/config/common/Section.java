@@ -1,4 +1,4 @@
-package com.coalesce.core.config;
+package com.coalesce.core.config.common;
 
 import com.coalesce.core.config.base.IConfig;
 import com.coalesce.core.config.base.ISection;

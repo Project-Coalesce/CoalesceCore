@@ -8,6 +8,7 @@ import com.coalesce.core.command.annotation.Permission;
 import com.coalesce.core.command.annotation.Sender;
 import com.coalesce.core.command.base.CommandContext;
 import com.coalesce.core.command.base.TabContext;
+import com.coalesce.core.config.YmlConfig;
 
 public final class TestCommand {
 	
@@ -22,6 +23,12 @@ public final class TestCommand {
 	@Completion("test")
 	public void testCompletion(TabContext context) {
 		context.completionAt(0, "hello");
+	}
+	
+	@Command(name = "ct", desc = "Tests the plugin config api", usage = "/ct", min = 3)
+	public void configTest(CommandContext context) {
+		YmlConfig config = new YmlConfig(context.argAt(0), context.getPlugin());
+		config.addEntry(context.argAt(1), context.joinArgs(2));
 	}
 	
 }

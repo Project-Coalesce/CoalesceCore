@@ -1,36 +1,47 @@
 package com.coalesce.core.config.base;
 
+import com.coalesce.core.plugin.ICoPlugin;
+
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
-public abstract class BaseConfig {
+public abstract class BaseConfig implements IConfig {
 	
+	private final String name;
+	private final ICoPlugin plugin;
 	protected final Map<String, Object> keyMap;
 	
-	public BaseConfig() {
+	public BaseConfig(String name, ICoPlugin plugin) {
 		this.keyMap = new HashMap<>();
+		this.plugin = plugin;
+		this.name = name;
 	}
 	
-	/**
-	 * Replaces a value in the config if the key exists
-	 * @param key The key to replace the value of
-	 * @param value The value to replace the old value with
-	 */
-	public void replaceValue(String key, Object value) {
-		this.keyMap.replace(key, value);
+	@Override
+	public Set<String> getKeys(boolean deep) {
+		if (deep) {
+			//Return the key set.
+			return keyMap.keySet();
+		}
+		else {
+			//
+			return getSection("").getKeys(false);
+		}
 	}
 	
-	/**
-	 * Puts a key in the configuration
-	 * @param key The key to put into the config
-	 * @param value The value to set the key to.
-	 */
-	public void setValue(String key, Object value) {
-		this.keyMap.put(key, value);
+	@Override
+	public ICoPlugin getPlugin() {
+		return plugin;
 	}
 	
-	public Object getValue(String key) {
-		return keyMap.get(key);
+	@Override
+	public String getName() {
+		return name;
 	}
-
+	
+	@Override
+	public Object getValue(String path) {
+		return keyMap.get(path);
+	}
 }

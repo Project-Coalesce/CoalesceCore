@@ -1,6 +1,6 @@
 package com.coalesce.core.config.base;
 
-import com.coalesce.core.config.Section;
+import com.coalesce.core.config.common.Section;
 import com.coalesce.core.plugin.ICoPlugin;
 
 import java.util.HashSet;

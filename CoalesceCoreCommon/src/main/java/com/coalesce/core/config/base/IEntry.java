@@ -5,6 +5,33 @@ import java.util.List;
 
 public interface IEntry {
 	
+	/**
+	 * Gets the path of this entry.
+	 *
+	 * @return The path in the config.
+	 */
+	String getPath();
+	
+	/**
+	 * Gets the value of this entry.
+	 *
+	 * @return The value of this entry.
+	 */
+	Object getValue();
+	
+	/**
+	 * Gets the database this entry is held in.
+	 *
+	 * @return The entry's database.
+	 */
+	IConfig getConfig();
+	
+	/**
+	 * Gets the entry value as a specific type
+	 * @param type The type of value to return.
+	 * @param <T> The type
+	 * @return The value of the entry as the specified type.
+	 */
 	default <T> T getAs(Class<T> type) {
 		return ((T)getValue());
 	}
@@ -59,6 +86,24 @@ public interface IEntry {
 	}
 	
 	/**
+	 * Checks if the value of this entry is a list.
+	 * @return True if its a list.
+	 */
+	default boolean isList() {
+		return getValue() instanceof List;
+	}
+	
+	/**
+	 * Checks if the value of this entry is a specific type
+	 * @param type The class of this type
+	 * @param <T> The type comparing the object to.
+	 * @return True if the type of the object matches the Type
+	 */
+	default <T> boolean isType(Class<T> type) {
+		return type.isInstance(getValue());
+	}
+	
+	/**
 	 * Gets a string list from an entry.
 	 * @return The String list.
 	 */
@@ -67,26 +112,16 @@ public interface IEntry {
 	}
 	
 	/**
-	 * Gets the path of this entry.
-	 *
-	 * @return The path in the config.
-	 */
-	String getPath();
-	
-	/**
-	 * Gets the value of this entry.
-	 *
-	 * @return The value of this entry.
-	 */
-	Object getValue();
-	
-	/**
 	 * Sets the path of this entry.
 	 *
 	 * @param newpath
 	 *            The new path this entry will have.
 	 */
-	IEntry setPath(String newpath);
+	default IEntry setPath(String newpath) {
+		remove();
+		getConfig().setEntry(newpath, getValue());
+		return this;
+	}
 	
 	/**
 	 * Sets the value of this entry.
@@ -94,24 +129,25 @@ public interface IEntry {
 	 * @param value
 	 *            The new value of this entry.
 	 */
-	IEntry setValue(Object value);
-	
-	/**
-	 * Gets the database this entry is held in.
-	 *
-	 * @return The entry's database.
-	 */
-	IConfig getConfig();
+	default IEntry setValue(Object value) {
+		getConfig().setEntry(getPath(), value);
+		return this;
+	}
 	
 	/**
 	 * Gets the name of this entry.
 	 * @return The entry name.
 	 */
-	String getName();
+	default String getName() {
+		if (getPath().contains(".")) return getPath().substring(getPath().lastIndexOf(".") + 1);
+		else return getPath();
+	}
 	
 	/**
 	 * Removes the entry.
 	 */
-	void remove();
+	default void remove() {
+		getConfig().setEntry(getPath(), null);
+	}
 	
 }
