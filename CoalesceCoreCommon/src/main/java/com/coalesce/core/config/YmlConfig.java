@@ -17,46 +17,44 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class YmlConfig extends BaseConfig {
 	
 	private final Collection<IEntry> entries;
-	private final Representer representer;
-	private final DumperOptions options;
 	private final Map<String, Object> mappedFile;
-	private final File path, file;
+	private final File file;
 	private final Yaml yaml;
 	
+	@SuppressWarnings({"ResultOfMethodCallIgnored", "unchecked"})
 	public YmlConfig(String name, ICoPlugin plugin) {
 		super(name, plugin);
 		this.entries = new HashSet<>();
 		this.mappedFile = new HashMap<>();
-		this.representer = new Representer();
-		this.options = new DumperOptions();
+		Representer representer = new Representer();
+		DumperOptions options = new DumperOptions();
 		
 		options.setIndent(2);
 		options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
 		representer.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
 		
+		File path;
 		if (!name.contains(File.separator)) {
-			this.path = plugin.getPluginFolder();
+			path = plugin.getPluginFolder();
 			this.file = new File(path.getAbsolutePath() + File.separator + name + ".yml");
 		} else {
 			int last = name.lastIndexOf(File.separator);
 			String fileName = name.substring(last + 1);
 			String directory = name.substring(0, last);
-			this.path = new File(plugin.getPluginFolder().getAbsolutePath() + File.separator + directory);
-			this.file = new File(this.path + File.separator + fileName + ".yml");
+			path = new File(plugin.getPluginFolder().getAbsolutePath() + File.separator + directory);
+			this.file = new File(path + File.separator + fileName + ".yml");
 		}
 		
-		if (!path.exists()) {
+		if (! path.exists()) {
 			path.mkdirs();
 			try {
 				file.createNewFile();
@@ -101,42 +99,12 @@ public class YmlConfig extends BaseConfig {
 				entries.add(new Entry(this, k, v));
 			}
 		});
-		
 	}
 	
-	//read the yml object from the file
-	//Once read, save the object in a map.
-	//Format:
-	/*
-	test: //Map
-	  test2:  //Map
-	    butt: hi //String
-	    bum: hello //String at this point::: Map<String, Map<String, Map<String, Object>>>
-	  test3: //Map
-	    foot: bye //String
-	    feet: mop //String
-	    bork: //Map
-	      yes: no //String
-	      no: yes //String
-    testB: //Map
-      testB2: //Map
-        butt: hi //String
-	    bum: hello //String
-	  testB3: //Map
-	    foot: bye //String
-	    feet: mop //String
-	 */
-	//Map<String, Object>
-	//First string would be a base value everything inherits
-	//Iterate through the first bottom level map values. if the value is a map then loop through that and so on until the value isnt a map
-	
-	private void collectKeys(Map<String, Object> input, String key) {
-		input.forEach((k,v) -> {
-			if (v instanceof Map) {
-				if (key != null) collectKeys((Map)v, key + "." + k);
-				else collectKeys((Map)v, k);
-			} else keyMap.put(key + "." + k, v);
-		});
+	@Override
+	public Set<String> getKeys(boolean deep) {
+		if (deep) return keyMap.keySet();
+		else return mappedFile.keySet();
 	}
 	
 	@Override
@@ -179,28 +147,47 @@ public class YmlConfig extends BaseConfig {
 		return file;
 	}
 	
-	private void setVal(String key, Object value, Map<String, Object> map, boolean isSet) {
-		String current = key.substring(key.contains(".") ? key.lastIndexOf(".") : 0);
-		Map<String, Object> temp = new HashMap<>();
+	@SuppressWarnings("unchecked")
+	private void collectKeys(Map<String, Object> input, String key) {
+		input.forEach((k,v) -> {
+			if (v instanceof Map) {
+				if (key != null) collectKeys((Map<String, Object>)v, key + "." + k);
+				else collectKeys((Map<String, Object>)v, k);
+			} else keyMap.put(key + "." + k, v);
+		});
+	}
+	
+	@SuppressWarnings("unchecked")
+	private void composeMap(String key, Object value, Map<String, Object> map, boolean isSet) {
+		String current = key.substring(key.contains(".") ? key.lastIndexOf(".") + 1 : 0);
+		Map<String, Object> temp;
+		Object previousMap = get(key.substring(0, key.contains(".") ? key.lastIndexOf(".") : key.length()), mappedFile);
+		
+		if (previousMap instanceof Map && !((Map<String, Object>)previousMap).isEmpty()) {
+			temp = (Map<String, Object>)previousMap;
+		} else temp = new HashMap<>();
+		
 		if (!isSet) {
 			if (key.contains(".")) {
 				temp.put(current, value);
-				setVal(key.substring(0, key.lastIndexOf(".")), value, temp, true);
+				composeMap(key.substring(0, key.lastIndexOf(".")), value, temp, true);
 			} else mappedFile.put(current, value);
 		} else {
 			if (key.contains(".")) {
 				temp.put(current, map);
-				setVal(key.substring(0, key.lastIndexOf(".")), value, temp, true);
+				composeMap(key.substring(0, key.lastIndexOf(".")), value, temp, true);
 			} else mappedFile.put(current, map);
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
 	private Object get(String key, Map<String, Object> map) {
-		String current = key.substring(0, key.indexOf("."));
-		Object object = map.get(current);
-		if (object instanceof Map) {
-			return get(key.substring(key.indexOf(".")), (Map<String, Object>) object);
-		} else return object;
+		String current = key.substring(0, key.contains(".") ? key.indexOf(".") : key.length());
+		if (map.get(current) == null) {
+			return null;
+		}
+		if (key.contains(".")) return get(key.substring(key.indexOf(".") + 1), (Map<String, Object>)map.get(current));
+		else return map.get(current);
 	}
 	
 	private void setValue(String path, Object val) {
@@ -208,7 +195,7 @@ public class YmlConfig extends BaseConfig {
 			keyMap.remove(path);
 		}
 		else keyMap.put(path, val);
-		setVal(path, val, null, false);
+		composeMap(path, val, null, false);
 		try {
 			save();
 		}
@@ -217,6 +204,7 @@ public class YmlConfig extends BaseConfig {
 		}
 	}
 	
+	@SuppressWarnings("ResultOfMethodCallIgnored")
 	private void save() throws IOException {
 		if (!getDirectory().exists()) {
 			getDirectory().mkdirs();
@@ -224,9 +212,7 @@ public class YmlConfig extends BaseConfig {
 		if (!getFile().exists()) {
 			getFile().createNewFile();
 		}
-	
 		Writer fileWriter = new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8);
-		System.out.println(mappedFile.toString());
 		yaml.dump(mappedFile, fileWriter);
 	}
 	

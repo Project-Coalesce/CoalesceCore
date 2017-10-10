@@ -19,18 +19,6 @@ public abstract class BaseConfig implements IConfig {
 	}
 	
 	@Override
-	public Set<String> getKeys(boolean deep) {
-		if (deep) {
-			//Return the key set.
-			return keyMap.keySet();
-		}
-		else {
-			//
-			return getSection("").getKeys(false);
-		}
-	}
-	
-	@Override
 	public ICoPlugin getPlugin() {
 		return plugin;
 	}
