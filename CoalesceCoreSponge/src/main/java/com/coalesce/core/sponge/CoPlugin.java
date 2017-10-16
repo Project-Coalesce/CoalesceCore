@@ -4,6 +4,7 @@ import com.coalesce.core.Color;
 import com.coalesce.core.Platform;
 import com.coalesce.core.chat.CoFormatter;
 import com.coalesce.core.command.base.CommandStore;
+import com.coalesce.core.config.ConfigManager;
 import com.coalesce.core.plugin.CoLogger;
 import com.coalesce.core.plugin.ICoModule;
 import com.coalesce.core.plugin.ICoPlugin;
@@ -14,27 +15,29 @@ import org.spongepowered.api.event.game.state.GameInitializationEvent;
 import org.spongepowered.api.event.game.state.GameStartingServerEvent;
 import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
 
+import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
 public abstract class CoPlugin implements ICoPlugin {
 	
-	private CommandStoreSponge commandStore;
-	private String displayName;
-	private CoFormatter formatter;
 	private final SessionStore sessionStore = new SessionStore();
 	private final List<ICoModule> modules = new LinkedList<>();
-	private CoLogger logger;
+	private CommandStoreSponge commandStore;
 	private Color pluginColor = Color.WHITE;
+	private ConfigManager configManager;
+	private CoFormatter formatter;
+	private String displayName;
+	private CoLogger logger;
 	
 	@Listener
 	public final void onEnable(GameStartingServerEvent e) {
 		displayName = Sponge.getPluginManager().fromInstance(this).get().getName();
 		logger = new CoLogger(this);
 		formatter = new CoFormatter(this);
+		configManager = new ConfigManager(this);
 		commandStore = new CommandStoreSponge(this);
 		CoreSponge.addSessionStore(this, sessionStore);
-		
 		try {
 			onPluginEnable();
 		}
@@ -176,5 +179,22 @@ public abstract class CoPlugin implements ICoPlugin {
 	@Override
 	public CommandStore getCommandStore() {
 		return commandStore;
+	}
+	
+	//
+	//
+	
+	@Override
+	public File getPluginFolder() {
+		return Sponge.getConfigManager().getPluginConfig(this).getDirectory().toFile();
+	}
+	
+	//
+	//
+	
+	
+	@Override
+	public ConfigManager getConfigManager() {
+		return configManager;
 	}
 }

@@ -9,15 +9,13 @@ public final class Entry implements IEntry {
 	private Object value;
 	private final IConfig config;
 	
-	public
-	Entry(IConfig config, String key) {
+	public Entry(IConfig config, String key) {
 		this.value = config.getValue(key);
 		this.config = config;
 		this.key = key;
 	}
 	
-	public
-	Entry(IConfig config, String key, Object value) {
+	public Entry(IConfig config, String key, Object value) {
 		this.config = config;
 		this.value = value;
 		this.key = key;

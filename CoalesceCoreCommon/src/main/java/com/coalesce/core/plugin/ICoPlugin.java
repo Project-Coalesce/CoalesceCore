@@ -4,6 +4,8 @@ import com.coalesce.core.Color;
 import com.coalesce.core.Platform;
 import com.coalesce.core.chat.CoFormatter;
 import com.coalesce.core.command.base.CommandStore;
+import com.coalesce.core.config.ConfigManager;
+import com.coalesce.core.config.base.IConfig;
 import com.coalesce.core.session.SessionStore;
 
 import java.io.File;
@@ -152,5 +154,11 @@ public interface ICoPlugin {
 	 * @return plugins folder for bukkit, mods folder for sponge.
 	 */
 	File getPluginFolder();
+	
+	/**
+	 * Gets the plugins configuration manager.
+	 * @return The plugins config manager.
+	 */
+	ConfigManager getConfigManager();
 	
 }

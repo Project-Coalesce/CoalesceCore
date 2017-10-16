@@ -29,13 +29,6 @@ public interface IConfig {
 	Set<String> getKeys(boolean deep);
 	
 	/**
-	 * Gets a value from a config entry.
-	 * @param path The path in the configuration.
-	 * @return An object from the specified path.
-	 */
-	Object getValue(String path);
-	
-	/**
 	 * Gets all the entries in a config.
 	 * @return A collection of entries in a config.
 	 */
@@ -70,6 +63,48 @@ public interface IConfig {
 	 * @return The file of this config.
 	 */
 	File getFile();
+	
+	/**
+	 * If the configuration is saved in the plugins configuration map.
+	 * @return True if in map, false otherwise.
+	 */
+	boolean isInMemory();
+	
+	/**
+	 * Loads the configuration into the plugins configuration map.
+	 */
+	void loadToMemory();
+	
+	/**
+	 * Unloads the configuration from the plugins configuration map.
+	 */
+	void unloadFromMemory();
+	
+	/**
+	 * Gets a value from a config entry.
+	 * @param path The path in the configuration.
+	 * @return An object from the specified path.
+	 */
+	default Object getValue(String path) {
+		if (contains(path, true)) return getEntry(path).getValue();
+		else return null;
+	}
+	
+	/**
+	 * Checks if this configuration contains a specified path
+	 * @param path The path to look for
+	 * @param exact Whether the path to look for needs to be an entry or if it just needs to exist.
+	 * @return True if the path exists.
+	 */
+	default boolean contains(String path, boolean exact) {
+		if (exact) return getEntry(path) == null;
+		else {
+			for (IEntry entry : getEntries()) {
+				if (entry.getPath().startsWith(path)) return true;
+			}
+		}
+		return false;
+	}
 	
 	/**
 	 * Gets a section of the configuration
@@ -215,14 +250,22 @@ public interface IConfig {
 		DateFormat format = new SimpleDateFormat("yyyy.dd.MM-hh.mm.ss");
 		File file = new File(getDirectory() + File.separator + "backups");
 		File bckp = new File(file + File.separator + getName() + format.format(new Date()) + ".yml");
-		if (!getDirectory().exists() || bckp.exists() || !getFile().exists()) {
-			return;
-		}
 		if (!file.exists()) {
 			file.mkdir();
 		}
+		backup(bckp);
+	}
+	
+	/**
+	 * Backs up the configuration
+	 * @param file The file to back the configuration up to.
+	 */
+	default void backup(File file) {
+		if (!getDirectory().exists() || file.exists() || !getFile().exists()) {
+			return;
+		}
 		try {
-			Files.copy(getFile().toPath(), bckp.toPath());
+			Files.copy(getFile().toPath(), file.toPath());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
