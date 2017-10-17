@@ -10,4 +10,8 @@ public final class CoreConfig extends YmlConfig {
 		addEntry("debug", false);
 		addEntry("logprocess", true);
 	}
+	
+	public boolean isDebugEnabled() {
+		return getBoolean("debug");
+	}
 }

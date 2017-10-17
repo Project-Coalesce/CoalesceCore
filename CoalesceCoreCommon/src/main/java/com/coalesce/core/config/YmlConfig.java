@@ -14,6 +14,7 @@ public class YmlConfig extends BaseConfig {
 	private final YamlConfiguration config;
 	private final File file;
 	
+	@SuppressWarnings("ResultOfMethodCallIgnored")
 	public YmlConfig(String name, ICoPlugin plugin) {
 		super(name, plugin);
 		

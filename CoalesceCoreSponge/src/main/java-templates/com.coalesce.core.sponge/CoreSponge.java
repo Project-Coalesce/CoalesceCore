@@ -1,5 +1,9 @@
 package com.coalesce.core.sponge;
 
+import com.coalesce.core.Color;
+import com.coalesce.core.CoreConfig;
+import com.coalesce.core.command.TestCommand;
+import com.coalesce.core.config.YmlConfig;
 import com.coalesce.core.plugin.ICoPlugin;
 import com.coalesce.core.session.SessionStore;
 import org.spongepowered.api.plugin.Plugin;
@@ -22,7 +26,10 @@ public class CoreSponge extends CoPlugin {
 	
 	@Override
 	public void onPluginEnable() throws Exception {
-
+		setDisplayName("CoalesceCore");
+		setPluginColor(Color.YELLOW);
+		getCommandStore().registerCommand(new TestCommand());
+		getConfigManager().loadStaticConfig(new CoreConfig(this)); //This will loop. When you create the new config, its going to try to call this method again which will create useless instances of the same class.
 	}
 	
 	@Override
