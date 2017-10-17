@@ -8,8 +8,8 @@ import java.util.HashSet;
 public abstract class BaseConfig implements IConfig {
 	
 	private final String name;
+	private boolean memoryLoaded;
 	private final ICoPlugin plugin;
-	private final boolean memoryLoaded;
 	protected final Collection<IEntry> entries;
 	
 	/**
@@ -35,7 +35,7 @@ public abstract class BaseConfig implements IConfig {
 		this.plugin = plugin;
 		this.name = name;
 		
-		if (loadToConfigMap) loadToMemory();
+		if (loadToConfigMap) plugin.getConfigManager().loadConfig(this);
 	}
 	
 	@Override
@@ -60,11 +60,17 @@ public abstract class BaseConfig implements IConfig {
 	
 	@Override
 	public void loadToMemory() {
-		plugin.getConfigManager().loadConfig(this);
+		if (!isInMemory()) {
+			memoryLoaded = true;
+			plugin.getConfigManager().loadConfig(this);
+		} else throw new RuntimeException("Cannot load a configuration that is already loaded.");
 	}
 	
 	@Override
 	public void unloadFromMemory() {
-		plugin.getConfigManager().unloadConfig(this);
+		if (isInMemory()) {
+			memoryLoaded = false;
+			plugin.getConfigManager().unloadConfig(this);
+		} else throw new RuntimeException("Cannot unload a configuration that hasn't been loaded.");
 	}
 }
