@@ -32,7 +32,13 @@ public interface IEntry {
 	 * @param <T> The type
 	 * @return The value of the entry as the specified type.
 	 */
+	@SuppressWarnings("unchecked")
 	default <T> T getAs(Class<T> type) {
+		if (type.equals(Long.class)) return (T)Long.valueOf(getValue().toString());
+		if (type.equals(Byte.class)) return (T)Byte.valueOf(getValue().toString());
+		if (type.equals(Short.class)) return (T)Short.valueOf(getValue().toString());
+		if (type.equals(Double.class)) return (T)Double.valueOf(getValue().toString());
+		if (type.equals(Integer.class)) return (T)Integer.valueOf(getValue().toString());
 		return ((T)getValue());
 	}
 	
