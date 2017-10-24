@@ -37,11 +37,12 @@ public abstract class CoModule implements ICoModule {
 		
 		try {
 			onEnable();
+			isEnabled = true;
+			onPostEnable();
 		}
 		catch (Exception e) {
 			e.printStackTrace();
 		}
-		isEnabled = true;
 	}
 	
 	public void disable() {
@@ -49,12 +50,19 @@ public abstract class CoModule implements ICoModule {
 		
 		try {
 			onDisable();
+			isEnabled = false;
+			onPostDisable();
 		}
 		catch (Exception e) {
 			e.printStackTrace();
 		}
-		isEnabled = false;
 	}
+	
+	@Override
+	public void onPostEnable() throws Exception {}
+	
+	@Override
+	public void onPostDisable() throws Exception {}
 	
 	public abstract void onEnable() throws Exception;
 	

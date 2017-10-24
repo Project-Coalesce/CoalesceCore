@@ -1,5 +1,7 @@
 package com.coalesce.core.plugin;
 
+import java.util.concurrent.Executors;
+
 public interface ICoModule {
 	
 	/**
@@ -29,6 +31,18 @@ public interface ICoModule {
 	 * Disables the module
 	 */
 	void disable();
+	
+	/**
+	 * Executed after the onEnable method.
+	 * <p>The onEnable method will show the module as not being enabled when {@link #isEnabled()} is called. At this stage, the {@link #isEnabled()} method will be true</p>
+	 */
+	void onPostEnable() throws Exception;
+	
+	/**
+	 * Executed after the onDisable method.
+	 * <p>The onDisable method will show the module as still being enabled when {@link #isEnabled()} is called. At this stage, the {@link #isEnabled()} method will return false.</p>
+	 */
+	void onPostDisable() throws Exception;
 	
 	/**
 	 * Method called when a module is enabled
