@@ -9,15 +9,21 @@ import com.coalesce.core.plugin.CoLogger;
 import com.coalesce.core.plugin.ICoModule;
 import com.coalesce.core.plugin.ICoPlugin;
 import com.coalesce.core.session.SessionStore;
+import com.coalesce.core.update.InstallUpdateThread;
+import com.coalesce.core.update.UpdateCheck;
+import jline.console.ConsoleReader;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
 import org.spongepowered.api.event.game.state.GameStartingServerEvent;
 import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
+import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.scheduler.Task;
 
 import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public abstract class CoPlugin implements ICoPlugin {
 	
@@ -25,18 +31,24 @@ public abstract class CoPlugin implements ICoPlugin {
 	private final List<ICoModule> modules = new LinkedList<>();
 	private CommandStoreSponge commandStore;
 	private Color pluginColor = Color.WHITE;
+	private PluginContainer pluginContainer;
+	private boolean updateNeeded = false;
 	private ConfigManager configManager;
 	private CoFormatter formatter;
 	private String displayName;
 	private CoLogger logger;
+	private File updateFile;
 	
 	@Listener
+	@SuppressWarnings("unused")
 	public final void onEnable(GameStartingServerEvent e) {
-		displayName = Sponge.getPluginManager().fromInstance(this).get().getName();
+		pluginContainer = Sponge.getPluginManager().fromInstance(this).get();
+		displayName = pluginContainer.getName();
 		logger = new CoLogger(this);
 		formatter = new CoFormatter(this);
 		configManager = new ConfigManager(this);
 		commandStore = new CommandStoreSponge(this);
+		CoreSponge.addCoPlugin(getRealName(), this);
 		CoreSponge.addSessionStore(this, sessionStore);
 		try {
 			onPluginEnable();
@@ -47,6 +59,8 @@ public abstract class CoPlugin implements ICoPlugin {
 		commandStore.registerObjects();
 	}
 	
+	@Listener
+	@SuppressWarnings("unused")
 	public final void onDisable(GameStoppingServerEvent e) {
 		try {
 			onPluginDisable();
@@ -54,8 +68,12 @@ public abstract class CoPlugin implements ICoPlugin {
 		catch (Exception e1) {
 			e1.printStackTrace();
 		}
+		if (updateNeeded) {
+			new InstallUpdateThread(updateFile, getPluginJar());
+		}
 	}
-	
+	@Listener
+	@SuppressWarnings("unused")
 	public final void onLoad(GameInitializationEvent e) {
 		try {
 			onPluginLoad();
@@ -83,6 +101,17 @@ public abstract class CoPlugin implements ICoPlugin {
 	public String getDisplayName() {
 		return displayName;
 	}
+	
+	//
+	//
+	
+	@Override
+	public String getRealName() {
+		return pluginContainer.getName();
+	}
+	
+	//
+	//
 	
 	@Override
 	public void setDisplayName(String displayName) {
@@ -196,5 +225,62 @@ public abstract class CoPlugin implements ICoPlugin {
 	@Override
 	public ConfigManager getConfigManager() {
 		return configManager;
+	}
+	
+	//
+	//
+	
+	@Override
+	public Map<String, ICoPlugin> getCoPlugins() {
+		return CoreSponge.getPlugins();
+	}
+	
+	//
+	//
+	
+	@Override
+	public void updateCheck(String repositoryOwner, String repositoryName, boolean autoUpdate) {
+		Task.builder().async().execute(new UpdateCheck(this, new UpdateLogger(this), repositoryOwner, repositoryName, autoUpdate)).submit(this);
+	}
+	
+	//
+	//
+	
+	@Override
+	public String getVersion() {
+		return pluginContainer.getVersion().get();
+	}
+	
+	//
+	//
+	
+	@Override
+	public void setUpdateFile(File file) {
+		this.updateFile = file;
+	}
+	
+	//
+	//
+	
+	@Override
+	public void setUpdateNeeded(boolean value) {
+		this.updateNeeded = value;
+	}
+	
+	
+	//
+	//
+	
+	@Override
+	public ConsoleReader getConsoleReader() {
+		return CoreSponge.getReader();
+	}
+	
+	//
+	//
+	
+	@Override
+	public File getPluginJar() {
+		return pluginContainer.getSource().get().toFile();
 	}
 }

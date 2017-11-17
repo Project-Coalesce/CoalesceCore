@@ -1,40 +1,92 @@
 package com.coalesce.core;
 
+import org.fusesource.jansi.Ansi;
+
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
 
 public enum Color {
 	
-	BLACK('0'),
-	DARK_BLUE('1'),
-	DARK_GREEN('2'),
-	AQUA('3'),
-	DARK_RED('4'),
-	PURPLE('5'),
-	GOLD('6'),
-	SILVER('7'),
-	GRAY('8'),
-	BLUE('9'),
-	GREEN('a'),
-	LIGHT_BLUE('b'),
-	RED('c'),
-	MAGENTA('d'),
-	YELLOW('e'),
-	WHITE('f'),
-	MAGIC('k'),
-	BOLD('l'),
-	STRIKE('m'),
-	UNDERLINE('n'),
-	ITALICS('o'),
-	RESET('r');
+	/**
+	 * <div style="border:1px solid black;width:40px;height:20px;background-color:#000000;float:right;margin: 0 10px 0 0"></div>
+	 */
+	BLACK('0', Ansi.ansi().a(Ansi.Attribute.RESET).fg(Ansi.Color.BLACK).toString()),
+	/**
+	 *  <div style="border:1px solid black;width:40px;height:20px;background-color:#0000AA;float:right;margin: 0 10px 0 0"></div>
+	 */
+	DARK_BLUE('1', Ansi.ansi().a(Ansi.Attribute.RESET).fg(Ansi.Color.BLUE).toString()),
+	/**
+	 * <div style="border:1px solid black;width:40px;height:20px;background-color:#00AA00;float:right;margin: 0 10px 0 0"></div>
+	 */
+	DARK_GREEN('2', Ansi.ansi().a(Ansi.Attribute.RESET).fg(Ansi.Color.GREEN).toString()),
+	/**
+	 * <div style="border:1px solid black;width:40px;height:20px;background-color:#00AAAA;float:right;margin: 0 10px 0 0"></div>
+	 */
+	AQUA('3', Ansi.ansi().a(Ansi.Attribute.RESET).fg(Ansi.Color.CYAN).toString()),
+	/**
+	 * <div style="border:1px solid black;width:40px;height:20px;background-color:#AA0000;float:right;margin: 0 10px 0 0"></div>
+	 */
+	DARK_RED('4', Ansi.ansi().a(Ansi.Attribute.RESET).fg(Ansi.Color.RED).toString()),
+	/**
+	 * <div style="border:1px solid black;width:40px;height:20px;background-color:#AA00AA;float:right;margin: 0 10px 0 0"></div>
+	 */
+	PURPLE('5', Ansi.ansi().a(Ansi.Attribute.RESET).fg(Ansi.Color.MAGENTA).toString()),
+	/**
+	 * <div style="border:1px solid black;width:40px;height:20px;background-color:#FFAA00;float:right;margin: 0 10px 0 0"></div>
+	 */
+	GOLD('6', Ansi.ansi().a(Ansi.Attribute.RESET).fg(Ansi.Color.YELLOW).toString()),
+	/**
+	 * <div style="border:1px solid black;width:40px;height:20px;background-color:#AAAAAA;float:right;margin: 0 10px 0 0"></div>
+	 */
+	SILVER('7', Ansi.ansi().a(Ansi.Attribute.RESET).fg(Ansi.Color.WHITE).toString()),
+	/**
+	 * <div style="border:1px solid black;width:40px;height:20px;background-color:#555555;float:right;margin: 0 10px 0 0"></div>
+	 */
+	GRAY('8', Ansi.ansi().a(Ansi.Attribute.RESET).fg(Ansi.Color.BLACK).bold().toString()),
+	/**
+	 * <div style="border:1px solid black;width:40px;height:20px;background-color:#5555FF;float:right;margin: 0 10px 0 0"></div>
+	 */
+	BLUE('9', Ansi.ansi().a(Ansi.Attribute.RESET).fg(Ansi.Color.BLUE).bold().toString()),
+	/**
+	 * <div style="border:1px solid black;width:40px;height:20px;background-color:#55FF55;float:right;margin: 0 10px 0 0"></div>
+	 */
+	GREEN('a', Ansi.ansi().a(Ansi.Attribute.RESET).fg(Ansi.Color.GREEN).bold().toString()),
+	/**
+	 * <div style="border:1px solid black;width:40px;height:20px;background-color:#55FFFF;float:right;margin: 0 10px 0 0"></div>
+	 */
+	LIGHT_BLUE('b', Ansi.ansi().a(Ansi.Attribute.RESET).fg(Ansi.Color.CYAN).bold().toString()),
+	/**
+	 * <div style="border:1px solid black;width:40px;height:20px;background-color:#FF5555;float:right;margin: 0 10px 0 0"></div>
+	 */
+	RED('c', Ansi.ansi().a(Ansi.Attribute.RESET).fg(Ansi.Color.RED).bold().toString()),
+	/**
+	 * <div style="border:1px solid black;width:40px;height:20px;background-color:#FF55FF;float:right;margin: 0 10px 0 0"></div>
+	 */
+	MAGENTA('d', Ansi.ansi().a(Ansi.Attribute.RESET).fg(Ansi.Color.MAGENTA).bold().toString()),
+	/**
+	 * <div style="border:1px solid black;width:40px;height:20px;background-color:#FFFF55;float:right;margin: 0 10px 0 0"></div>
+	 */
+	YELLOW('e', Ansi.ansi().a(Ansi.Attribute.RESET).fg(Ansi.Color.YELLOW).bold().toString()),
+	/**
+	 * <div style="border:1px solid black;width:40px;height:20px;background-color:#FFFFFF;float:right;margin: 0 10px 0 0"></div>
+	 */
+	WHITE('f', Ansi.ansi().a(Ansi.Attribute.RESET).fg(Ansi.Color.WHITE).bold().toString()),
+	MAGIC('k', Ansi.ansi().a(Ansi.Attribute.BLINK_SLOW).toString()),
+	BOLD('l', Ansi.ansi().a(Ansi.Attribute.UNDERLINE_DOUBLE).toString()),
+	STRIKE('m', Ansi.ansi().a(Ansi.Attribute.STRIKETHROUGH_ON).toString()),
+	UNDERLINE('n', Ansi.ansi().a(Ansi.Attribute.UNDERLINE).toString()),
+	ITALICS('o', Ansi.ansi().a(Ansi.Attribute.ITALIC).toString()),
+	RESET('r', Ansi.ansi().a(Ansi.Attribute.RESET).toString());
 	
 	private char code;
+	private String ansi;
 	public static final char CHAR = '\u00A7';
 	private static final Pattern STRIP_COLOR_PATTERN = Pattern.compile("(?i)" + String.valueOf(CHAR) + "[0-9A-FK-OR]"); //Bukkit
 	
-	Color(char code) {
+	Color(char code, String ansi) {
 		this.code = code;
+		this.ansi = ansi;
 	}
 	
 	@Override
@@ -42,15 +94,27 @@ public enum Color {
 		return new String(new char[] {CHAR, code});
 	}
 	
+	/**
+	 * Gets the char code this color code uses
+	 * @return The color code
+	 */
 	public char getCode() {
 		return this.code;
 	}
 	
 	/**
+	 * Gets the ansi equivalent of this color
+	 * @return The ansi color
+	 */
+	public String getAnsi() {
+		return ansi;
+	}
+	
+	/**
 	 *
 	 * @param prefix The prefix of the color codes indicating a color code
-	 * @param message
-	 * @return
+	 * @param message The message to be translated
+	 * @return The translated message.
 	 */
 	public static String translate(char prefix, String message) {
 		//From Bukkit
@@ -103,7 +167,7 @@ public enum Color {
 	}
 	
 	/**
-	 * Strips a string of all color codes
+	 * Strips a string of all color codes //From Bukkit
 	 *
 	 * @param input Input String
 	 * @return The input without color codes.
@@ -113,6 +177,14 @@ public enum Color {
 			return null;
 		}
 		return STRIP_COLOR_PATTERN.matcher(input).replaceAll("");
+	}
+	
+	public static String toConsoleColor(char prefix, String input) {
+		String translated = translate(prefix, input);
+		for (Color color : values()) {
+			translated = translated.replace(color.toString(), color.getAnsi());
+		}
+		return translated;
 	}
 
 }

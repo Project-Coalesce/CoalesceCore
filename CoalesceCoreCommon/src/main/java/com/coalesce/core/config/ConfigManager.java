@@ -6,6 +6,7 @@ import com.coalesce.core.plugin.ICoPlugin;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,6 +18,22 @@ public class ConfigManager {
 	public ConfigManager(ICoPlugin plugin) {
 		this.configMap = new HashMap<>();
 		this.plugin = plugin;
+	}
+	
+	/**
+	 * A map of all the configurations in this plugin.
+	 * @return A map of all the plugin configurations.
+	 */
+	public Map<String, IConfig> getConfigMap() {
+		return configMap;
+	}
+	
+	/**
+	 * Gets a collection of all the plugin configurations.
+	 * @return The plugin config
+	 */
+	public Collection<IConfig> getConfigurations() {
+		return configMap.values();
 	}
 	
 	/**

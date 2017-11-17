@@ -1,5 +1,6 @@
 package com.coalesce.core.bukkit;
 
+import com.coalesce.core.Color;
 import com.coalesce.core.command.base.CommandInfo;
 import com.coalesce.core.command.base.CommandStore;
 import com.coalesce.core.plugin.ICoPlugin;
@@ -34,7 +35,7 @@ public final class CommandStoreBukkit extends CommandStore {
 			throw new RuntimeException("Bukkit CommandMap could not be found");
 		}
 		if (!isRegistered(info.getName())) {
-			bukkitCommandMap.register(plugin.getDisplayName(), new CommandRegister(info, plugin));
+			bukkitCommandMap.register(Color.stripColor(plugin.getDisplayName()), new CommandRegister(info, plugin));
 		}
 	}
 	

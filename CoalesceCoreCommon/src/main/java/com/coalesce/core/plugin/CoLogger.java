@@ -1,13 +1,23 @@
 package com.coalesce.core.plugin;
 
+import jline.Terminal;
+import org.fusesource.jansi.Ansi;
+
 import static com.coalesce.core.Color.*;
 
 public final class CoLogger {
 	
-	private ICoPlugin plugin;
+	private static Terminal terminal = null;
+	private final ICoPlugin plugin;
 	
 	public CoLogger(ICoPlugin plugin) {
 		this.plugin = plugin;
+		try {
+			terminal = plugin.getConsoleReader().getTerminal();
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	/**
@@ -64,7 +74,10 @@ public final class CoLogger {
 		}
 		
 		public void log(ICoPlugin plugin, String message) {
-			System.out.print(String.format(prefix, plugin.getDisplayName()) + ' ' + message);
+			if (terminal.isAnsiSupported()) {
+				System.out.println(toConsoleColor(CHAR, String.format(prefix, plugin.getDisplayName()) + ' ' + message) + Ansi.ansi().a(Ansi.Attribute.RESET));
+			}
+			else System.out.print(String.format(prefix, plugin.getDisplayName()) + ' ' + message);
 		}
 	}
 	

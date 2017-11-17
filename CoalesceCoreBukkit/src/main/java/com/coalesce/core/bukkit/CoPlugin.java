@@ -9,6 +9,9 @@ import com.coalesce.core.plugin.CoLogger;
 import com.coalesce.core.plugin.ICoModule;
 import com.coalesce.core.plugin.ICoPlugin;
 import com.coalesce.core.session.SessionStore;
+import com.coalesce.core.update.InstallUpdateThread;
+import com.coalesce.core.update.UpdateCheck;
+import jline.console.ConsoleReader;
 import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
@@ -17,6 +20,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public abstract class CoPlugin extends JavaPlugin implements ICoPlugin, Listener {
 	
@@ -24,10 +28,12 @@ public abstract class CoPlugin extends JavaPlugin implements ICoPlugin, Listener
 	private final List<ICoModule> modules = new LinkedList<>();
 	private CommandStoreBukkit commandStore;
 	private Color pluginColor = Color.WHITE;
+	private boolean updateNeeded = false;
 	private ConfigManager configManager;
 	private CoFormatter formatter;
 	private String displayName;
 	private CoLogger logger;
+	private File updateFile;
 	
 	@Override
 	public final void onEnable() {
@@ -36,6 +42,7 @@ public abstract class CoPlugin extends JavaPlugin implements ICoPlugin, Listener
 		formatter = new CoFormatter(this);
 		configManager = new ConfigManager(this);
 		commandStore = new CommandStoreBukkit(this);
+		CoreBukkit.addCoPlugin(getRealName(), this);
 		CoreBukkit.addSessionStore(this, sessionStore);
 		
 		try {
@@ -54,6 +61,11 @@ public abstract class CoPlugin extends JavaPlugin implements ICoPlugin, Listener
 		}
 		catch (Exception e) {
 			e.printStackTrace();
+		}
+		disableModules();
+		
+		if (updateNeeded) {
+			new InstallUpdateThread(updateFile, getFile()).start();
 		}
 	}
 	
@@ -84,6 +96,14 @@ public abstract class CoPlugin extends JavaPlugin implements ICoPlugin, Listener
 	@Override
 	public String getDisplayName() {
 		return displayName;
+	}
+	
+	//
+	//
+	
+	@Override
+	public String getRealName() {
+		return getName();
 	}
 	
 	//
@@ -199,5 +219,63 @@ public abstract class CoPlugin extends JavaPlugin implements ICoPlugin, Listener
 	@Override
 	public ConfigManager getConfigManager() {
 		return configManager;
+	}
+	
+	//
+	//
+	
+	@Override
+	public Map<String, ICoPlugin> getCoPlugins() {
+		return CoreBukkit.getPlugins();
+	}
+	
+	//
+	//
+	
+	@Override
+	public String getVersion() {
+		return getDescription().getVersion();
+	}
+	
+	//
+	//
+	
+	
+	@Override
+	public void updateCheck(String repositoryOwner, String repositoryName, boolean autoUpdate) {
+		Bukkit.getScheduler().runTaskAsynchronously(this, new UpdateCheck(this, new UpdateLogger(this), repositoryOwner, repositoryName, autoUpdate));
+	}
+	
+	//
+	//
+	
+	@Override
+	public void setUpdateFile(File file) {
+		this.updateFile = file;
+	}
+	
+	//
+	//
+	
+	@Override
+	public void setUpdateNeeded(boolean value) {
+		this.updateNeeded = value;
+	}
+	
+	//
+	//
+	
+	@Override
+	public ConsoleReader getConsoleReader() {
+		return CoreBukkit.getReader();
+	}
+	
+	//
+	//
+	
+	
+	@Override
+	public File getPluginJar() {
+		return getFile();
 	}
 }

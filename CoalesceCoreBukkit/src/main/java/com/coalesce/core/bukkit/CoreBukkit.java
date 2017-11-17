@@ -5,6 +5,8 @@ import com.coalesce.core.command.TestCommand;
 import com.coalesce.core.config.YmlConfig;
 import com.coalesce.core.plugin.ICoPlugin;
 import com.coalesce.core.session.SessionStore;
+import jline.console.ConsoleReader;
+import jline.console.completer.CandidateListCompletionHandler;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,14 +14,25 @@ import java.util.Map;
 public class CoreBukkit extends CoPlugin {
 	
 	//Creates a map of all the session stores for each plugin
-	private static Map<ICoPlugin, SessionStore> SESSION_STORES = new HashMap<>();
+	private static final Map<ICoPlugin, SessionStore> SESSION_STORES = new HashMap<>();
+	private static final Map<String, ICoPlugin> PLUGINS = new HashMap<>();
+	private static ConsoleReader consoleReader;
 	
 	@Override
 	public void onPluginEnable() throws Exception {
+		updateCheck("google"/*"Project-Coalesce"*/, "android-classyshark"/*"CoalesceCore"*/, true);
 		setDisplayName("CoalesceCore");
 		setPluginColor(Color.YELLOW);
 		getCommandStore().registerCommand(new TestCommand());
 		new YmlConfig("groups", this);
+		
+	}
+	
+	@Override
+	public void onPluginLoad() throws Exception {
+		consoleReader = new ConsoleReader(System.in, System.out);
+		consoleReader.setCompletionHandler(new CandidateListCompletionHandler());
+		consoleReader.setExpandEvents(false);
 	}
 	
 	@Override
@@ -33,6 +46,18 @@ public class CoreBukkit extends CoPlugin {
 	
 	static Map<ICoPlugin, SessionStore> getSessionStores() {
 		return SESSION_STORES;
+	}
+	
+	static Map<String, ICoPlugin> getPlugins() {
+		return PLUGINS;
+	}
+	
+	static void addCoPlugin(String name, ICoPlugin plugin) {
+		PLUGINS.put(name, plugin);
+	}
+	
+	static ConsoleReader getReader() {
+		return consoleReader;
 	}
 	
 }

@@ -1,5 +1,6 @@
 package com.coalesce.core.command;
 
+import com.coalesce.core.Color;
 import com.coalesce.core.SenderType;
 import com.coalesce.core.command.annotation.Alias;
 import com.coalesce.core.command.annotation.Command;
@@ -15,20 +16,15 @@ public final class TestCommand {
 	@Alias({"tst","ts"})
 	@Permission({"core.test", "core.test2"})
 	@Sender({SenderType.PLAYER, SenderType.CONSOLE})
-	@Command(name = "test", desc = "A test command", usage = "/test", max = 1, min = 0)
+	@Command(name = "test", desc = "A test command", usage = "/test", min = 0)
 	public void testCommand(CommandContext context) {
-		context.getSender().pluginMessage(context.joinArgs());
+		System.out.println(Color.toConsoleColor('&', context.joinArgs()));
+		//context.getSender().pluginMessage(context.joinArgs());
 	}
 	
 	@Completion("test")
 	public void testCompletion(TabContext context) {
 		context.completionAt(0, "hello");
-	}
-	
-	@Command(name = "ct", desc = "Tests the plugin config api", usage = "/ct", min = 3)
-	public void configTest(CommandContext context) {
-		YmlConfig config = new YmlConfig(context.argAt(0), context.getPlugin());
-		config.addEntry(context.argAt(1), context.joinArgs(2));
 	}
 	
 }

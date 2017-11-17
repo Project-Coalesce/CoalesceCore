@@ -5,15 +5,57 @@ import com.coalesce.core.Platform;
 import com.coalesce.core.chat.CoFormatter;
 import com.coalesce.core.command.base.CommandStore;
 import com.coalesce.core.config.ConfigManager;
-import com.coalesce.core.config.base.IConfig;
 import com.coalesce.core.session.SessionStore;
+import jline.console.ConsoleReader;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 public interface ICoPlugin {
+	
+	/**
+	 * Gets a map of all the current CoPlugins loaded on the server
+	 * @return The map of CoPlugins
+	 */
+	Map<String, ICoPlugin> getCoPlugins();
+	
+	/**
+	 * Gets a CoPlugin by name
+	 * @param name The name of the plugin to get.
+	 * @return The plugin if running
+	 */
+	default ICoPlugin getCoPlugin(String name) {
+		return getCoPlugins().get(name);
+	}
+	
+	/**
+	 * Checks if an update exists for this plugin.
+	 * @param repositoryOwner The user or organization that this repository is held in.
+	 * @param repositoryName The name of the repository.
+	 * @param autoUpdate Whether or not to download a new version if it's out.
+	 */
+	void updateCheck(String repositoryOwner, String repositoryName, boolean autoUpdate);
+	
+	/**
+	 * Sets the file to replace this plugin jar with when shutting down
+	 * @param file The file to update the jar with
+	 */
+	void setUpdateFile(File file);
+	
+	/**
+	 * Whether to update the plugin or not
+	 * @param value Whether to update the plugin or not.
+	 */
+	void setUpdateNeeded(boolean value);
+	
+	/**
+	 * Gets the plugin version
+	 * @return The version of the plugin.
+	 */
+	String getVersion();
 	
 	/**
 	 * Method called when the plugin is enabled
@@ -63,6 +105,7 @@ public interface ICoPlugin {
 	 * @param <M> A module class
 	 * @return The module.
 	 */
+	@SuppressWarnings("unchecked")
 	default <M extends ICoModule> M getModule(Class<M> clazz) {
 		return getModules().stream().filter(module -> module.getClass().equals(clazz)).map(module -> ((M)module)).iterator().next();
 	}
@@ -114,6 +157,12 @@ public interface ICoPlugin {
 	String getDisplayName();
 	
 	/**
+	 * Gets the unedited name of the plugin. (Will not be affected by {@link #setDisplayName(String)})
+	 * @return The name of the plugin
+	 */
+	String getRealName();
+	
+	/**
 	 * Sets the color of this plugin
 	 * @param color The plugin color.
 	 */
@@ -156,9 +205,17 @@ public interface ICoPlugin {
 	File getPluginFolder();
 	
 	/**
+	 * Gets the plugin jar file
+	 * @return The plugin jar file.
+	 */
+	File getPluginJar();
+	
+	/**
 	 * Gets the plugins configuration manager.
 	 * @return The plugins config manager.
 	 */
 	ConfigManager getConfigManager();
+	
+	ConsoleReader getConsoleReader();
 	
 }
