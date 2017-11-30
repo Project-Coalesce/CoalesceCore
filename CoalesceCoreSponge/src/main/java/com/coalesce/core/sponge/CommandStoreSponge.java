@@ -21,7 +21,7 @@ public final class CommandStoreSponge extends CommandStore {
 	@Override
 	protected void registerCommand(CommandInfo info) {
 		List<String> aliases = new ArrayList<>();
-		aliases.addAll(Arrays.asList(info.getAliases()));
+		aliases.addAll(info.getAliases());
 		aliases.add(info.getName());
 		
 		Sponge.getCommandManager().register(plugin, new CommandRegister(info, plugin), aliases);

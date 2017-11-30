@@ -1,18 +1,25 @@
 package com.coalesce.core.command.base;
 
 import com.coalesce.core.Color;
+import com.coalesce.core.RegistrationType;
 import com.coalesce.core.SenderType;
 import com.coalesce.core.command.annotation.Alias;
 import com.coalesce.core.command.annotation.Command;
 import com.coalesce.core.command.annotation.Permission;
 import com.coalesce.core.command.annotation.Sender;
+import com.coalesce.core.command.builder.interfaces.CommandExecutor;
+import com.coalesce.core.command.builder.interfaces.TabExecutor;
 import com.coalesce.core.plugin.ICoPlugin;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public final class CommandInfo {
 	
@@ -21,13 +28,20 @@ public final class CommandInfo {
 	private final String name;
 	private final String desc;
 	private final String usage;
-	private final Method method;
 	private final ICoPlugin plugin;
-	private final Object container;
-	private String[] aliases = null;
-	private String[] permissions = null;
+	private Set<String> aliases;
+	private String permission = null;
 	private SenderType[] senderTypes = null;
-	private final CompletionInfo completionInfo;
+	private final RegistrationType registrationType;
+	
+	//Annotation Only
+	private Method method;
+	private Object container;
+	private CompletionInfo completionInfo;
+	
+	//Builder Only
+	private TabExecutor tabExecutor;
+	private CommandExecutor commandExecutor;
 	
 	public CommandInfo(Object container, Method method, CompletionInfo completionInfo, ICoPlugin plugin) {
 		Command command;
@@ -51,11 +65,27 @@ public final class CommandInfo {
 		this.container = container;
 		this.usage = command.usage();
 		this.completionInfo = completionInfo;
-		this.aliases = alias == null ? new String[]{""} : alias.value();
-		this.permissions = permission == null ? new String[]{""} : permission.value();
+		this.registrationType = RegistrationType.ANNOTATION;
+		this.permission = permission == null ? null : permission.value();
 		this.senderTypes = sender == null ? new SenderType[]{SenderType.ALL} : sender.value();
+		this.aliases = alias == null ? new HashSet<>() : Stream.of(alias.value()).map(String::toLowerCase).collect(Collectors.toSet());
 	}
 	
+	public CommandInfo(ProcessedCommand command, ICoPlugin plugin) {
+		this.plugin = plugin;
+		this.min = command.getMin();
+		this.max = command.getMax();
+		this.name = command.getName();
+		this.usage = command.getUsage();
+		this.aliases = command.getAliases();
+		this.desc = command.getDescription();
+		this.permission = command.getPermission();
+		this.tabExecutor = command.getTabExecutor();
+		this.registrationType = RegistrationType.BUILDER;
+		this.commandExecutor = command.getCommandExecutor();
+		this.senderTypes = command.getSenders() == null ? new SenderType[]{SenderType.ALL} : command.getSenders();
+		
+	}
 	
 	/**
 	 * @see Command#min()
@@ -110,15 +140,15 @@ public final class CommandInfo {
 	/**
 	 * @see Alias#value()
 	 */
-	public String[] getAliases() {
+	public Set<String> getAliases() {
 		return aliases;
 	}
 	
 	/**
 	 * @see Permission#value()
 	 */
-	public String[] getPermissions() {
-		return permissions;
+	public String getPermission() {
+		return permission;
 	}
 	
 	/**
@@ -137,17 +167,7 @@ public final class CommandInfo {
 	}
 	
 	public boolean run(com.coalesce.core.Sender sender, String... args) {
-		boolean permission = false;
 		boolean senderType = false;
-		
-		if (this.permissions.length != 0) {
-			for (String node : this.permissions) {
-				if (sender.hasPermission(node)) {
-					permission = true;
-					break;
-				}
-			}
-		} else permission = true;
 		
 		if (!Arrays.equals(this.senderTypes, new SenderType[]{SenderType.ALL})) {
 			for (SenderType type : this.senderTypes) {
@@ -158,13 +178,14 @@ public final class CommandInfo {
 			}
 		} else senderType = true;
 		
-		if (!permission) {
-			StringBuilder builder = new StringBuilder();
-			for (String node : permissions) builder.append(node).append(", ");
-			sender.pluginMessage(Color.RED + "You do not have sufficient permission to run " +
-					"this command! Permission(s) required: " + Color.SILVER + builder.toString().trim());
-			return true;
+		if (this.permission != null) {
+			if (!sender.hasPermission(this.permission)) {
+				sender.pluginMessage(Color.RED + "You do not have sufficient permission to run " +
+						"this command! Permission required: " + Color.SILVER + this.permission);
+				return true;
+			}
 		}
+		
 		if (!senderType) {
 			StringBuilder builder = new StringBuilder();
 			for (SenderType type : senderTypes) builder.append(type.toString()).append(", ");
@@ -172,6 +193,7 @@ public final class CommandInfo {
 					"command! One of the following sender type(s) are required: " + Color.SILVER + builder.toString().trim());
 			return true;
 		}
+		
 		if (args.length < min && this.getMin() > -1) {
 			sender.pluginMessage(
 					Color.RED + "Not enough arguments supplied to run command!",
@@ -186,13 +208,15 @@ public final class CommandInfo {
 					Color.RED + "Given: " + Color.SILVER + args.length);
 			return true;
 		}
-		
-		try {
-			this.method.invoke(container, new CommandContext(sender, args, plugin));
+		if (registrationType == RegistrationType.ANNOTATION) {
+			try {
+				this.method.invoke(container, new CommandContext(sender, args, plugin));
+			}
+			catch (IllegalAccessException | InvocationTargetException e) {
+				e.printStackTrace();
+			}
 		}
-		catch (IllegalAccessException | InvocationTargetException e) {
-			e.printStackTrace();
-		}
+		else commandExecutor.run(new CommandContext(sender, args, plugin));
 		return true;
 	}
 	
@@ -200,20 +224,39 @@ public final class CommandInfo {
 		
 		List<String> sub = new ArrayList<>();
 		
-		if (this.completionInfo != null) {
-			TabContext context = new TabContext(new CommandContext(sender, args, plugin), this, sender, args);
-			try {
-				this.completionInfo.getMethod().invoke(this.completionInfo.getContainer(), context);
-			}
-			catch (IllegalAccessException | InvocationTargetException e) {
-				e.printStackTrace();
-			}
-			for (String completion : context.currentPossibleCompletion()) {
-				if (completion.toLowerCase().startsWith(context.getCommandContext().argAt(context.getCommandContext().getArgs().size() - 1))) {
-					sub.add(completion);
+		TabContext context = new TabContext(new CommandContext(sender, args, plugin), this, sender, args);
+		String startString = context.getCommandContext().argAt(context.getCommandContext().getArgs().size() - 1);
+		
+		if (startString == null) return null;
+		
+		if (registrationType == RegistrationType.ANNOTATION) {
+			if (this.completionInfo != null) {
+				try {
+					this.completionInfo.getMethod().invoke(this.completionInfo.getContainer(), context);
 				}
+				catch (IllegalAccessException | InvocationTargetException e) {
+					e.printStackTrace();
+				}
+				for (String completion : context.currentPossibleCompletion()) {
+					if (completion.toLowerCase().startsWith(startString)) {
+						sub.add(completion);
+					}
+				}
+				return sub;
 			}
-			return sub;
+		}
+		else {
+			if (tabExecutor != null) {
+				tabExecutor.run(context);
+				
+				for (String completion : context.currentPossibleCompletion()) {
+					if (completion.toLowerCase().startsWith(startString)) {
+						sub.add(completion);
+					}
+				}
+				return sub;
+				
+			}
 		}
 		return null;
 	}

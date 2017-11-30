@@ -14,7 +14,7 @@ import com.coalesce.core.config.YmlConfig;
 public final class TestCommand {
 	
 	@Alias({"tst","ts"})
-	@Permission({"core.test", "core.test2"})
+	@Permission("core.test")
 	@Sender({SenderType.PLAYER, SenderType.CONSOLE})
 	@Command(name = "test", desc = "A test command", usage = "/test", min = 0)
 	public void testCommand(CommandContext context) {

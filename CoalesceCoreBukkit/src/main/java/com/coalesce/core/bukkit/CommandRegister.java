@@ -7,7 +7,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginIdentifiableCommand;
 import org.bukkit.plugin.Plugin;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 public final class CommandRegister extends Command implements PluginIdentifiableCommand{
@@ -21,7 +21,7 @@ public final class CommandRegister extends Command implements PluginIdentifiable
 		this.plugin = plugin;
 		this.description = commandInfo.getDesc();
 		this.usageMessage = commandInfo.getUsage();
-		this.setAliases(Arrays.asList(commandInfo.getAliases()));
+		this.setAliases(commandInfo.getAliases() != null ? new ArrayList<>(commandInfo.getAliases()) : new ArrayList<>());
 	}
 	
 	@Override

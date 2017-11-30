@@ -37,16 +37,7 @@ public final class CommandRegister implements CommandCallable {
 	
 	@Override
 	public boolean testPermission(CommandSource source) {
-		boolean permission = false;
-		if (command.getPermissions().length != 0) {
-			for (String node : command.getPermissions()) {
-				if (source.hasPermission(node)) {
-					permission = true;
-					break;
-				}
-			}
-		} else permission = true;
-		return permission;
+		return command.getPermission() != null && source.hasPermission(command.getPermission());
 	}
 	
 	@Override

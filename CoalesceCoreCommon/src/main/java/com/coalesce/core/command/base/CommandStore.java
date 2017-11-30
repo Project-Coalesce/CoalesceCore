@@ -46,6 +46,14 @@ public abstract class CommandStore {
 		return commandMap.get(name);
 	}
 	
+	/**
+	 * Registers a command made with the CommandBuilder
+	 * @param command The command to register
+	 */
+	public void registerCommand(ProcessedCommand command) {
+		CommandInfo commandInfo = new CommandInfo(command, plugin);
+		registerCommand(commandInfo);
+	}
 	
 	/**
 	 * Adds a command into the command map.

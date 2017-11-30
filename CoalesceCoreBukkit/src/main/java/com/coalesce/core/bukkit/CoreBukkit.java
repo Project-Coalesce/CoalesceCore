@@ -1,6 +1,7 @@
 package com.coalesce.core.bukkit;
 
 import com.coalesce.core.Color;
+import com.coalesce.core.command.BuilderTest;
 import com.coalesce.core.command.TestCommand;
 import com.coalesce.core.config.YmlConfig;
 import com.coalesce.core.plugin.ICoPlugin;
@@ -20,12 +21,11 @@ public class CoreBukkit extends CoPlugin {
 	
 	@Override
 	public void onPluginEnable() throws Exception {
-		updateCheck("google"/*"Project-Coalesce"*/, "android-classyshark"/*"CoalesceCore"*/, true);
 		setDisplayName("CoalesceCore");
 		setPluginColor(Color.YELLOW);
 		getCommandStore().registerCommand(new TestCommand());
+		new BuilderTest(this);
 		new YmlConfig("groups", this);
-		
 	}
 	
 	@Override

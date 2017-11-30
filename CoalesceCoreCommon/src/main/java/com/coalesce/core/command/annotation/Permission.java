@@ -12,5 +12,5 @@ public @interface Permission {
 	/**
 	 * The permission(s) needed to run this command.
 	 */
-	String[] value() default "";
+	String value() default "";
 }
