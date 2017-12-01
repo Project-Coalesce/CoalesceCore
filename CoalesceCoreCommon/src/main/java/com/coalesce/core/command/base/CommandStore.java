@@ -4,6 +4,7 @@ import com.coalesce.core.command.annotation.Command;
 import com.coalesce.core.command.annotation.Completion;
 import com.coalesce.core.plugin.ICoPlugin;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -56,11 +57,30 @@ public abstract class CommandStore {
 	}
 	
 	/**
+	 * Registers an array of processed commands
+	 * @param command The commands to register
+	 */
+	public void registerCommands(ProcessedCommand... command) {
+		for (ProcessedCommand cmd : command) {
+			registerCommand(cmd);
+		}
+	}
+	
+	/**
 	 * Adds a command into the command map.
 	 * @param commandObj The object the command is stored in.
 	 */
 	public void registerCommand(Object commandObj) {
 		registeredObjects.add(commandObj);
+	}
+	
+	/**
+	 * @apiNote The commands registered in here must only be annotation commands.
+	 * Registers an array of instances as commands.
+	 * @param infos The instances to look through and register commands from
+	 */
+	public void registerCommands(Object... infos) {
+		Collections.addAll(registeredObjects, infos);
 	}
 	
 	/**

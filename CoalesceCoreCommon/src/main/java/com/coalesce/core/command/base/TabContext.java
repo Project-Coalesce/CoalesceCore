@@ -1,6 +1,6 @@
 package com.coalesce.core.command.base;
 
-import com.coalesce.core.Sender;
+import com.coalesce.core.wrappers.CoSender;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,10 +10,10 @@ public final class TabContext {
 	private final CommandContext context;
 	private final List<String> possible;
 	private final CommandInfo command;
-	private final Sender sender;
+	private final CoSender sender;
 	private final String[] args;
 	
-	public TabContext(CommandContext context, CommandInfo command, Sender sender, String[] args) {
+	public TabContext(CommandContext context, CommandInfo command, CoSender sender, String[] args) {
 		this.possible = new ArrayList<>();
 		this.command = command;
 		this.context = context;
@@ -38,10 +38,11 @@ public final class TabContext {
 	}
 	
 	/**
-	 * Gets the Sender that's executing the command.
+	 * Gets the CoSender that's executing the command.
 	 * @return The command sender.
 	 */
-	public Sender getSender() {
+	public
+	CoSender getSender() {
 		return sender;
 	}
 	
@@ -81,26 +82,14 @@ public final class TabContext {
 	
 	/**
 	 * A quick player completion for tab completes.
-	 * @param index The index to run this completion at
-	 * @param predicate A filter of the players
-	 */
-/*	public void playerCompletion(int index, Predicate<? super Player> predicate) {
-		if (length(index)) {
-			possible.clear();
-			Kernel.getPlayers().stream().filter(predicate).forEach(p -> possible.add(p.getName()));
-		}
-	}*/
-	
-	/**
-	 * A quick player completion for tab completes.
 	 * @param index The index to run this completion at.
 	 */
-/*	public void playerCompletion(int index) {
+	public void playerCompletion(int index) {
 		if (length(index)) {
 			possible.clear();
-			Kernel.getPlayers().forEach(p -> possible.add(p.getName()));
+			possible.addAll(context.getPlugin().getOnlinePlayers());
 		}
-	}*/
+	}
 	
 	/**
 	 * A quick tab complete method for any point in the command

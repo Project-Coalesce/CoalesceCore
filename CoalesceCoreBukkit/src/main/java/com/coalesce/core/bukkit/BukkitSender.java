@@ -1,6 +1,6 @@
 package com.coalesce.core.bukkit;
 
-import com.coalesce.core.Sender;
+import com.coalesce.core.wrappers.CoSender;
 import com.coalesce.core.SenderType;
 import com.coalesce.core.plugin.ICoPlugin;
 import org.bukkit.command.BlockCommandSender;
@@ -8,12 +8,13 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
-public final class BukkitSender implements Sender<CommandSender> {
+public final class BukkitSender implements CoSender<CommandSender> {
 	
 	private final ICoPlugin plugin;
 	private final CommandSender sender;
 	
-	public BukkitSender(CommandSender sender, ICoPlugin plugin) {
+	public
+	BukkitSender(CommandSender sender, ICoPlugin plugin) {
 		this.sender = sender;
 		this.plugin = plugin;
 	}

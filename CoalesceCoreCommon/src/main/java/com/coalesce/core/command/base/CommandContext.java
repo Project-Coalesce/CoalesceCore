@@ -1,6 +1,6 @@
 package com.coalesce.core.command.base;
 
-import com.coalesce.core.Sender;
+import com.coalesce.core.wrappers.CoSender;
 import com.coalesce.core.plugin.ICoPlugin;
 
 import java.util.Arrays;
@@ -9,10 +9,10 @@ import java.util.List;
 public final class CommandContext {
 	
 	private ICoPlugin plugin;
-	private final Sender sender;
+	private final CoSender sender;
 	private final List<String> args;
 	
-	public CommandContext(Sender sender, String[] args, ICoPlugin plugin) {
+	public CommandContext(CoSender sender, String[] args, ICoPlugin plugin) {
 		this.plugin = plugin;
 		this.sender = sender;
 		this.args = Arrays.asList(args);
@@ -30,7 +30,8 @@ public final class CommandContext {
 	 * Gets the command sender
 	 * @return The command sender
 	 */
-	public Sender getSender() {
+	public
+	CoSender getSender() {
 		return sender;
 	}
 	
@@ -86,5 +87,24 @@ public final class CommandContext {
 	 */
 	public String joinArgs() {
 		return joinArgs(0);
+	}
+	
+	/**
+	 * Sends a message to the player/console.
+	 * @param message The message to send.
+	 */
+	public void send(String message) {
+		sender.sendMessage(message);
+	}
+	
+	/**
+	 * Sends a formatted plguin message.
+	 *
+	 * <p>Ex. [PlguinName] MESSAGE FROM THE PARAMETER</p>
+	 *
+	 * @param message The message to send with the plugin name before it.
+	 */
+	public void pluginMessage(String message) {
+		send(plugin.getCoFormatter().format(message));
 	}
 }

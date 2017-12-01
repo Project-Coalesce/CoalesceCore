@@ -1,6 +1,6 @@
 package com.coalesce.core.sponge;
 
-import com.coalesce.core.Sender;
+import com.coalesce.core.wrappers.CoSender;
 import com.coalesce.core.SenderType;
 import com.coalesce.core.plugin.ICoPlugin;
 import org.spongepowered.api.command.CommandSource;
@@ -9,12 +9,13 @@ import org.spongepowered.api.command.source.ConsoleSource;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 
-public final class SpongeSender implements Sender<CommandSource> {
+public final class SpongeSender implements CoSender<CommandSource> {
 	
 	private final CommandSource sender;
 	private final ICoPlugin plugin;
 	
-	public SpongeSender(CommandSource sender, ICoPlugin plugin) {
+	public
+	SpongeSender(CommandSource sender, ICoPlugin plugin) {
 		this.sender = sender;
 		this.plugin = plugin;
 	}

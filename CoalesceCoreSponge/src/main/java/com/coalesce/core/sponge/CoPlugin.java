@@ -13,6 +13,7 @@ import com.coalesce.core.update.InstallUpdateThread;
 import com.coalesce.core.update.UpdateCheck;
 import jline.console.ConsoleReader;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
 import org.spongepowered.api.event.game.state.GameStartingServerEvent;
@@ -21,9 +22,11 @@ import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.scheduler.Task;
 
 import java.io.File;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public abstract class CoPlugin implements ICoPlugin {
 	
@@ -282,5 +285,15 @@ public abstract class CoPlugin implements ICoPlugin {
 	@Override
 	public File getPluginJar() {
 		return pluginContainer.getSource().get().toFile();
+	}
+	
+	//
+	//
+	
+	@Override
+	public Set<String> getOnlinePlayers() {
+		Set<String> names = new HashSet<>();
+		Sponge.getServer().getOnlinePlayers().stream().map(Player::getName).forEach(names::add);
+		return names;
 	}
 }

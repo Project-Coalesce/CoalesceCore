@@ -1,8 +1,9 @@
-package com.coalesce.core;
+package com.coalesce.core.wrappers;
 
+import com.coalesce.core.SenderType;
 import com.coalesce.core.plugin.ICoPlugin;
 
-public interface Sender<T> {
+public interface CoSender<T> {
 	
 	/**
 	 * Sends the sender a message
@@ -69,7 +70,7 @@ public interface Sender<T> {
 	 * @return The base sender as a specific type.
 	 *
 	 * <p>
-	 *     E.g. Sender#as(Player.class); returns the sender as a player.
+	 *     E.g. CoSender#as(Player.class); returns the sender as a player.
 	 * </p>
 	 */
 	<E extends T> E as(Class<E> type);

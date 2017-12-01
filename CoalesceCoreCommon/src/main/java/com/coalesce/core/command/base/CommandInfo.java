@@ -10,6 +10,7 @@ import com.coalesce.core.command.annotation.Sender;
 import com.coalesce.core.command.builder.interfaces.CommandExecutor;
 import com.coalesce.core.command.builder.interfaces.TabExecutor;
 import com.coalesce.core.plugin.ICoPlugin;
+import com.coalesce.core.wrappers.CoSender;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -166,7 +167,7 @@ public final class CommandInfo {
 		return completionInfo;
 	}
 	
-	public boolean run(com.coalesce.core.Sender sender, String... args) {
+	public boolean run(CoSender sender, String... args) {
 		boolean senderType = false;
 		
 		if (!Arrays.equals(this.senderTypes, new SenderType[]{SenderType.ALL})) {
@@ -220,7 +221,7 @@ public final class CommandInfo {
 		return true;
 	}
 	
-	public List<String> complete(com.coalesce.core.Sender sender, String... args) {
+	public List<String> complete(CoSender sender, String... args) {
 		
 		List<String> sub = new ArrayList<>();
 		

@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public interface ICoPlugin {
 	
@@ -217,5 +218,11 @@ public interface ICoPlugin {
 	ConfigManager getConfigManager();
 	
 	ConsoleReader getConsoleReader();
+	
+	/**
+	 * Gets a set of the online player's names.
+	 * @return The online player names.
+	 */
+	Set<String> getOnlinePlayers();
 	
 }

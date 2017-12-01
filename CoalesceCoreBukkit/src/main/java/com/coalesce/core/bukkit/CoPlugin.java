@@ -13,14 +13,17 @@ import com.coalesce.core.update.InstallUpdateThread;
 import com.coalesce.core.update.UpdateCheck;
 import jline.console.ConsoleReader;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public abstract class CoPlugin extends JavaPlugin implements ICoPlugin, Listener {
 	
@@ -52,6 +55,7 @@ public abstract class CoPlugin extends JavaPlugin implements ICoPlugin, Listener
 			e.printStackTrace();
 		}
 		commandStore.registerObjects();
+		enableModules();
 	}
 	
 	@Override
@@ -277,5 +281,15 @@ public abstract class CoPlugin extends JavaPlugin implements ICoPlugin, Listener
 	@Override
 	public File getPluginJar() {
 		return getFile();
+	}
+	
+	//
+	//
+	
+	@Override
+	public Set<String> getOnlinePlayers() {
+		Set<String> names = new HashSet<>();
+		Bukkit.getOnlinePlayers().stream().map(Player::getName).forEach(names::add);
+		return names;
 	}
 }
