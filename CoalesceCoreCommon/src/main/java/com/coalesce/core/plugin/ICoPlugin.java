@@ -4,7 +4,6 @@ import com.coalesce.core.Color;
 import com.coalesce.core.Platform;
 import com.coalesce.core.chat.CoFormatter;
 import com.coalesce.core.command.base.CommandStore;
-import com.coalesce.core.config.ConfigManager;
 import com.coalesce.core.session.SessionStore;
 import jline.console.ConsoleReader;
 
@@ -15,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+@SuppressWarnings({"unused", "unchecked"})
 public interface ICoPlugin {
 	
 	/**
@@ -106,7 +106,6 @@ public interface ICoPlugin {
 	 * @param <M> A module class
 	 * @return The module.
 	 */
-	@SuppressWarnings("unchecked")
 	default <M extends ICoModule> M getModule(Class<M> clazz) {
 		return getModules().stream().filter(module -> module.getClass().equals(clazz)).map(module -> ((M)module)).iterator().next();
 	}
@@ -210,12 +209,6 @@ public interface ICoPlugin {
 	 * @return The plugin jar file.
 	 */
 	File getPluginJar();
-	
-	/**
-	 * Gets the plugins configuration manager.
-	 * @return The plugins config manager.
-	 */
-	ConfigManager getConfigManager();
 	
 	ConsoleReader getConsoleReader();
 	

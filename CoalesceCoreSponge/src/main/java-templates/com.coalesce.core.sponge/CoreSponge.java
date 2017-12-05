@@ -32,7 +32,6 @@ public class CoreSponge extends CoPlugin {
 		setDisplayName("CoalesceCore");
 		setPluginColor(Color.YELLOW);
 		getCommandStore().registerCommand(new TestCommand());
-		getConfigManager().loadStaticConfig(new CoreConfig(this)); //This will loop. When you create the new config, its going to try to call this method again which will create useless instances of the same class.
 	}
 	
 	@Override

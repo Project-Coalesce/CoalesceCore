@@ -40,6 +40,28 @@ public interface CoSender<T> {
 	}
 	
 	/**
+	 * Checks if the sender has any of the permissions specified
+	 * @param permissions The permissions to look for.
+	 */
+	default boolean hasAnyPermission(String... permissions) {
+		for (String permission : permissions) {
+			if (hasPermission(permission)) return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Checks to see if the sender has all of the permissions specified
+	 * @param permissions The permissions to look for.
+	 */
+	default boolean hasAllPermissions(String... permissions) {
+		for (String permission : permissions) {
+			if (!hasPermission(permission)) return false;
+		}
+		return true;
+	}
+	
+	/**
 	 * The name of the sender
 	 * @return The name of the sender
 	 */

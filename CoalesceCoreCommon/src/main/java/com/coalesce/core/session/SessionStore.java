@@ -3,99 +3,108 @@ package com.coalesce.core.session;
 import com.coalesce.core.plugin.ICoPlugin;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
+@SuppressWarnings({"unchecked", "WeakerAccess", "unused"})
 public final class SessionStore {
 	
-	private final List<AbstractSession> sessions;
+	private final Map<String, NamespacedSessionStore<? extends AbstractSession>> namespaces;
 	
 	public SessionStore() {
-		sessions = new ArrayList<>();
+		this.namespaces = new HashMap<>();
+	}
+	
+	public List<String> getNamespaceNames() {
+		return namespaces.values().stream().map(NamespacedSessionStore::getName).collect(Collectors.toList());
+	}
+	
+	public List<String> getNamespaceNames(ICoPlugin plugin) {
+		return plugin.getSessionStore().getNamespaces().stream().map(NamespacedSessionStore::getName).collect(Collectors.toList());
 	}
 	
 	/**
-	 * Gets all the sessions that belong to this plugin.
-	 * @return THe plugin sessions
+	 * Gets all the namespaces that belong to this plugin.
+	 * @return The plugin namespaces
 	 */
-	public List<AbstractSession> getSessions() {
-		return sessions;
+	public List<NamespacedSessionStore<AbstractSession>> getNamespaces() {
+		return new ArrayList(namespaces.values());
 	}
 	
 	/**
-	 * Gets all the sessions that are a specific session type.
-	 * @param sessionType The type of session this is.
-	 * @param <T> The type of session to look for and return as
-	 * @return Returns a list of sessions that are the correct type.
+	 * Gets a namespace via name
+	 * @param name The name of the namespace
+	 * @return The namespace
 	 */
-	public <T extends AbstractSession> List<? extends AbstractSession> getSessions(Class<T> sessionType) {
-		List<T> correctSessions = new ArrayList<>();
-		sessions.forEach(session -> {
-			if (session.getSessionType().equals(sessionType)) correctSessions.add((T)session);
-		});
-		return correctSessions;
+	public NamespacedSessionStore<AbstractSession> getNamespace(String name) {
+		return (NamespacedSessionStore<AbstractSession>)namespaces.get(name);
 	}
 	
 	/**
-	 * Gets a session by key. Plugin is not needed with this because it is automatically assumed its the current plugin.
-	 * @param sessionType The session type.
-	 * @param key The session key
-	 * @param <T> The type of session to return.
-	 * @return The session.
+	 * Gets a namespace via name and SessionType
+	 * @param name The name of the namespace
+	 * @param sessionType The session type (Class)
+	 * @param <T> The session. (Extends {@link AbstractSession})
+	 * @return The namespace if it exists. null otherwise.
 	 */
-	public <T extends AbstractSession> T getSession(Class<T> sessionType, String key) {
-		T correctSession = null;
-		for (AbstractSession session : getSessions(sessionType)) {
-			if (session.getSessionKey().matches(key)) {
-				correctSession = (T)session;
-				break;
-			}
-		}
-		return correctSession;
+	public <T extends AbstractSession> NamespacedSessionStore<T> getNamespace(String name, Class<T> sessionType) {
+		return (NamespacedSessionStore<T>)namespaces.get(name);
 	}
 	
 	/**
-	 * Gets a list of session pairs from a plugin.
+	 * Gets a list of namespaces from a plugin.
 	 * @param plugin The owning plugin
-	 * @return A list of pairs
+	 * @return A list of namespaces
 	 */
-	public List<AbstractSession> getSessions(ICoPlugin plugin) {
-		return plugin.getSessionStore(plugin).getSessions();
-	}
-	
-	public <T extends AbstractSession> List<? extends AbstractSession> getSessions(ICoPlugin plugin, Class<T> sessionType) {
-		List<T> correctSessions = new ArrayList<>();
-		getSessions(plugin).forEach(session -> {
-			if (session.getSessionType().equals(sessionType)) correctSessions.add((T)session);
-		});
-		return correctSessions;
+	public List<NamespacedSessionStore<AbstractSession>> getNamespaces(ICoPlugin plugin) {
+		return plugin.getSessionStore(plugin).getNamespaces();
 	}
 	
 	/**
-	 * Gets a session from another plugin
-	 * @param plugin The plugin to get the session from
-	 * @param sessionType The type of session being retrieved
-	 * @param key The session key
-	 * @param <T> The type of session to return
-	 * @return A session from another plugin
+	 * Adds a NamespacedSession to the pluing SessionStore
+	 * @param namespace The name of the namespace to add
+	 * @return The created namespace
 	 */
-	public <T extends AbstractSession> T getSession(ICoPlugin plugin, Class<T> sessionType, String key) {
-		T correctSession = null;
-		for (AbstractSession session : getSessions(plugin, sessionType)) {
-			if (session.getSessionKey().matches(key)) {
-				correctSession = (T)session;
-				break;
-			}
-		}
-		return correctSession;
+	public NamespacedSessionStore<AbstractSession> addNamespace(String namespace) {
+		if (namespaces.containsKey(namespace)) return (NamespacedSessionStore<AbstractSession>)namespaces.get(namespace);
+		NamespacedSessionStore<AbstractSession> ns = new NamespacedSessionStore(namespace, AbstractSession.class);
+		namespaces.put(namespace, ns);
+		return ns;
 	}
 	
 	/**
-	 * Adds a session to a plugin
-	 * @param session The session to add
-	 * @return True if the session was added, false otherwise.
+	 * Adds a NamespacedSession to the plugin SessionStore
+	 * @param namespace The name of the namespace to add
+	 * @param sessionType The type of session the namespaced session will hold
+	 * @param <T> The sessionType.
+	 * @return The created namespaced session.
 	 */
-	public boolean addSession(AbstractSession session) {
-		return sessions.add(session);
+	public <T extends AbstractSession> NamespacedSessionStore<T> addNamespace(String namespace, Class<T> sessionType) {
+		if (namespaces.containsKey(namespace)) return (NamespacedSessionStore<T>)namespaces.get(namespace);
+		NamespacedSessionStore<T> ns = new NamespacedSessionStore(namespace, sessionType);
+		namespaces.put(namespace, ns);
+		return ns;
 	}
 	
+	/**
+	 * Removes a namespace from the plugin
+	 * @param namespace The name of the namespace to remove
+	 * @return True if the namespace was successfully removed, false otherwise.
+	 */
+	public boolean removeNamespace(String namespace) {
+		if (!namespaces.containsKey(namespace)) return false;
+		namespaces.remove(namespace);
+		return true;
+	}
+	
+	/**
+	 * Removes all stored namespaces and their sessions that match the given predicate
+	 * @param predicate The predicate needed to be matched
+	 */
+	public void removeNamespaces(Predicate<NamespacedSessionStore<? extends AbstractSession>> predicate) {
+		namespaces.values().stream().filter(predicate).map(NamespacedSessionStore::getName).forEach(this::removeNamespace);
+	}
 }

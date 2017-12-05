@@ -41,8 +41,7 @@ public final class TabContext {
 	 * Gets the CoSender that's executing the command.
 	 * @return The command sender.
 	 */
-	public
-	CoSender getSender() {
+	public CoSender getSender() {
 		return sender;
 	}
 	
@@ -122,6 +121,23 @@ public final class TabContext {
 			possible.clear();
 			possible.addAll(Arrays.asList(completions));
 		}
+	}
+	
+	/**
+	 * Gets the current argument being typed
+	 * @return The current arg being typed
+	 */
+	public String getCurrent() {
+		return context.argAt(args.length);
+	}
+	
+	/**
+	 * Gets an argument at a specific index
+	 * @param index The index to get the arg from
+	 * @return The arg, null if it doesn't exist.
+	 */
+	public String getArg(int index) {
+		return context.argAt(index);
 	}
 	
 	List<String> currentPossibleCompletion() {

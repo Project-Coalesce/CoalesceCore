@@ -4,7 +4,6 @@ import com.coalesce.core.Color;
 import com.coalesce.core.Platform;
 import com.coalesce.core.chat.CoFormatter;
 import com.coalesce.core.command.base.CommandStore;
-import com.coalesce.core.config.ConfigManager;
 import com.coalesce.core.plugin.CoLogger;
 import com.coalesce.core.plugin.ICoModule;
 import com.coalesce.core.plugin.ICoPlugin;
@@ -32,7 +31,6 @@ public abstract class CoPlugin extends JavaPlugin implements ICoPlugin, Listener
 	private CommandStoreBukkit commandStore;
 	private Color pluginColor = Color.WHITE;
 	private boolean updateNeeded = false;
-	private ConfigManager configManager;
 	private CoFormatter formatter;
 	private String displayName;
 	private CoLogger logger;
@@ -43,7 +41,6 @@ public abstract class CoPlugin extends JavaPlugin implements ICoPlugin, Listener
 		displayName = getName();
 		logger = new CoLogger(this);
 		formatter = new CoFormatter(this);
-		configManager = new ConfigManager(this);
 		commandStore = new CommandStoreBukkit(this);
 		CoreBukkit.addCoPlugin(getRealName(), this);
 		CoreBukkit.addSessionStore(this, sessionStore);
@@ -214,15 +211,6 @@ public abstract class CoPlugin extends JavaPlugin implements ICoPlugin, Listener
 	@Override
 	public File getPluginFolder() {
 		return getDataFolder();
-	}
-	
-	//
-	//
-	
-	
-	@Override
-	public ConfigManager getConfigManager() {
-		return configManager;
 	}
 	
 	//

@@ -65,22 +65,6 @@ public interface IConfig {
 	File getFile();
 	
 	/**
-	 * If the configuration is saved in the plugins configuration map.
-	 * @return True if in map, false otherwise.
-	 */
-	boolean isInMemory();
-	
-	/**
-	 * Loads the configuration into the plugins configuration map.
-	 */
-	void loadToMemory();
-	
-	/**
-	 * Unloads the configuration from the plugins configuration map.
-	 */
-	void unloadFromMemory();
-	
-	/**
 	 * Gets a value from a config entry.
 	 * @param path The path in the configuration.
 	 * @return An object from the specified path.
@@ -196,6 +180,7 @@ public interface IConfig {
 	 * @param <E> The list type
 	 * @return The list
 	 */
+	@SuppressWarnings({"unchecked", "unused"})
 	default <E> List<E> getList(String path, Class<E> type) {
 		return (List<E>)getList(path);
 	}
@@ -246,6 +231,7 @@ public interface IConfig {
 	/**
 	 * Backs up this configuration.
 	 */
+	@SuppressWarnings("ResultOfMethodCallIgnored")
 	default void backup() {
 		DateFormat format = new SimpleDateFormat("yyyy.dd.MM-hh.mm.ss");
 		File file = new File(getDirectory() + File.separator + "backups");

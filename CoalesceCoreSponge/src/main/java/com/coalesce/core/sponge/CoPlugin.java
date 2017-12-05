@@ -4,7 +4,6 @@ import com.coalesce.core.Color;
 import com.coalesce.core.Platform;
 import com.coalesce.core.chat.CoFormatter;
 import com.coalesce.core.command.base.CommandStore;
-import com.coalesce.core.config.ConfigManager;
 import com.coalesce.core.plugin.CoLogger;
 import com.coalesce.core.plugin.ICoModule;
 import com.coalesce.core.plugin.ICoPlugin;
@@ -36,7 +35,6 @@ public abstract class CoPlugin implements ICoPlugin {
 	private Color pluginColor = Color.WHITE;
 	private PluginContainer pluginContainer;
 	private boolean updateNeeded = false;
-	private ConfigManager configManager;
 	private CoFormatter formatter;
 	private String displayName;
 	private CoLogger logger;
@@ -49,7 +47,6 @@ public abstract class CoPlugin implements ICoPlugin {
 		displayName = pluginContainer.getName();
 		logger = new CoLogger(this);
 		formatter = new CoFormatter(this);
-		configManager = new ConfigManager(this);
 		commandStore = new CommandStoreSponge(this);
 		CoreSponge.addCoPlugin(getRealName(), this);
 		CoreSponge.addSessionStore(this, sessionStore);
@@ -219,15 +216,6 @@ public abstract class CoPlugin implements ICoPlugin {
 	@Override
 	public File getPluginFolder() {
 		return Sponge.getConfigManager().getPluginConfig(this).getDirectory().toFile();
-	}
-	
-	//
-	//
-	
-	
-	@Override
-	public ConfigManager getConfigManager() {
-		return configManager;
 	}
 	
 	//

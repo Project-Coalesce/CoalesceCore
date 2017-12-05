@@ -11,7 +11,7 @@ public class PlayerSession extends AbstractSession<Player> {
 	private final Player player;
 	
 	public PlayerSession(ICoPlugin sessionOwner, String sessionKey, Player player) {
-		super(sessionOwner, sessionKey, player);
+		super(sessionOwner, "players", sessionKey, player);
 		this.player = player;
 	}
 	

@@ -11,14 +11,20 @@ public abstract class AbstractSession<T> {
 	private final String sessionKey;
 	private final Map<?, ?> sessionMeta;
 	private final ICoPlugin sessionOwner;
+	private final NamespacedSessionStore<AbstractSession> namespace;
 	private final Class<? extends AbstractSession> session;
 	
-	public AbstractSession(ICoPlugin sessionOwner, String sessionKey, T type) {
+	public AbstractSession(ICoPlugin sessionOwner, NamespacedSessionStore<AbstractSession> namespace, String sessionKey, T type) {
 		this.type = type;
+		this.namespace = namespace;
 		this.sessionKey = sessionKey;
 		this.session = this.getClass();
 		this.sessionOwner = sessionOwner;
 		this.sessionMeta = new HashMap<>();
+	}
+	
+	public AbstractSession(ICoPlugin sessionOwner, String namespace, String sessionKey, T type) {
+		this(sessionOwner, sessionOwner.getSessionStore().getNamespace(namespace), sessionKey, type);
 	}
 	
 	/**
@@ -27,6 +33,22 @@ public abstract class AbstractSession<T> {
 	 */
 	public String getSessionKey() {
 		return sessionKey;
+	}
+	
+	/**
+	 * Gets the name of the namespace this session is stored in.
+	 * @return The session namespace name
+	 */
+	public String getNamespaceName() {
+		return getNamespace().getName();
+	}
+	
+	/**
+	 * The NamespacedSessionStore this Session is stored in
+	 * @return The sessions NamespacedSessionStore
+	 */
+	public NamespacedSessionStore getNamespace() {
+		return namespace;
 	}
 	
 	/**
