@@ -197,16 +197,16 @@ public final class CommandInfo {
 		
 		if (args.length < min && this.getMin() > -1) {
 			sender.pluginMessage(
-					Color.RED + "Not enough arguments supplied to run command!",
-					Color.RED + "Minimum: " + Color.SILVER + min,
-					Color.RED + "Given: " + Color.SILVER + args.length);
+					Color.RED + "Not enough arguments supplied to run command!" +
+					Color.RED + " Minimum: " + Color.SILVER + min +
+					Color.RED + " Given: " + Color.SILVER + args.length);
 			return true;
 		}
 		if (args.length > max && this.getMax() > -1) {
 			sender.pluginMessage(
-					Color.RED + "Too many arguments supplied to run command!",
-					Color.RED + "Maximum: " + Color.SILVER + max,
-					Color.RED + "Given: " + Color.SILVER + args.length);
+					Color.RED + "Too many arguments supplied to run command!" +
+					Color.RED + " Maximum: " + Color.SILVER + max +
+					Color.RED + " Given: " + Color.SILVER + args.length);
 			return true;
 		}
 		if (registrationType == RegistrationType.ANNOTATION) {

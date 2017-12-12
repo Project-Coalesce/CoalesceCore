@@ -72,7 +72,8 @@ public final class NamespacedSessionStore<T extends AbstractSession> {
 	 * @return Whether the session could be added or not.
 	 */
 	public T addSession(T session) {
-		return sessions.put(session.getSessionKey(), session);
+		sessions.put(session.getSessionKey(), session);
+		return session;
 	}
 	
 	/**

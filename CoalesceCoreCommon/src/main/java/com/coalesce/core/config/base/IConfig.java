@@ -81,7 +81,7 @@ public interface IConfig {
 	 * @return True if the path exists.
 	 */
 	default boolean contains(String path, boolean exact) {
-		if (exact) return getEntry(path) == null;
+		if (exact) return getEntry(path) != null;
 		else {
 			for (IEntry entry : getEntries()) {
 				if (entry.getPath().startsWith(path)) return true;
@@ -255,6 +255,20 @@ public interface IConfig {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	/**
+	 * Creates the new file if it doesn't exist.
+	 * @return true if the file was created, false otherwise.
+	 */
+	default boolean create() {
+		try {
+			return getFile().createNewFile();
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+		return false;
 	}
 	
 	/**

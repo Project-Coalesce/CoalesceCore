@@ -3,6 +3,9 @@ package com.coalesce.core.chat;
 import static com.coalesce.core.Color.*;
 import com.coalesce.core.plugin.ICoPlugin;
 
+import java.util.Arrays;
+import java.util.List;
+
 public final class CoFormatter {
 	
 	private final ICoPlugin plugin;
@@ -21,6 +24,33 @@ public final class CoFormatter {
 	 */
 	public String format(String message) {
 		return GRAY + "[" + RESET + plugin.getDisplayName() + GRAY + "]" + RESET + " " + message;
+	}
+	
+	/**
+	 * Formats a plugin message
+	 * @param message The message to format
+	 * @param objects The objects to replace the placeholders with
+	 * @return The formatted message.
+	 */
+	public String format(String message, Object... objects) {
+		return GRAY + "[" + RESET + plugin.getDisplayName() + GRAY + "]" + RESET + " " + formatString(message, objects);
+	}
+	
+	/**
+	 * Formats a message and replaces placeholders
+	 * @param message The message to format
+	 * @param objects The objects used to replace the placeholders
+	 * @return The formatted string
+	 *
+	 * @apiNote Example placeholders: <code>formatString("Hello, I am {0}, a {1} year old person.", "NJDaeger", "100")</code>
+	 * <p>that would return "Hello, I am NJDaeger, a 100 year old person.</p>
+	 */
+	public String formatString(String message, Object... objects) {
+		List<Object> fillers = Arrays.asList(objects);
+		for (int i = 0; i < fillers.size(); i++) {
+			if (fillers.get(i) != null)	message = message.replace("{" + i + "}", fillers.get(i).toString());
+		}
+		return message;
 	}
 	
 	/**

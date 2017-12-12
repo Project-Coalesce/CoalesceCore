@@ -1,10 +1,13 @@
 package com.coalesce.core.command.base;
 
+import com.coalesce.core.SenderType;
+import com.coalesce.core.command.builder.interfaces.TabExecutor;
 import com.coalesce.core.wrappers.CoSender;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Predicate;
 
 public final class TabContext {
 	private final CommandContext context;
@@ -19,6 +22,33 @@ public final class TabContext {
 		this.context = context;
 		this.sender = sender;
 		this.args = args;
+	}
+	
+	/**
+	 * Checks if the sender has a specific permission
+	 * @param permission The permission to check for
+	 * @return True if the sender has permission.
+	 */
+	public boolean hasPermission(String permission) {
+		return sender.hasPermission(permission);
+	}
+	
+	/**
+	 * Checks if the sender of this command has any of these permissions
+	 * @param permission The permissions to look for
+	 * @return True if the sender has at least one of the permissions specified
+	 */
+	public boolean hasAnyPermission(String... permission) {
+		return sender.hasAnyPermission(permission);
+	}
+	
+	/**
+	 * Checks if the sender of this command has all permissions
+	 * @param permissions The permissions the sender needs
+	 * @return True if the sender has all the permissions, false otherwise
+	 */
+	public boolean hasAllPermissions(String... permissions) {
+		return sender.hasAllPermissions(permissions);
 	}
 	
 	/**
@@ -128,7 +158,7 @@ public final class TabContext {
 	 * @return The current arg being typed
 	 */
 	public String getCurrent() {
-		return context.argAt(args.length);
+		return context.argAt(getLength());
 	}
 	
 	/**
@@ -139,6 +169,64 @@ public final class TabContext {
 	public String getArg(int index) {
 		return context.argAt(index);
 	}
+	
+	/**
+	 * Runs a sub completion of this completion if the sender matches the given sender type
+	 * @param senderType The type of sender needed to run the subCompletion
+	 * @param executor The completion method (method reference)
+	 * @return true if the senderType passed. False otherwise
+	 */
+	public boolean subCompletion(SenderType senderType, TabExecutor executor) {
+		if (getSender().getType() == senderType) {
+			executor.run(this);
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Runs a sub completion of this completion if the index of the completion matches the given index
+	 * @param index The index needed to run the completion
+	 * @param executor The completion method (method reference)
+	 * @return true if the index passed. False otherwise.
+	 */
+	public boolean subCompletionAt(int index, TabExecutor executor) {
+		if (getLength() == index) {
+			executor.run(this);
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Runs a sub completion of this completion if the index matches the given index and if the sender matches the given sender type
+	 * @param index The index needed to run the completion
+	 * @param senderType The type of sender needed to run the subCompletion
+	 * @param executor The completion method (method reference)
+	 * @return true if the index and the senderType passed. False otherwise
+	 */
+	public boolean subCompletionAt(int index, SenderType senderType, TabExecutor executor) {
+		if (getLength() == index && getSender().getType() == senderType) {
+			executor.run(this);
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Runs a sub completion of this completion if the predicate passes.
+	 * @param predicate The predicate needed to pass
+	 * @param executor The completion method (method reference)
+	 * @return true if the predicate passed. False otherwise
+	 */
+	public boolean subCompletion(Predicate<TabContext> predicate, TabExecutor executor) {
+		if (predicate.test(this)) {
+			executor.run(this);
+			return true;
+		}
+		return false;
+	}
+	
 	
 	List<String> currentPossibleCompletion() {
 		return possible;

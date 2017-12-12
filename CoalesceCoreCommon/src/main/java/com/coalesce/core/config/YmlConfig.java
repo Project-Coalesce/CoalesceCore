@@ -14,9 +14,13 @@ public class YmlConfig extends BaseConfig {
 	private final YamlConfiguration config;
 	private final File file;
 	
-	@SuppressWarnings("ResultOfMethodCallIgnored")
 	public YmlConfig(String name, ICoPlugin plugin) {
-		super(name, plugin);
+		this(name, plugin, true);
+	}
+	
+	@SuppressWarnings("ResultOfMethodCallIgnored")
+	public YmlConfig(String name, ICoPlugin plugin, boolean createNow) {
+		super(name, plugin, createNow);
 		
 		File path;
 		if (!name.contains(File.separator)) {
@@ -30,21 +34,13 @@ public class YmlConfig extends BaseConfig {
 			this.file = new File(path + File.separator + fileName + ".yml");
 		}
 		
-		if (! path.exists()) {
-			path.mkdirs();
-			try {
-				file.createNewFile();
+		if (createNow) {
+			if (!path.exists()) {
+				path.mkdirs();
+				create();
 			}
-			catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		if (!file.exists()) {
-			try {
-				file.createNewFile();
-			}
-			catch (IOException e) {
-				e.printStackTrace();
+			if (!file.exists()) {
+				create();
 			}
 		}
 		

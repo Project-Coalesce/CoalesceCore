@@ -1,10 +1,15 @@
 package com.coalesce.core.command.base;
 
+import com.coalesce.core.Color;
+import com.coalesce.core.SenderType;
+import com.coalesce.core.command.annotation.Command;
+import com.coalesce.core.command.builder.interfaces.CommandExecutor;
 import com.coalesce.core.wrappers.CoSender;
 import com.coalesce.core.plugin.ICoPlugin;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Predicate;
 
 public final class CommandContext {
 	
@@ -19,6 +24,50 @@ public final class CommandContext {
 	}
 	
 	/**
+	 * Gets how long the command currently is.
+	 * @return How many arguments there are
+	 */
+	public int length() {
+		return getArgs().size();
+	}
+	
+	/**
+	 * Checks if the length of the command matches a specific length
+	 * @param length The length to match
+	 * @return True if the length of the command matches the length parameter
+	 */
+	public boolean isLength(int length) {
+		return length() == length;
+	}
+	
+	/**
+	 * Checks if the sender has a specific permission
+	 * @param permission The permission to check for
+	 * @return True if the sender has permission.
+	 */
+	public boolean hasPermission(String permission) {
+		return sender.hasPermission(permission);
+	}
+	
+	/**
+	 * Checks if the sender of this command has any of these permissions
+	 * @param permission The permissions to look for
+	 * @return True if the sender has at least one of the permissions specified
+	 */
+	public boolean hasAnyPermission(String... permission) {
+		return sender.hasAnyPermission(permission);
+	}
+	
+	/**
+	 * Checks if the sender of this command has all permissions
+	 * @param permissions The permissions the sender needs
+	 * @return True if the sender has all the permissions, false otherwise
+	 */
+	public boolean hasAllPermissions(String... permissions) {
+		return sender.hasAllPermissions(permissions);
+	}
+	
+	/**
 	 * Gets the plugin
 	 * @return The plugin
 	 */
@@ -30,8 +79,7 @@ public final class CommandContext {
 	 * Gets the command sender
 	 * @return The command sender
 	 */
-	public
-	CoSender getSender() {
+	public CoSender getSender() {
 		return sender;
 	}
 	
@@ -106,5 +154,114 @@ public final class CommandContext {
 	 */
 	public void pluginMessage(String message) {
 		send(plugin.getCoFormatter().format(message));
+	}
+	
+	/**
+	 * Sends a formatted plugin message.
+	 * @param message The message to format
+	 * @param objects The objects used to replace the placeholders.
+	 */
+	public void pluginMessage(String message, Object... objects) {
+		send(plugin.getCoFormatter().format(message, objects));
+	}
+	
+	/**
+	 * Sends the sender the default, formatted, noPermissions message
+	 * @param permissionsNeeded The permissions required to run this command
+	 */
+	public void noPermission(String... permissionsNeeded) {
+		send(plugin.getCoFormatter().format(Color.RED + "You do not have sufficient permission to run " +
+		"this command! Permission(s) required: " + Color.SILVER + Arrays.toString(permissionsNeeded)));
+	}
+	
+	/**
+	 * Sends the sender the default, formatted, tooManyArgs message
+	 * @param max The maximum arguments allowed in the command
+	 * @param given The amount given
+	 */
+	public void tooManyArgs(int max, int given) {
+		send(plugin.getCoFormatter().format(
+				Color.RED + "Too many arguments supplied to run command!" +
+				Color.RED + "Maximum: " + Color.SILVER + max +
+				Color.RED + "Given: " + Color.SILVER + given));
+	}
+	
+	/**
+	 * Sends the sender the default, formatted, notEnoughArgs message
+	 * @param min The minimum arguments allowed in the command
+	 * @param given The amount given
+	 */
+	public void notEnoughArgs(int min, int given) {
+		send(plugin.getCoFormatter().format(
+				Color.RED + "Not enough arguments supplied to run command!" +
+				Color.RED + "Minimum: " + Color.SILVER + min +
+				Color.RED + "Given: " + Color.SILVER + given
+		));
+	}
+	
+	/**
+	 * Sends the sender a regular message with placeholder parsing
+	 * @param message The message to send
+	 * @param objects The placeholders to use
+	 */
+	public void send(String message, Object... objects) {
+		send(plugin.getCoFormatter().formatString(message, objects));
+	}
+	
+	/**
+	 * Runs a sub command of this command if the sender matches the given sender type
+	 * @param senderType The type of sender needed to run the subCommand
+	 * @param executor The command method (method reference)
+	 * @return true if the senderType passed. False otherwise
+	 */
+	public boolean subCommand(SenderType senderType, CommandExecutor executor) {
+		if (getSender().getType() == senderType) {
+			executor.run(this);
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Runs a sub command of this command if the index of the command matches the given index
+	 * @param index The index needed to run the command
+	 * @param executor The command method (method reference)
+	 * @return true if the index passed. False otherwise.
+	 */
+	public boolean subCommandAt(int index, CommandExecutor executor) {
+		if (getArgs().size()-1 == index) {
+			executor.run(this);
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Runs a sub command of this command if the index matches the given index and if the sender matches the given sender type
+	 * @param index The index needed to run the command
+	 * @param senderType The type of sender needed to run the subCommand
+	 * @param executor The command method (method reference)
+	 * @return true if the index and the senderType passed. False otherwise
+	 */
+	public boolean subCommandAt(int index, SenderType senderType, CommandExecutor executor) {
+		if (getArgs().size()-1 == index && getSender().getType() == senderType) {
+			executor.run(this);
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Runs a sub command of this command if the predicate passes.
+	 * @param predicate The predicate needed to pass
+	 * @param executor The command method (method reference)
+	 * @return true if the predicate passed. False otherwise
+	 */
+	public boolean subCommand(Predicate<CommandContext> predicate, CommandExecutor executor) {
+		if (predicate.test(this)) {
+			executor.run(this);
+			return true;
+		}
+		return false;
 	}
 }
