@@ -97,7 +97,7 @@ public final class TabContext {
 	 * @return The previous arg
 	 */
 	public String getPrevious() {
-		return context.getArgs().get(getLength());
+		return getLength() == 0 ? null : context.getArgs().get(getLength()-1);
 	}
 	
 	/**
@@ -106,7 +106,7 @@ public final class TabContext {
 	 * @return True if the previous arg matches the provided
 	 */
 	public boolean previous(String previousArg) {
-		return getPrevious().matches(previousArg);
+		return getPrevious() != null && getPrevious().matches(previousArg);
 	}
 	
 	/**
@@ -166,7 +166,7 @@ public final class TabContext {
 	 * @param index The index to get the arg from
 	 * @return The arg, null if it doesn't exist.
 	 */
-	public String getArg(int index) {
+	public String argAt(int index) {
 		return context.argAt(index);
 	}
 	
