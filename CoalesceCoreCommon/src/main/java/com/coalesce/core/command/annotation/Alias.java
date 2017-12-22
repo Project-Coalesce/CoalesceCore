@@ -8,10 +8,10 @@ import java.lang.annotation.Target;
 @Target( ElementType.METHOD )
 @Retention( RetentionPolicy.RUNTIME )
 public @interface Alias {
-	
-	/**
-	 * All the aliases for a command.
-	 */
-	String[] value() default "";
-	
+    
+    /**
+     * All the aliases for a command.
+     */
+    String[] value() default "";
+    
 }

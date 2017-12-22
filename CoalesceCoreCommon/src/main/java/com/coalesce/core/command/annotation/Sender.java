@@ -10,10 +10,10 @@ import java.lang.annotation.Target;
 @Target( ElementType.METHOD )
 @Retention( RetentionPolicy.RUNTIME )
 public @interface Sender {
-	
-	/**
-	 * The senders allowed to execute a command
-	 */
-	SenderType[] value() default SenderType.ALL;
-
+    
+    /**
+     * The senders allowed to execute a command
+     */
+    SenderType[] value() default SenderType.ALL;
+    
 }

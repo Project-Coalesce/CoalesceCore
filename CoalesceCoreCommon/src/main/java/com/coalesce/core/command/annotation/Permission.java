@@ -8,9 +8,9 @@ import java.lang.annotation.Target;
 @Target( ElementType.METHOD )
 @Retention( RetentionPolicy.RUNTIME )
 public @interface Permission {
-	
-	/**
-	 * The permission(s) needed to run this command.
-	 */
-	String value() default "";
+    
+    /**
+     * The permission(s) needed to run this command.
+     */
+    String[] value() default {};
 }

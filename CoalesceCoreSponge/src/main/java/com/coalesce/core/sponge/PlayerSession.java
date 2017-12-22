@@ -7,15 +7,15 @@ import org.spongepowered.api.entity.living.player.Player;
 import java.util.UUID;
 
 public class PlayerSession extends AbstractSession<Player> {
-	
-	private final Player player;
-	
-	public PlayerSession(ICoPlugin sessionOwner, String sessionKey, Player player) {
-		super(sessionOwner, "players", sessionKey, player);
-		this.player = player;
-	}
-	
-	public UUID getUserId() {
-		return player.getUniqueId();
-	}
+
+    private final Player player;
+
+    public PlayerSession(ICoPlugin sessionOwner, String sessionKey, Player player) {
+        super(sessionOwner, "players", sessionKey, player);
+        this.player = player;
+    }
+
+    public UUID getUserId() {
+        return player.getUniqueId();
+    }
 }
