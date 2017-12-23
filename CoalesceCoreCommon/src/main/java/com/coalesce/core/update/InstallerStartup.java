@@ -53,7 +53,7 @@ public class InstallerStartup {
     @SuppressWarnings("all")
     public void addUpdate(String oldFileName, String newFileName) {
         plugin.getCoLogger().info(oldFileName + " will be updated to " + newFileName + " upon restart.");
-        files.add(oldFileName + ":" + newFileName);
+        files.add(oldFileName + ":" + newFileName.concat(" "));
     }
     
     public void start() {
