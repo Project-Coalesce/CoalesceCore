@@ -46,6 +46,10 @@ public final class TestCommand {
             .hoverEvent((e) -> {
                 e.action(Text.HoverAction.SHOW_TEXT);
                 e.hover((h) -> h.setText("there").setColor(Color.PURPLE));
+            })
+            .clickEvent((e) -> {
+                e.action(Text.ClickAction.RUN_COMMAND);
+                e.click("/help");
             });
         });
         Coalesce.getCoPlayer(context.getSender().getName()).sendMessage(text);

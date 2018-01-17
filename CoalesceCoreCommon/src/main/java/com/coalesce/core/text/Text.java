@@ -19,8 +19,7 @@ public abstract class Text {
      * @return A new Text Section. This will clear all existing text sections.
      */
     public static TextSection of(String text) {
-        TextSection section = new TextSection(true, true, null).setText(text);
-        parent = section;
+        parent = new TextSection(true, true, null).setText(text);
         return parent;
     }
     
