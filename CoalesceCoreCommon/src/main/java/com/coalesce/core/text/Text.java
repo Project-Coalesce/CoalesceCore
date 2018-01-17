@@ -38,12 +38,20 @@ public abstract class Text {
         return section;
     }
     
+    /**
+     * Adds a text section to the current text
+     * @param consumer The text to append to this current section
+     */
     public final void append(Consumer<TextSection> consumer) {
         TextSection section = new TextSection(true);
         consumer.accept(section);
         getExtra().add(section);
     }
     
+    /**
+     * Gets all the additional text sections
+     * @return all the additional text sections.
+     */
     public List<TextSection> getExtra() {
         if (isParent()) {
             if (extra == null) return extra = new ArrayList<>();
@@ -56,6 +64,10 @@ public abstract class Text {
         this.isParent = parent;
     }
     
+    /**
+     * Checks if this current section is a parent section
+     * @return True if this section is the parent section, false otherwise.
+     */
     public final boolean isParent() {
         return isParent;
     }
@@ -66,6 +78,7 @@ public abstract class Text {
     public static class TextSection extends Text {
         
         private String text = "";
+        private String insertion;
         private HoverEvent hoverEvent;
         private ClickEvent clickEvent;
         private Color color = Color.RESET;
@@ -157,6 +170,17 @@ public abstract class Text {
         }
     
         /**
+         * When the current text is shift clicked, this will insert the given text
+         * @param insertion The text to insert
+         * @return This TextSection
+         */
+        public TextSection shiftClickEvent(String insertion) {
+            if (!canHaveEvents) return this;
+            this.insertion = insertion;
+            return this;
+        }
+        
+        /**
          * Adds a hover event to this text section
          * @param hoverEvent The hover event
          * @return This TextSection
@@ -167,26 +191,45 @@ public abstract class Text {
             hoverEvent.accept(this.hoverEvent);
             return this;
         }
-        
+    
+        /**
+         * Adds a hover event to this text section
+         * @param hoverEvent The hover event
+         * @return This TextSection
+         */
         public TextSection hoverEvent(HoverEvent hoverEvent) {
             if (!canHaveEvents) return this;
             this.hoverEvent = hoverEvent;
             return this;
         }
-        
+    
+        /**
+         * Adds a click event to this text section
+         * @param clickEvent The click event
+         * @return This TextSection
+         */
         public TextSection clickEvent(Consumer<ClickEvent> clickEvent) {
             if (!canHaveEvents) return this;
             this.clickEvent = new ClickEvent();
             clickEvent.accept(this.clickEvent);
             return this;
         }
-        
+    
+        /**
+         * Adds a click event to this text section
+         * @param clickEvent The click event
+         * @return This TextSection
+         */
         public TextSection clickEvent(ClickEvent clickEvent) {
             if (!canHaveEvents) return this;
             this.clickEvent = clickEvent;
             return this;
         }
-        
+    
+        /**
+         * Returns this TextSection as a JsonObject
+         * @return The TextSection JsonObject.
+         */
         public JsonObject getJson() {
     
             JsonObject hover = null;
@@ -207,10 +250,12 @@ public abstract class Text {
     
             JsonObject json = new JsonObject();
             json.addProperty("text", text);
+            json.addProperty("color", color.getComponentCode());
             if (bold) json.addProperty("bold", true);
             if (italics) json.addProperty("italic", true);
             if (underline) json.addProperty("underlined", true);
             if (obfuscated) json.addProperty("obfuscated", true);
+            if (insertion != null) json.addProperty("insertion", insertion);
             if (strikethrough) json.addProperty("strikethrough", true);
             if (hover != null) {
                 json.add("hoverEvent", hover);
@@ -221,6 +266,10 @@ public abstract class Text {
             return json;
         }
     
+        /**
+         * Turns this TextSection into a string.
+         * @return The jsonObject to a strign.
+         */
         @Override
         public String toString() {
             return getJson().toString();

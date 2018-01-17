@@ -29,16 +29,26 @@ public final class TestCommand {
                 .setColor(Color.BLUE)
                 .setBold(true)
                 .setItalics(true)
-                /*.clickEvent((e) -> {
+                .clickEvent((e) -> {
                     e.action(Text.ClickAction.SUGGEST_COMMAND);
-                    e.click((s) -> s.setText("click"));
-                })*/
+                    e.click("click");
+                })
                 .hoverEvent((e) -> {
                     e.action(Text.HoverAction.SHOW_TEXT);
                     e.hover((s) -> s.setText("hover"));
-                });
-    
-        System.out.println(context.getSender().getName());
+                })
+                .shiftClickEvent("insert");
+        text.append((s) -> {
+            s.setText(" im poo")
+            .setBold(true)
+            .setUnderlined(true)
+            .setColor(Color.DARK_GREEN)
+            .hoverEvent((e) -> {
+                e.action(Text.HoverAction.SHOW_TEXT);
+                e.hover((h) -> h.setText("there").setColor(Color.PURPLE));
+            });
+        });
+        System.out.println(text.toString());
         Coalesce.getCoPlayer(context.getSender().getName()).sendMessage(text);
     }
 

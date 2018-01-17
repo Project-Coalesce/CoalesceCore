@@ -11,87 +11,97 @@ public enum Color {
     /**
      * <div style="border:1px solid black;width:40px;height:20px;background-color:#000000;float:right;margin: 0 10px 0 0"></div>
      */
-    BLACK('0', Ansi.ansi().a(Ansi.Attribute.RESET).fg(Ansi.Color.BLACK).toString()),
+    BLACK('0', "black", Ansi.ansi().a(Ansi.Attribute.RESET).fg(Ansi.Color.BLACK).toString()),
     /**
      * <div style="border:1px solid black;width:40px;height:20px;background-color:#0000AA;float:right;margin: 0 10px 0 0"></div>
      */
-    DARK_BLUE('1', Ansi.ansi().a(Ansi.Attribute.RESET).fg(Ansi.Color.BLUE).toString()),
+    DARK_BLUE('1', "dark_blue", Ansi.ansi().a(Ansi.Attribute.RESET).fg(Ansi.Color.BLUE).toString()),
     /**
      * <div style="border:1px solid black;width:40px;height:20px;background-color:#00AA00;float:right;margin: 0 10px 0 0"></div>
      */
-    DARK_GREEN('2', Ansi.ansi().a(Ansi.Attribute.RESET).fg(Ansi.Color.GREEN).toString()),
+    DARK_GREEN('2', "dark_green", Ansi.ansi().a(Ansi.Attribute.RESET).fg(Ansi.Color.GREEN).toString()),
     /**
      * <div style="border:1px solid black;width:40px;height:20px;background-color:#00AAAA;float:right;margin: 0 10px 0 0"></div>
      */
-    AQUA('3', Ansi.ansi().a(Ansi.Attribute.RESET).fg(Ansi.Color.CYAN).toString()),
+    AQUA('3', "dark_aqua", Ansi.ansi().a(Ansi.Attribute.RESET).fg(Ansi.Color.CYAN).toString()),
     /**
      * <div style="border:1px solid black;width:40px;height:20px;background-color:#AA0000;float:right;margin: 0 10px 0 0"></div>
      */
-    DARK_RED('4', Ansi.ansi().a(Ansi.Attribute.RESET).fg(Ansi.Color.RED).toString()),
+    DARK_RED('4', "dark_red", Ansi.ansi().a(Ansi.Attribute.RESET).fg(Ansi.Color.RED).toString()),
     /**
      * <div style="border:1px solid black;width:40px;height:20px;background-color:#AA00AA;float:right;margin: 0 10px 0 0"></div>
      */
-    PURPLE('5', Ansi.ansi().a(Ansi.Attribute.RESET).fg(Ansi.Color.MAGENTA).toString()),
+    PURPLE('5', "dark_purple", Ansi.ansi().a(Ansi.Attribute.RESET).fg(Ansi.Color.MAGENTA).toString()),
     /**
      * <div style="border:1px solid black;width:40px;height:20px;background-color:#FFAA00;float:right;margin: 0 10px 0 0"></div>
      */
-    GOLD('6', Ansi.ansi().a(Ansi.Attribute.RESET).fg(Ansi.Color.YELLOW).toString()),
+    GOLD('6', "gold", Ansi.ansi().a(Ansi.Attribute.RESET).fg(Ansi.Color.YELLOW).toString()),
     /**
      * <div style="border:1px solid black;width:40px;height:20px;background-color:#AAAAAA;float:right;margin: 0 10px 0 0"></div>
      */
-    SILVER('7', Ansi.ansi().a(Ansi.Attribute.RESET).fg(Ansi.Color.WHITE).toString()),
+    SILVER('7', "gray", Ansi.ansi().a(Ansi.Attribute.RESET).fg(Ansi.Color.WHITE).toString()),
     /**
      * <div style="border:1px solid black;width:40px;height:20px;background-color:#555555;float:right;margin: 0 10px 0 0"></div>
      */
-    GRAY('8', Ansi.ansi().a(Ansi.Attribute.RESET).fg(Ansi.Color.BLACK).bold().toString()),
+    GRAY('8', "dark_gray", Ansi.ansi().a(Ansi.Attribute.RESET).fg(Ansi.Color.BLACK).bold().toString()),
     /**
      * <div style="border:1px solid black;width:40px;height:20px;background-color:#5555FF;float:right;margin: 0 10px 0 0"></div>
      */
-    BLUE('9', Ansi.ansi().a(Ansi.Attribute.RESET).fg(Ansi.Color.BLUE).bold().toString()),
+    BLUE('9', "blue", Ansi.ansi().a(Ansi.Attribute.RESET).fg(Ansi.Color.BLUE).bold().toString()),
     /**
      * <div style="border:1px solid black;width:40px;height:20px;background-color:#55FF55;float:right;margin: 0 10px 0 0"></div>
      */
-    GREEN('a', Ansi.ansi().a(Ansi.Attribute.RESET).fg(Ansi.Color.GREEN).bold().toString()),
+    GREEN('a', "green", Ansi.ansi().a(Ansi.Attribute.RESET).fg(Ansi.Color.GREEN).bold().toString()),
     /**
      * <div style="border:1px solid black;width:40px;height:20px;background-color:#55FFFF;float:right;margin: 0 10px 0 0"></div>
      */
-    LIGHT_BLUE('b', Ansi.ansi().a(Ansi.Attribute.RESET).fg(Ansi.Color.CYAN).bold().toString()),
+    LIGHT_BLUE('b', "aqua", Ansi.ansi().a(Ansi.Attribute.RESET).fg(Ansi.Color.CYAN).bold().toString()),
     /**
      * <div style="border:1px solid black;width:40px;height:20px;background-color:#FF5555;float:right;margin: 0 10px 0 0"></div>
      */
-    RED('c', Ansi.ansi().a(Ansi.Attribute.RESET).fg(Ansi.Color.RED).bold().toString()),
+    RED('c', "red", Ansi.ansi().a(Ansi.Attribute.RESET).fg(Ansi.Color.RED).bold().toString()),
     /**
      * <div style="border:1px solid black;width:40px;height:20px;background-color:#FF55FF;float:right;margin: 0 10px 0 0"></div>
      */
-    MAGENTA('d', Ansi.ansi().a(Ansi.Attribute.RESET).fg(Ansi.Color.MAGENTA).bold().toString()),
+    MAGENTA('d', "light_purple", Ansi.ansi().a(Ansi.Attribute.RESET).fg(Ansi.Color.MAGENTA).bold().toString()),
     /**
      * <div style="border:1px solid black;width:40px;height:20px;background-color:#FFFF55;float:right;margin: 0 10px 0 0"></div>
      */
-    YELLOW('e', Ansi.ansi().a(Ansi.Attribute.RESET).fg(Ansi.Color.YELLOW).bold().toString()),
+    YELLOW('e', "yellow", Ansi.ansi().a(Ansi.Attribute.RESET).fg(Ansi.Color.YELLOW).bold().toString()),
     /**
      * <div style="border:1px solid black;width:40px;height:20px;background-color:#FFFFFF;float:right;margin: 0 10px 0 0"></div>
      */
-    WHITE('f', Ansi.ansi().a(Ansi.Attribute.RESET).fg(Ansi.Color.WHITE).bold().toString()),
-    MAGIC('k', Ansi.ansi().a(Ansi.Attribute.BLINK_SLOW).toString()),
-    BOLD('l', Ansi.ansi().a(Ansi.Attribute.UNDERLINE_DOUBLE).toString()),
-    STRIKE('m', Ansi.ansi().a(Ansi.Attribute.STRIKETHROUGH_ON).toString()),
-    UNDERLINE('n', Ansi.ansi().a(Ansi.Attribute.UNDERLINE).toString()),
-    ITALICS('o', Ansi.ansi().a(Ansi.Attribute.ITALIC).toString()),
-    RESET('r', Ansi.ansi().a(Ansi.Attribute.RESET).toString());
+    WHITE('f', "white", Ansi.ansi().a(Ansi.Attribute.RESET).fg(Ansi.Color.WHITE).bold().toString()),
+    MAGIC('k', "obfuscated", Ansi.ansi().a(Ansi.Attribute.BLINK_SLOW).toString()),
+    BOLD('l', "bold", Ansi.ansi().a(Ansi.Attribute.UNDERLINE_DOUBLE).toString()),
+    STRIKE('m', "strikethrough", Ansi.ansi().a(Ansi.Attribute.STRIKETHROUGH_ON).toString()),
+    UNDERLINE('n', "underline", Ansi.ansi().a(Ansi.Attribute.UNDERLINE).toString()),
+    ITALICS('o', "italics", Ansi.ansi().a(Ansi.Attribute.ITALIC).toString()),
+    RESET('r', "reset", Ansi.ansi().a(Ansi.Attribute.RESET).toString());
     
     private char code;
     private String ansi;
+    private String componentCode;
     public static final char CHAR = '\u00A7';
     private static final Pattern STRIP_COLOR_PATTERN = Pattern.compile("(?i)" + String.valueOf(CHAR) + "[0-9A-FK-OR]"); //Bukkit
     
-    Color(char code, String ansi) {
+    Color(char code, String componentCode, String ansi) {
         this.code = code;
         this.ansi = ansi;
+        this.componentCode = componentCode;
     }
     
     @Override
     public String toString() {
         return new String(new char[]{CHAR, code});
+    }
+    
+    /**
+     * Gets the color code name for textcomponents
+     * @return The TextComponent code.
+     */
+    public String getComponentCode() {
+        return componentCode;
     }
     
     /**

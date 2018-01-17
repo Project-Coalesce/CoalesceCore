@@ -8,8 +8,6 @@ import com.coalesce.core.text.Text;
 import com.coalesce.core.text.Title;
 import com.coalesce.core.text.Toast;
 import com.coalesce.core.wrappers.CoPlayer;
-import net.minecraft.server.v1_12_R1.IChatBaseComponent;
-import net.minecraft.server.v1_12_R1.PacketPlayOutChat;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
