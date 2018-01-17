@@ -48,7 +48,6 @@ public final class TestCommand {
                 e.hover((h) -> h.setText("there").setColor(Color.PURPLE));
             });
         });
-        System.out.println(text.toString());
         Coalesce.getCoPlayer(context.getSender().getName()).sendMessage(text);
     }
 

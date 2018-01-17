@@ -2,7 +2,6 @@ package com.coalesce.core.text;
 
 import com.coalesce.core.Color;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
@@ -13,18 +12,16 @@ import java.util.function.Consumer;
 public abstract class Text {
     
     private static TextSection parent;
-    private List<TextSection> extra;
-    private boolean isParent = false;
-    
+ 
     /**
      * Creates a new Text.
      * @param text The beginning text
      * @return A new Text Section. This will clear all existing text sections.
      */
     public static TextSection of(String text) {
-        TextSection section = new TextSection(true).setText(text);
-        section.setParent(true);
-        return parent = section;
+        TextSection section = new TextSection(true, true, null).setText(text);
+        parent = section;
+        return parent;
     }
     
     /**
@@ -33,8 +30,8 @@ public abstract class Text {
      * @return The newly created text section
      */
     public final TextSection append(String text) {
-        TextSection section = new TextSection(true).setText(text);
-        getExtra().add(section);
+        TextSection section = new TextSection(true, false, parent).setText(text);
+        parent.getExtra().add(section);
         return section;
     }
     
@@ -43,33 +40,9 @@ public abstract class Text {
      * @param consumer The text to append to this current section
      */
     public final void append(Consumer<TextSection> consumer) {
-        TextSection section = new TextSection(true);
+        TextSection section = new TextSection(true, false, parent);
         consumer.accept(section);
-        getExtra().add(section);
-    }
-    
-    /**
-     * Gets all the additional text sections
-     * @return all the additional text sections.
-     */
-    public List<TextSection> getExtra() {
-        if (isParent()) {
-            if (extra == null) return extra = new ArrayList<>();
-            return extra;
-        }
-        else return parent.getExtra();
-    }
-    
-    final void setParent(boolean parent) {
-        this.isParent = parent;
-    }
-    
-    /**
-     * Checks if this current section is a parent section
-     * @return True if this section is the parent section, false otherwise.
-     */
-    public final boolean isParent() {
-        return isParent;
+        section.getExtra().add(section);
     }
     
     /**
@@ -79,18 +52,25 @@ public abstract class Text {
         
         private String text = "";
         private String insertion;
+        private TextSection parent;
         private HoverEvent hoverEvent;
         private ClickEvent clickEvent;
         private Color color = Color.RESET;
+        private static List<TextSection> extra;
         private boolean bold = false;
         private boolean italics = false;
+        private boolean isParent = false;
         private boolean underline = false;
         private boolean obfuscated = false;
         private boolean canHaveEvents = true;
         private boolean strikethrough = false;
         
-        private TextSection(boolean events) {
+        private TextSection(boolean events, boolean isParent, TextSection parent) {
             this.canHaveEvents = events;
+            this.isParent = isParent;
+            if (!isParent) {
+                this.parent = parent;
+            } else extra = new ArrayList<>();
         }
     
         /**
@@ -187,7 +167,7 @@ public abstract class Text {
          */
         public TextSection hoverEvent(Consumer<HoverEvent> hoverEvent) {
             if (!canHaveEvents) return this;
-            this.hoverEvent = new HoverEvent();
+            this.hoverEvent = new HoverEvent(parent);
             hoverEvent.accept(this.hoverEvent);
             return this;
         }
@@ -227,6 +207,31 @@ public abstract class Text {
         }
     
         /**
+         * Checks if this current section is a parent section
+         * @return True if this section is the parent section, false otherwise.
+         */
+        public final boolean isParent() {
+            return isParent;
+        }
+    
+        /**
+         * Gets all the additional text sections
+         * @return all the additional text sections.
+         */
+        public List<TextSection> getExtra() {
+            if (isParent()) return extra;
+            else return getParent().getExtra();
+        }
+        
+        /**
+         * Returns the parent of the entire TextComponent
+         * @return The parent TextSection
+         */
+        public final TextSection getParent() {
+            return parent;
+        }
+        
+        /**
          * Returns this TextSection as a JsonObject
          * @return The TextSection JsonObject.
          */
@@ -263,6 +268,13 @@ public abstract class Text {
             if (click != null) {
                 json.add("clickEvent", click);
             }
+            if (isParent) {
+                List<JsonObject> sections = new ArrayList<>();
+                for (TextSection section : getExtra()) {
+                    sections.add(section.getJson());
+                }
+                json.add("extra", new GsonBuilder().setPrettyPrinting().create().toJsonTree(sections));
+            }
             return json;
         }
     
@@ -282,7 +294,11 @@ public abstract class Text {
     public class HoverEvent {
         
         private HoverAction action = HoverAction.SHOW_TEXT;
-        private TextSection text = new TextSection(false);
+        private TextSection text;
+        
+        public HoverEvent(TextSection parent) {
+            this.text = new TextSection(false, false, parent);
+        }
         
         public final void action(HoverAction action) {
             this.action = action;
@@ -375,11 +391,6 @@ public abstract class Text {
      */
     @Override
     public String toString() {
-        JsonArray extra = new JsonArray();
-        for (TextSection section : parent.getExtra()) {
-            extra.add(section.toString());
-        }
-        parent.getJson().add("extra", extra);
-        return parent.toString();
+        return parent.getJson().toString();
     }
 }
