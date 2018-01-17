@@ -5,10 +5,12 @@ import com.coalesce.core.Platform;
 import com.coalesce.core.chat.CoFormatter;
 import com.coalesce.core.command.base.CommandStore;
 import com.coalesce.core.session.SessionStore;
+import com.coalesce.core.wrappers.CoPlayer;
 import jline.console.ConsoleReader;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -237,5 +239,13 @@ public interface ICoPlugin {
      * @return The online player names.
      */
     Set<String> getOnlinePlayers();
+    
+    /**
+     * Gets a collection of registered CoPlayer objects
+     * @return Collection of CoPlayers.
+     */
+    <T> Collection<CoPlayer<T>> getCoPlayers();
+    
+    <T> CoPlayer<T> getCoPlayer(String name);
     
 }

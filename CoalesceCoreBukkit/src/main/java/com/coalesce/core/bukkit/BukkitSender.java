@@ -8,12 +8,12 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
-public final class BukkitSender implements CoSender<CommandSender> {
+public class BukkitSender implements CoSender<CommandSender> {
     
     private final ICoPlugin plugin;
     private final CommandSender sender;
     
-    public BukkitSender(CommandSender sender, ICoPlugin plugin) {
+    public <T extends CommandSender> BukkitSender(T sender, ICoPlugin plugin) {
         this.sender = sender;
         this.plugin = plugin;
     }
