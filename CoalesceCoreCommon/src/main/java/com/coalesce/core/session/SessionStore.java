@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 @SuppressWarnings( {"unchecked", "WeakerAccess", "unused"} )
 public final class SessionStore {
     
-    private final Map<String, NamespacedSessionStore<? extends AbstractSession>> namespaces;
+    private final Map<String, NamespacedSessionStore<? extends ISession>> namespaces;
     
     public SessionStore() {
         this.namespaces = new HashMap<>();
@@ -31,7 +31,7 @@ public final class SessionStore {
      *
      * @return The plugin namespaces
      */
-    public List<NamespacedSessionStore<AbstractSession>> getNamespaces() {
+    public List<NamespacedSessionStore<ISession>> getNamespaces() {
         return new ArrayList(namespaces.values());
     }
     
@@ -41,8 +41,8 @@ public final class SessionStore {
      * @param name The name of the namespace
      * @return The namespace
      */
-    public NamespacedSessionStore<AbstractSession> getNamespace(String name) {
-        return (NamespacedSessionStore<AbstractSession>)namespaces.get(name);
+    public NamespacedSessionStore<ISession> getNamespace(String name) {
+        return (NamespacedSessionStore<ISession>)namespaces.get(name);
     }
     
     /**
@@ -63,7 +63,7 @@ public final class SessionStore {
      * @param plugin The owning plugin
      * @return A list of namespaces
      */
-    public List<NamespacedSessionStore<AbstractSession>> getNamespaces(ICoPlugin plugin) {
+    public List<NamespacedSessionStore<ISession>> getNamespaces(ICoPlugin plugin) {
         return plugin.getSessionStore(plugin).getNamespaces();
     }
     
@@ -73,11 +73,11 @@ public final class SessionStore {
      * @param namespace The name of the namespace to add
      * @return The created namespace
      */
-    public NamespacedSessionStore<AbstractSession> addNamespace(String namespace) {
+    public NamespacedSessionStore<ISession> addNamespace(String namespace) {
         if (namespaces.containsKey(namespace)) {
-            return (NamespacedSessionStore<AbstractSession>)namespaces.get(namespace);
+            return (NamespacedSessionStore<ISession>)namespaces.get(namespace);
         }
-        NamespacedSessionStore<AbstractSession> ns = new NamespacedSessionStore(namespace, AbstractSession.class);
+        NamespacedSessionStore<ISession> ns = new NamespacedSessionStore(namespace, AbstractSession.class);
         namespaces.put(namespace, ns);
         return ns;
     }
@@ -90,7 +90,7 @@ public final class SessionStore {
      * @param <T>         The sessionType.
      * @return The created namespaced session.
      */
-    public <T extends AbstractSession> NamespacedSessionStore<T> addNamespace(String namespace, Class<T> sessionType) {
+    public <T extends ISession> NamespacedSessionStore<T> addNamespace(String namespace, Class<T> sessionType) {
         if (namespaces.containsKey(namespace)) {
             return (NamespacedSessionStore<T>)namespaces.get(namespace);
         }
@@ -118,7 +118,7 @@ public final class SessionStore {
      *
      * @param predicate The predicate needed to be matched
      */
-    public void removeNamespaces(Predicate<NamespacedSessionStore<? extends AbstractSession>> predicate) {
+    public void removeNamespaces(Predicate<NamespacedSessionStore<? extends ISession>> predicate) {
         namespaces.values().stream().filter(predicate).map(NamespacedSessionStore::getName).forEach(this::removeNamespace);
     }
 }

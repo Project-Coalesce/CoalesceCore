@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public final class NamespacedSessionStore<T extends AbstractSession> {
+public final class NamespacedSessionStore<T extends ISession> {
 
     private final Map<String, T> sessions;
     private final String namespace;
