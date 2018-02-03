@@ -1,0 +1,5 @@
+name: ${project.artifactId}
+version: ${project.version}
+description: An API for Bukkit Plugins
+author: NJDaeger
+main: com.coalesce.core.Core

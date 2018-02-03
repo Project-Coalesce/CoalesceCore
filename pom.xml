@@ -6,7 +6,7 @@
 
     <groupId>com.coalesce</groupId>
     <artifactId>CoalesceCoreParent</artifactId>
-    <version>1.0.0</version>
+    <version>2.0.0</version>
     <packaging>pom</packaging>
 
     <properties>
@@ -21,9 +21,7 @@
 
     <modules>
         <module>Coalescing</module>
-        <module>CoalesceCoreCommon</module>
-        <module>CoalesceCoreBukkit</module>
-        <module>CoalesceCoreSponge</module>
+        <module>CoalesceCore</module>
     </modules>
 
     <build>
@@ -75,7 +73,7 @@
                 <configuration>
                     <outputDirectory>docs/</outputDirectory>
                     <jarOutputDirectory>jars/</jarOutputDirectory>
-                    <additionalparam>-Xdoclint:none</additionalparam>
+                    <!--<doclint>none</doclint>-->
                 </configuration>
             </plugin>
 
