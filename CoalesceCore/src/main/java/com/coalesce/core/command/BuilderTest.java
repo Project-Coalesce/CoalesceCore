@@ -3,10 +3,9 @@ package com.coalesce.core.command;
 import com.coalesce.core.Coalesce;
 import com.coalesce.core.Color;
 import com.coalesce.core.SenderType;
+import com.coalesce.core.command.base.CommandContext;
 import com.coalesce.core.command.base.ProcessedCommand;
-import com.coalesce.core.command.base.TestCommandContext;
-import com.coalesce.core.command.base.TestRegister;
-import com.coalesce.core.command.base.TestTabContext;
+import com.coalesce.core.command.base.TabContext;
 import com.coalesce.core.plugin.ICoPlugin;
 import com.coalesce.core.text.Text;
 import org.bukkit.entity.Player;
@@ -15,7 +14,7 @@ public final class BuilderTest {
 
     public BuilderTest(ICoPlugin plugin) {
 
-        ProcessedCommand<TestCommandContext, TestTabContext> command = ProcessedCommand.builder(TestCommandContext.class, TestTabContext.class, plugin, "test2")
+        ProcessedCommand<CommandContext, TabContext> command = ProcessedCommand.builder(plugin, "test2")
                 .permission("core.test1")
                 .executor(this::testCommand2)
                 .completer(this::testCompletion)
@@ -24,14 +23,14 @@ public final class BuilderTest {
                 .usage("/test")
                 .description("tests the builder pattern command registration").build();
 
-        plugin.getCommandStore().registerCommand(command, new TestRegister(command));
+        plugin.getCommandStore().registerCommand(command);
     }
     
-    private void testCompletion(TestTabContext tabContext) {
+    private void testCompletion(TabContext tabContext) {
         tabContext.completion("hi", "hello");
     }
     
-    private void testCommand2(TestCommandContext context) {
+    private void testCommand2(CommandContext context) {
         System.out.println(Color.toConsoleColor('&', context.joinArgs()));
         
         Text text = Text.of("Hello")
