@@ -219,7 +219,7 @@ public class CommandContext<C extends CommandContext, T extends TabContext> {
      * @param allowed The sender type that is allowed.
      */
     public void notCorrectSender(SenderType... allowed) {
-        send(plugin.getCoFormatter().format(Color.RED + "You are not the correct sender type to run this command! You must be one of the following: " + Color.SILVER + Arrays.toString(Stream.of(allowed).map(t -> t.toString().toLowerCase()).toArray())));
+        send(plugin.getCoFormatter().format(Color.RED + "You are not the correct sender type to run this command! You must be one of the following: " + Color.SILVER + Arrays.toString(Stream.of(allowed).map(t -> t.toString().toLowerCase() + ",").toArray())));
     }
     
     /**
