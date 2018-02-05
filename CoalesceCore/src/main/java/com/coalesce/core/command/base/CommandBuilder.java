@@ -20,7 +20,7 @@ public final class CommandBuilder<C extends CommandContext, T extends TabContext
      * @param plugin The plugin the command is registered to
      * @param name   The name of the command
      */
-    CommandBuilder(ICoPlugin plugin, String name) {
+    public CommandBuilder(ICoPlugin plugin, String name) {
         this.command = new ProcessedCommand<>(plugin, name);
     }
     
@@ -89,7 +89,7 @@ public final class CommandBuilder<C extends CommandContext, T extends TabContext
      *
      * @param permission The required permission node.
      */
-    public CommandBuilder<C, T> permission(String permission) {
+    public CommandBuilder<C, T> permission(String... permission) {
         command.setPermission(permission);
         return this;
     }

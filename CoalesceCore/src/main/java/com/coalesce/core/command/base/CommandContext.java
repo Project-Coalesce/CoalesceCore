@@ -9,8 +9,9 @@ import com.coalesce.core.wrappers.CoSender;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
-//@SuppressWarnings({"unused", "unchecked", "WeakerAccess"})
+@SuppressWarnings({"unused", "unchecked", "WeakerAccess"})
 public class CommandContext<C extends CommandContext, T extends TabContext> {
     
     private ICoPlugin plugin;
@@ -211,6 +212,14 @@ public class CommandContext<C extends CommandContext, T extends TabContext> {
      */
     public void notEnoughArgs(int min, int given) {
         send(plugin.getCoFormatter().format(Color.RED + "Not enough arguments supplied to run command!" + Color.RED + "Minimum: " + Color.SILVER + min + Color.RED + "Given: " + Color.SILVER + given));
+    }
+    
+    /**
+     * Sends the sender the default, formatted, notCorrectSender message
+     * @param allowed The sender type that is allowed.
+     */
+    public void notCorrectSender(SenderType... allowed) {
+        send(plugin.getCoFormatter().format(Color.RED + "You are not the correct sender type to run this command! You must be one of the following: " + Color.SILVER + Arrays.toString(Stream.of(allowed).map(t -> t.toString().toLowerCase()).toArray())));
     }
     
     /**

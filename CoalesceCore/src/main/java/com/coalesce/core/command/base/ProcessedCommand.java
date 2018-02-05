@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 @SuppressWarnings({"unused", "unchecked", "WeakerAccess"})
-public final class ProcessedCommand<C extends CommandContext, T extends TabContext> {
+public class ProcessedCommand<C extends CommandContext, T extends TabContext> {
     
     private CommandExecutor<C> commandExecutor;
     private TabExecutor<T> tabExecutor;
@@ -27,7 +27,7 @@ public final class ProcessedCommand<C extends CommandContext, T extends TabConte
     private int min = -1;
     private int max = -1;
     
-    ProcessedCommand(ICoPlugin plugin, String name) {
+    public ProcessedCommand(ICoPlugin plugin, String name) {
         this.name = name;
         this.plugin = plugin;
     }
@@ -43,6 +43,13 @@ public final class ProcessedCommand<C extends CommandContext, T extends TabConte
         return new CommandBuilder<>(plugin, name);
     }
     
+    /**
+     * The ProcessedCommand Builder
+     *
+     * @param plugin The plugin registering the command
+     * @param name   The name of the command
+     * @return The command builder
+     */
     public static CommandBuilder<CommandContext, TabContext> builder(ICoPlugin plugin, String name) {
         return builder(CommandContext.class, TabContext.class, plugin, name);
     }
@@ -227,6 +234,8 @@ public final class ProcessedCommand<C extends CommandContext, T extends TabConte
         return plugin;
     }
     
+    
+    
     public boolean run(C context) {
         
         CoSender sender = context.getSender();
@@ -247,29 +256,22 @@ public final class ProcessedCommand<C extends CommandContext, T extends TabConte
         
         if (this.permission != null) {
             if (!sender.hasAnyPermission(this.permission)) {
-                StringBuilder builder = new StringBuilder();
-                for (String permission : this.permission) {
-                    builder.append(permission).append(", ");
-                }
-                sender.pluginMessage(Color.RED + "You do not have sufficient permission to run this command! One of the following permission(s) are required: " + Color.SILVER + builder.deleteCharAt(builder.lastIndexOf(",")).toString().trim());
+                context.noPermission(this.permission);
                 return true;
             }
         }
         
         if (!senderType) {
-            StringBuilder builder = new StringBuilder();
-            for (SenderType type : senders)
-                builder.append(type.toString()).append(", ");
-            sender.pluginMessage(Color.RED + "You are not the correct sender type to run this " + "command! One of the following sender type(s) are required: " + Color.SILVER + builder.deleteCharAt(builder.lastIndexOf(",")).toString().trim());
+            context.notCorrectSender(senders);
             return true;
         }
         
         if (args.length < min && this.getMin() > -1) {
-            sender.pluginMessage(Color.RED + "Not enough arguments supplied to run command!" + Color.RED + " Minimum: " + Color.SILVER + min + Color.RED + " Given: " + Color.SILVER + args.length);
+            context.notEnoughArgs(min, args.length);
             return true;
         }
         if (args.length > max && this.getMax() > -1) {
-            sender.pluginMessage(Color.RED + "Too many arguments supplied to run command!" + Color.RED + " Maximum: " + Color.SILVER + max + Color.RED + " Given: " + Color.SILVER + args.length);
+            context.tooManyArgs(max, args.length);
             return true;
         }
         commandExecutor.run(context);
