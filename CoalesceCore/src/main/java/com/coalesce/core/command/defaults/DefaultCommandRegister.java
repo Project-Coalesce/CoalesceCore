@@ -1,5 +1,9 @@
-package com.coalesce.core.command.base;
+package com.coalesce.core.command.defaults;
 
+import com.coalesce.core.command.base.CommandContext;
+import com.coalesce.core.command.base.CommandRegister;
+import com.coalesce.core.command.base.ProcessedCommand;
+import com.coalesce.core.command.base.TabContext;
 import com.coalesce.core.wrappers.CoSender;
 import org.bukkit.command.CommandSender;
 

@@ -1,6 +1,7 @@
 package com.coalesce.core.command.base;
 
 import com.coalesce.core.Color;
+import com.coalesce.core.command.defaults.DefaultCommandRegister;
 import com.coalesce.core.plugin.ICoPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandMap;

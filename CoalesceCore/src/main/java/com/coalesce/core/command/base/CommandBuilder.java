@@ -10,9 +10,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @SuppressWarnings("unused")
-public final class CommandBuilder<C extends CommandContext, T extends TabContext> {
+public abstract class CommandBuilder<C extends CommandContext, T extends TabContext, P extends ProcessedCommand<C, T>> {
     
-    private ProcessedCommand<C, T> command;
+    protected P command;
     
     /**
      * Creates a new CommandBuilder
@@ -20,8 +20,8 @@ public final class CommandBuilder<C extends CommandContext, T extends TabContext
      * @param plugin The plugin the command is registered to
      * @param name   The name of the command
      */
-    public CommandBuilder(ICoPlugin plugin, String name) {
-        this.command = new ProcessedCommand<>(plugin, name);
+    public CommandBuilder(ICoPlugin plugin, String name, P command) {
+        this.command = command;
     }
     
     /**
@@ -29,7 +29,7 @@ public final class CommandBuilder<C extends CommandContext, T extends TabContext
      *
      * @param executor The method of this command. Should be this::method_name
      */
-    public CommandBuilder<C, T> executor(CommandExecutor<C> executor) {
+    public CommandBuilder<C, T, P> executor(CommandExecutor<C> executor) {
         command.setCommandExecutor(executor);
         return this;
     }
@@ -39,7 +39,7 @@ public final class CommandBuilder<C extends CommandContext, T extends TabContext
      *
      * @param executor The method of this command's tab completer
      */
-    public CommandBuilder<C, T> completer(TabExecutor<T> executor) {
+    public CommandBuilder<C, T, P> completer(TabExecutor<T> executor) {
         command.setTabExecutor(executor);
         return this;
     }
@@ -49,7 +49,7 @@ public final class CommandBuilder<C extends CommandContext, T extends TabContext
      *
      * @param aliases List of aliases.
      */
-    public CommandBuilder<C, T> aliases(String... aliases) {
+    public CommandBuilder<C, T, P> aliases(String... aliases) {
         command.setAliases(Stream.of(aliases).map(String::toLowerCase).collect(Collectors.toSet()));
         return this;
     }
@@ -59,7 +59,7 @@ public final class CommandBuilder<C extends CommandContext, T extends TabContext
      *
      * @param aliases List of aliases.
      */
-    public CommandBuilder<C, T> aliases(Set<String> aliases) {
+    public CommandBuilder<C, T, P> aliases(Set<String> aliases) {
         command.setAliases(aliases);
         return this;
     }
@@ -69,7 +69,7 @@ public final class CommandBuilder<C extends CommandContext, T extends TabContext
      *
      * @param description The command description.
      */
-    public CommandBuilder<C, T> description(String description) {
+    public CommandBuilder<C, T, P> description(String description) {
         command.setDescription(description);
         return this;
     }
@@ -79,7 +79,7 @@ public final class CommandBuilder<C extends CommandContext, T extends TabContext
      *
      * @param usage The command usage.
      */
-    public CommandBuilder<C, T> usage(String usage) {
+    public CommandBuilder<C, T, P> usage(String usage) {
         command.setUsage(usage);
         return this;
     }
@@ -89,7 +89,7 @@ public final class CommandBuilder<C extends CommandContext, T extends TabContext
      *
      * @param permission The required permission node.
      */
-    public CommandBuilder<C, T> permission(String... permission) {
+    public CommandBuilder<C, T, P> permission(String... permission) {
         command.setPermission(permission);
         return this;
     }
@@ -99,7 +99,7 @@ public final class CommandBuilder<C extends CommandContext, T extends TabContext
      *
      * @param minArgs The min amount of args without error.
      */
-    public CommandBuilder<C, T> minArgs(int minArgs) {
+    public CommandBuilder<C, T, P> minArgs(int minArgs) {
         command.setMin(minArgs);
         return this;
     }
@@ -109,7 +109,7 @@ public final class CommandBuilder<C extends CommandContext, T extends TabContext
      *
      * @param maxArgs The max amount of args without error.
      */
-    public CommandBuilder<C, T> maxArgs(int maxArgs) {
+    public CommandBuilder<C, T, P> maxArgs(int maxArgs) {
         command.setMax(maxArgs);
         return this;
     }
@@ -119,7 +119,7 @@ public final class CommandBuilder<C extends CommandContext, T extends TabContext
      *
      * @param allowedSenders The senders allowed to run the command
      */
-    public CommandBuilder<C, T> senders(SenderType... allowedSenders) {
+    public CommandBuilder<C, T, P> senders(SenderType... allowedSenders) {
         command.setSenders(allowedSenders);
         return this;
     }
@@ -129,7 +129,7 @@ public final class CommandBuilder<C extends CommandContext, T extends TabContext
      *
      * @return A new ProcessedCommand.
      */
-    public ProcessedCommand<C, T> build() {
+    public P build() {
         return command;
     }
     

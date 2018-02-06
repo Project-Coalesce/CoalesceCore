@@ -1,9 +1,9 @@
 package com.coalesce.core.command.base;
 
-import com.coalesce.core.Color;
 import com.coalesce.core.SenderType;
 import com.coalesce.core.command.builder.interfaces.CommandExecutor;
 import com.coalesce.core.command.builder.interfaces.TabExecutor;
+import com.coalesce.core.command.defaults.DefaultCommandBuilder;
 import com.coalesce.core.plugin.ICoPlugin;
 import com.coalesce.core.wrappers.CoSender;
 
@@ -39,19 +39,8 @@ public class ProcessedCommand<C extends CommandContext, T extends TabContext> {
      * @param name   The name of the command
      * @return The command builder
      */
-    public static <C extends CommandContext, T extends TabContext> CommandBuilder<C, T> builder(Class<C> cContext, Class<T> tContext, ICoPlugin plugin, String name) {
-        return new CommandBuilder<>(plugin, name);
-    }
-    
-    /**
-     * The ProcessedCommand Builder
-     *
-     * @param plugin The plugin registering the command
-     * @param name   The name of the command
-     * @return The command builder
-     */
-    public static CommandBuilder<CommandContext, TabContext> builder(ICoPlugin plugin, String name) {
-        return builder(CommandContext.class, TabContext.class, plugin, name);
+    public static DefaultCommandBuilder builder(ICoPlugin plugin, String name) {
+        return new DefaultCommandBuilder(plugin, name);
     }
     
     /**
