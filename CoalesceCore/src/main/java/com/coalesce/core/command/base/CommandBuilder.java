@@ -9,8 +9,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-@SuppressWarnings("unused")
-public abstract class CommandBuilder<C extends CommandContext, T extends TabContext, P extends ProcessedCommand<C, T>> {
+@SuppressWarnings({"unused", "unchecked"})
+public abstract class CommandBuilder<C extends CommandContext, T extends TabContext, B extends CommandBuilder<C, T, B, P>, P extends ProcessedCommand<C, T, B>> {
     
     protected P command;
     
@@ -29,9 +29,9 @@ public abstract class CommandBuilder<C extends CommandContext, T extends TabCont
      *
      * @param executor The method of this command. Should be this::method_name
      */
-    public CommandBuilder<C, T, P> executor(CommandExecutor<C> executor) {
+    public B executor(CommandExecutor<C> executor) {
         command.setCommandExecutor(executor);
-        return this;
+        return (B)this;
     }
     
     /**
@@ -39,9 +39,9 @@ public abstract class CommandBuilder<C extends CommandContext, T extends TabCont
      *
      * @param executor The method of this command's tab completer
      */
-    public CommandBuilder<C, T, P> completer(TabExecutor<T> executor) {
+    public B completer(TabExecutor<T> executor) {
         command.setTabExecutor(executor);
-        return this;
+        return (B)this;
     }
     
     /**
@@ -49,9 +49,9 @@ public abstract class CommandBuilder<C extends CommandContext, T extends TabCont
      *
      * @param aliases List of aliases.
      */
-    public CommandBuilder<C, T, P> aliases(String... aliases) {
+    public B aliases(String... aliases) {
         command.setAliases(Stream.of(aliases).map(String::toLowerCase).collect(Collectors.toSet()));
-        return this;
+        return (B)this;
     }
     
     /**
@@ -59,9 +59,9 @@ public abstract class CommandBuilder<C extends CommandContext, T extends TabCont
      *
      * @param aliases List of aliases.
      */
-    public CommandBuilder<C, T, P> aliases(Set<String> aliases) {
+    public B aliases(Set<String> aliases) {
         command.setAliases(aliases);
-        return this;
+        return (B)this;
     }
     
     /**
@@ -69,9 +69,9 @@ public abstract class CommandBuilder<C extends CommandContext, T extends TabCont
      *
      * @param description The command description.
      */
-    public CommandBuilder<C, T, P> description(String description) {
+    public B description(String description) {
         command.setDescription(description);
-        return this;
+        return (B)this;
     }
     
     /**
@@ -79,9 +79,9 @@ public abstract class CommandBuilder<C extends CommandContext, T extends TabCont
      *
      * @param usage The command usage.
      */
-    public CommandBuilder<C, T, P> usage(String usage) {
+    public B usage(String usage) {
         command.setUsage(usage);
-        return this;
+        return (B)this;
     }
     
     /**
@@ -89,9 +89,9 @@ public abstract class CommandBuilder<C extends CommandContext, T extends TabCont
      *
      * @param permission The required permission node.
      */
-    public CommandBuilder<C, T, P> permission(String... permission) {
+    public B permission(String... permission) {
         command.setPermission(permission);
-        return this;
+        return (B)this;
     }
     
     /**
@@ -99,9 +99,9 @@ public abstract class CommandBuilder<C extends CommandContext, T extends TabCont
      *
      * @param minArgs The min amount of args without error.
      */
-    public CommandBuilder<C, T, P> minArgs(int minArgs) {
+    public B minArgs(int minArgs) {
         command.setMin(minArgs);
-        return this;
+        return (B)this;
     }
     
     /**
@@ -109,9 +109,9 @@ public abstract class CommandBuilder<C extends CommandContext, T extends TabCont
      *
      * @param maxArgs The max amount of args without error.
      */
-    public CommandBuilder<C, T, P> maxArgs(int maxArgs) {
+    public B maxArgs(int maxArgs) {
         command.setMax(maxArgs);
-        return this;
+        return (B)this;
     }
     
     /**
@@ -119,9 +119,9 @@ public abstract class CommandBuilder<C extends CommandContext, T extends TabCont
      *
      * @param allowedSenders The senders allowed to run the command
      */
-    public CommandBuilder<C, T, P> senders(SenderType... allowedSenders) {
+    public B senders(SenderType... allowedSenders) {
         command.setSenders(allowedSenders);
-        return this;
+        return (B)this;
     }
     
     /**

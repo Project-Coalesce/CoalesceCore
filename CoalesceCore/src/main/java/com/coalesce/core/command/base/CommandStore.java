@@ -1,6 +1,7 @@
 package com.coalesce.core.command.base;
 
 import com.coalesce.core.Color;
+import com.coalesce.core.command.defaults.DefaultCommandBuilder;
 import com.coalesce.core.command.defaults.DefaultCommandRegister;
 import com.coalesce.core.plugin.ICoPlugin;
 import org.bukkit.Bukkit;
@@ -13,7 +14,7 @@ import java.util.Map;
 @SuppressWarnings({"unused", "WeakerAccess", "u"})
 public class CommandStore {
     
-    private final Map<String, ProcessedCommand<? extends CommandContext, ? extends TabContext>> commandMap;
+    private final Map<String, ProcessedCommand<? extends CommandContext, ? extends TabContext, ? extends DefaultCommandBuilder>> commandMap;
     private final ICoPlugin plugin;
     private CommandMap bukkitCommandMap;
     
@@ -40,7 +41,7 @@ public class CommandStore {
      *
      * @param command The command info.
      */
-    public <C extends CommandContext, T extends TabContext, R extends CommandRegister<C, T>> void registerCommand(ProcessedCommand<C, T> command, R register) {
+    public <C extends CommandContext, T extends TabContext, B extends CommandBuilder, R extends CommandRegister<C, T, B>> void registerCommand(ProcessedCommand<C, T, B> command, R register) {
         if (this.bukkitCommandMap == null) {
             throw new RuntimeException("Bukkit CommandMap could not be found");
         }
@@ -49,7 +50,7 @@ public class CommandStore {
         }
     }
     
-    public void registerCommand(ProcessedCommand<CommandContext, TabContext> command) {
+    public void registerCommand(ProcessedCommand<CommandContext, TabContext, DefaultCommandBuilder> command) {
         registerCommand(command, new DefaultCommandRegister(command));
     }
     
@@ -72,7 +73,7 @@ public class CommandStore {
      * @param name The name of the command to get.
      * @return The command if exists.
      */
-    public ProcessedCommand<? extends CommandContext, ? extends TabContext> getCommand(String name) {
+    public ProcessedCommand<? extends CommandContext, ? extends TabContext, ? extends DefaultCommandBuilder> getCommand(String name) {
         return commandMap.get(name);
     }
 }

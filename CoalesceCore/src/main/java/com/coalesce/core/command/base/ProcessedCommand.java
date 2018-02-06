@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 @SuppressWarnings({"unused", "unchecked", "WeakerAccess"})
-public class ProcessedCommand<C extends CommandContext, T extends TabContext> {
+public abstract class ProcessedCommand<C extends CommandContext, T extends TabContext, B extends CommandBuilder> {
     
     private CommandExecutor<C> commandExecutor;
     private TabExecutor<T> tabExecutor;

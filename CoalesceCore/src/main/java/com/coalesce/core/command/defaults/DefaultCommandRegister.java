@@ -10,9 +10,9 @@ import org.bukkit.command.CommandSender;
 import java.util.List;
 
 @SuppressWarnings("WeakerAccess")
-public final class DefaultCommandRegister extends CommandRegister<CommandContext, TabContext> {
+public final class DefaultCommandRegister extends CommandRegister<CommandContext, TabContext, DefaultCommandBuilder> {
     
-    public DefaultCommandRegister(ProcessedCommand<CommandContext, TabContext> command) {
+    public DefaultCommandRegister(ProcessedCommand<CommandContext, TabContext, DefaultCommandBuilder> command) {
         super(command, command.getPlugin());
     }
     

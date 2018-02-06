@@ -6,6 +6,7 @@ import com.coalesce.core.SenderType;
 import com.coalesce.core.command.base.CommandContext;
 import com.coalesce.core.command.base.ProcessedCommand;
 import com.coalesce.core.command.base.TabContext;
+import com.coalesce.core.command.defaults.DefaultCommandBuilder;
 import com.coalesce.core.plugin.ICoPlugin;
 import com.coalesce.core.text.Text;
 import org.bukkit.entity.Player;
@@ -14,7 +15,7 @@ public final class BuilderTest {
 
     public BuilderTest(ICoPlugin plugin) {
 
-        ProcessedCommand<CommandContext, TabContext> command = ProcessedCommand.builder(plugin, "test2")
+        ProcessedCommand<CommandContext, TabContext, DefaultCommandBuilder> command = ProcessedCommand.builder(plugin, "test2")
                 .permission("core.test1")
                 .executor(this::testCommand2)
                 .completer(this::testCompletion)

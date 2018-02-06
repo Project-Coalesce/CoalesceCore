@@ -13,15 +13,15 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @SuppressWarnings({"WeakerAccess", "unused", "unchecked"})
-public class TabContext<C extends CommandContext, T extends TabContext> {
+public class TabContext<C extends CommandContext, T extends TabContext, B extends CommandBuilder> {
     
-    private final ProcessedCommand<C, T> command;
+    private final ProcessedCommand<C, T, B> command;
     private final List<String> possible;
     private final CoSender sender;
     private final String[] args;
     private final C context;
     
-    public TabContext(C context, ProcessedCommand<C, T> command, String[] args) {
+    public TabContext(C context, ProcessedCommand<C, T, B> command, String[] args) {
         this.possible = new ArrayList<>();
         this.sender = context.getSender();
         this.command = command;
@@ -244,7 +244,7 @@ public class TabContext<C extends CommandContext, T extends TabContext> {
      * @param executor  The completion method (method reference)
      * @return true if the predicate passed. False otherwise
      */
-    public boolean subCompletion(Predicate<TabContext<C, T>> predicate, TabExecutor<T> executor) {
+    public boolean subCompletion(Predicate<TabContext<C, T, B>> predicate, TabExecutor<T> executor) {
         if (predicate.test(this)) {
             executor.run((T)this);
             return true;
