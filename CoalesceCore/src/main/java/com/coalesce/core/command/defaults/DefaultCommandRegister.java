@@ -18,11 +18,11 @@ public final class DefaultCommandRegister extends CommandRegister<CommandContext
     
     @Override
     public boolean execute(CommandSender sender, String alias, String[] args) {
-        return command.run(new CommandContext<>(new CoSender(plugin, sender), args, plugin));
+        return command.run(new CommandContext<>(new CoSender(plugin, sender), alias, args, plugin));
     }
     
     @Override
     public List<String> tabComplete(CommandSender sender, String alias, String[] args) throws IllegalArgumentException {
-        return command.complete(new TabContext<>(new CommandContext<>(new CoSender(plugin, sender), args, plugin), command, args));
+        return command.complete(new TabContext<>(new CommandContext<>(new CoSender(plugin, sender), alias, args, plugin), command, args));
     }
 }

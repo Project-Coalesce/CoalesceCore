@@ -15,13 +15,23 @@ import java.util.stream.Stream;
 public class CommandContext<C extends CommandContext, T extends TabContext> {
     
     private ICoPlugin plugin;
+    private final String alias;
     private final CoSender sender;
     private final List<String> args;
     
-    public CommandContext(CoSender sender, String[] args, ICoPlugin plugin) {
+    public CommandContext(CoSender sender, String alias, String[] args, ICoPlugin plugin) {
+        this.alias = alias;
         this.plugin = plugin;
         this.sender = sender;
         this.args = Arrays.asList(args);
+    }
+    
+    /**
+     * Gets the current alias being used to run this command
+     * @return The alias used
+     */
+    public String getAlias() {
+        return alias;
     }
     
     /**

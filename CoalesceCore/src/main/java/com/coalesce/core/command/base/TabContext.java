@@ -30,6 +30,14 @@ public class TabContext<C extends CommandContext, T extends TabContext, B extend
     }
     
     /**
+     * Gets the current alias being used to run this command
+     * @return The alias used
+     */
+    public String getAlias() {
+        return context.getAlias();
+    }
+    
+    /**
      * Checks if the sender has a specific permission
      *
      * @param permission The permission to check for
