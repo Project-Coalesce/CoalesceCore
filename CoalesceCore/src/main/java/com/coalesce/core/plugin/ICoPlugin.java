@@ -4,7 +4,7 @@ import com.coalesce.core.Color;
 import com.coalesce.core.chat.CoFormatter;
 import com.coalesce.core.command.base.CommandStore;
 import com.coalesce.core.session.SessionStore;
-import jline.console.ConsoleReader;
+import org.bukkit.craftbukkit.libs.jline.console.ConsoleReader;
 import org.bukkit.plugin.Plugin;
 
 import java.io.File;

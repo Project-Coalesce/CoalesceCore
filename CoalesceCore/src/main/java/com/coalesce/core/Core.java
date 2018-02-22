@@ -5,8 +5,8 @@ import com.coalesce.core.config.YmlConfig;
 import com.coalesce.core.plugin.ICoPlugin;
 import com.coalesce.core.session.SessionStore;
 import com.coalesce.core.update.InstallerStartup;
-import jline.console.ConsoleReader;
-import jline.console.completer.CandidateListCompletionHandler;
+import org.bukkit.Bukkit;
+import org.bukkit.craftbukkit.libs.jline.console.ConsoleReader;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,8 +15,8 @@ public class Core extends CoPlugin {
     
     private static final Map<ICoPlugin, SessionStore> SESSION_STORES = new HashMap<>();
     private static final Map<String, ICoPlugin> PLUGINS = new HashMap<>();
-    private static ConsoleReader consoleReader;
     private static InstallerStartup installer;
+    private static ConsoleReader consoleReader;
     
     @Override
     public void onPluginEnable() throws Exception {
@@ -32,9 +32,7 @@ public class Core extends CoPlugin {
     @Override
     public void onPluginLoad() throws Exception {
         installer = new InstallerStartup(this);
-        consoleReader = new ConsoleReader(System.in, System.out);
-        consoleReader.setCompletionHandler(new CandidateListCompletionHandler());
-        consoleReader.setExpandEvents(false);
+        consoleReader = (ConsoleReader)Bukkit.getServer().getClass().getDeclaredMethod("getReader", null).invoke(Bukkit.getServer(), null);
     }
     
     @Override

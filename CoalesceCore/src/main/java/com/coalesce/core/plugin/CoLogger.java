@@ -1,6 +1,6 @@
 package com.coalesce.core.plugin;
 
-import jline.Terminal;
+import org.bukkit.craftbukkit.libs.jline.Terminal;
 import org.fusesource.jansi.Ansi;
 
 import static com.coalesce.core.Color.*;
