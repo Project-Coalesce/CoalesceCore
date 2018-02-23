@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("WeakerAccess")
 public class UpdateLookup implements Runnable {
     
     /*
@@ -65,7 +66,7 @@ public class UpdateLookup implements Runnable {
                     List<Asset> javaAssets = data.assets.stream().filter(check -> check.assetName.substring((check.assetName.length() - 3)).equalsIgnoreCase("jar")).collect(Collectors.toList());
                 
                     if (javaAssets.size() == 0) {
-                        System.out.println("Cannot find a jar to download! Download the update manually at " + data.getUrl());
+                        plugin.getCoLogger().warn("Cannot find a jar to download! Download the update manually at " + data.getUrl());
                         return;
                     } else if (javaAssets.size() == 1) {
                         Asset download = javaAssets.get(0);
@@ -79,24 +80,24 @@ public class UpdateLookup implements Runnable {
                     List<Asset> labeledAssets = javaAssets.stream().filter(check -> check.label != null && check.label.equals("Auto-Download")).collect(Collectors.toList());
                 
                     if (labeledAssets.size() != 1) {
-                        System.out.println(String.format("More than one possible jar was found in the release \"%s\". Aborting auto-update. You can update manually.", data.getUrl()));
+                        plugin.getCoLogger().warn(String.format("More than one possible jar was found in the release \"%s\". Aborting auto-update. You can update manually.", data.getUrl()));
                         return;
                     }
                 
                     Asset download = labeledAssets.get(0);
                     new DownloadThread(plugin, new URL(download.downloadURL), downloadLocation, download.assetName).start();
                 } else {
-                    System.out.println("Download it at: " + data.getUrl());
+                    plugin.getCoLogger().warn("Download it at: " + data.getUrl());
                 }
                 return;
             }
-            System.out.println(plugin.getRealName() + " is up to date.");
+            plugin.getCoLogger().info(plugin.getRealName() + " is up to date.");
         }
         catch (NullPointerException e) {
-            System.out.println("Could not find latest released version from GitHub. (This plugin may not have a public release yet)");
+            plugin.getCoLogger().warn("Could not find latest released version from GitHub. (This plugin may not have a public release yet)");
         }
         catch (Exception e) {
-            System.out.println("There was an error checking for updates.");
+            plugin.getCoLogger().error("There was an error checking for updates.");
         }
     }
     
