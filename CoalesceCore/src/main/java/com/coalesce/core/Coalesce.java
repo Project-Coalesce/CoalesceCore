@@ -72,10 +72,21 @@ public final class Coalesce {
     
     }
     
-    private static Class<?> getNMSClass(String className) {
+    public static Class<?> getNMSClass(String className) {
         String version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
         try {
             return Class.forName("net.minecraft.server." + version + "." + className);
+        }
+        catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    
+    public static Class<?> getOBCClass(String className) {
+        String version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
+        try {
+            return Class.forName("org.bukkit.craftbukkit." + version + "." + className);
         }
         catch (ClassNotFoundException e) {
             e.printStackTrace();
