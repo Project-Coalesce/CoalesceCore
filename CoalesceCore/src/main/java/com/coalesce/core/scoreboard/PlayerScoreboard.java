@@ -1,135 +1,76 @@
 package com.coalesce.core.scoreboard;
 
+import com.coalesce.core.Color;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
-import java.util.stream.Stream;
 
 public class PlayerScoreboard implements CoScoreboard<Function<Player, String>> {
-
+    
+    private Objective objective;
+    private final Scoreboard scoreboard;
     private Function<Player, String> title;
-    private final Map<Function<Player, String>, Integer> entries;
-
-    private PlayerScoreboard(Builder builder) {
-
-        title = builder.title;
-        entries = builder.entries;
+    private final Map<Integer, Function<Player, String>> lines;
+    
+    public PlayerScoreboard() {
+        this.lines = new HashMap<>();
+        this.scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
     }
-
+    
     @Override
-    public void send(Player player) {
-
-        Scoreboard scoreboard = generateScoreboard(player);
-        player.setScoreboard(scoreboard);
+    public Map<Integer, Function<Player, String>> getLines() {
+        return lines;
     }
-
+    
     @Override
-    public void send(Collection<Player> players) {
-        players.forEach(this::send);
+    public Objective getObjective() {
+        return objective;
     }
-
-    private Scoreboard generateScoreboard(Player player) {
-
-        Scoreboard scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
-        String titleString = title.apply(player);
-
-        Objective scoreboardObjective = scoreboard.registerNewObjective(titleString, "dummy");
-        scoreboardObjective.setDisplayName(titleString);
-        scoreboardObjective.setDisplaySlot(DisplaySlot.SIDEBAR);
-
-        entries.forEach((playerStringFunction, score) -> {
-
-            String entryString = playerStringFunction.apply(player);
-            scoreboardObjective.getScore(entryString).setScore(score);
-
-        });
-
+    
+    @Override
+    public Scoreboard getScoreboard() {
         return scoreboard;
     }
-
+    
     @Override
-    public void setTitle(Function<Player, String> titleEntry) {
-        this.title = titleEntry;
+    public Function<Player, String> blankLine(int line) {
+        String base = Color.RESET.toString();
+        for (int i = 0; i <  line; i++) {
+            base = base.concat(Color.RESET.toString());
+        }
+        String finalBase = base;
+        return player -> finalBase;
     }
-
+    
     @Override
-    public void addEntry(Function<Player, String> entry, int score) {
-
-        entries.put(entry, score);
+    public void setTitle(Function<Player, String> title) {
+        this.title = title;
     }
-
-    public void addEntry(Function<Player, String> entry) {
-
-        addEntry(entry, MAX_ENTRIES - entries.size());
-    }
-
-    public void addEntries(Collection<Function<Player, String>> entries) {
-
-        entries.forEach(this::addEntry);
-    }
-
+    
     @Override
-    public void removeEntry(Function<Player, String> entry) {
-        entries.remove(entry);
+    public void send(Player player) {
+        
+        if (objective != null) {
+            objective.unregister();
+        }
+        //Resets the objective
+        objective = scoreboard.registerNewObjective(title.apply(player), "dummy");
+        objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+        objective.setDisplayName(title.apply(player));
+        
+        //Updates the scoreboard
+        int i = 0;
+        while (i < lines.size()) {
+            objective.getScore(lines.get(i).apply(player)).setScore(-i+15);
+            i++;
+        }
+        
+        player.setScoreboard(scoreboard);
     }
-
-    @Override
-    public void clearEntries() {
-        entries.clear();
-    }
-
-    public static class Builder {
-
-        private Function<Player, String> title;
-        private Map<Function<Player, String>, Integer> entries;
-
-        public Builder() {
-            this.title = (player -> "");
-
-            entries = new HashMap<>(MAX_ENTRIES);
-        }
-
-        public Builder title(Function<Player, String> title) {
-            this.title = title;
-
-            return this;
-        }
-
-        public Builder title(String title) {
-            this.title = (player -> title);
-
-            return this;
-        }
-
-        public Builder addEntry(Function<Player, String> entry) {
-
-            entries.put(entry, MAX_ENTRIES - entries.size());
-            return this;
-        }
-
-        public Builder addEntries(Function<Player, String>... entries) {
-
-            Stream.of(entries).forEach(this::addEntry);
-
-            return this;
-        }
-
-        public Builder addEntry(Function<Player, String> entry, int score) {
-
-            entries.put(entry, score);
-            return this;
-        }
-
-        public PlayerScoreboard build() {
-            return new PlayerScoreboard(this);
-        }
-    }
-
 }

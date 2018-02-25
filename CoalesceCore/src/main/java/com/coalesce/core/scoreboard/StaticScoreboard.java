@@ -1,148 +1,75 @@
 package com.coalesce.core.scoreboard;
 
+import com.coalesce.core.Color;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Stream;
 
 public class StaticScoreboard implements CoScoreboard<String> {
-
-    private final Scoreboard scoreboard;
-    private Objective scoreboardObjective;
+    
     private String title;
-    private final Map<String, Integer> entries;
-
-    private StaticScoreboard(Builder builder) {
-
-        scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
-
-        title = builder.title;
-        entries = builder.entries;
-
-        update();
+    private Objective objective;
+    private final Scoreboard scoreboard;
+    private final Map<Integer, String> lines;
+    
+    public StaticScoreboard() {
+        this.lines = new HashMap<>();
+        this.scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
     }
-
-    public void update() {
-
-        if (scoreboardObjective != null) {
-            scoreboardObjective.unregister();
+    
+    @Override
+    public Map<Integer, String> getLines() {
+        return lines;
+    }
+    
+    @Override
+    public Objective getObjective() {
+        return objective;
+    }
+    
+    @Override
+    public Scoreboard getScoreboard() {
+        return scoreboard;
+    }
+    
+    @Override
+    public String blankLine(int line) {
+        String base = Color.RESET.toString();
+        for (int i = 0; i <  line; i++) {
+            base = base.concat(Color.RESET.toString());
         }
-
-        //Update the objective
-        scoreboardObjective = scoreboard.registerNewObjective(title, "dummy");
-        scoreboardObjective.setDisplayName(this.title);
-        scoreboardObjective.setDisplaySlot(DisplaySlot.SIDEBAR);
-
-        //Sets the data to the scoreboard
-        entries.forEach((entry, score) -> {
-
-            scoreboardObjective.getScore(entry).setScore(score);
-        });
+        return base;
     }
-
+    
+    @Override
+    public void setTitle(String title) {
+        this.title = title;
+    }
+    
     @Override
     public void send(Player player) {
-
+        
+        if (objective != null) {
+            objective.unregister();
+        }
+        //Resets the objective
+        objective = scoreboard.registerNewObjective(title, "dummy");
+        objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+        objective.setDisplayName(title);
+        
+        //Updates the scoreboard
+        int i = 0;
+        while (i < lines.size()) {
+            objective.getScore(lines.get(i)).setScore(-i+15);
+            i++;
+        }
+        
         player.setScoreboard(scoreboard);
     }
-
-    @Override
-    public void send(Collection<Player> players) {
-        players.forEach(this::send);
-    }
-
-    @Override
-    public void setTitle(String titleEntry) {
-        this.title = titleEntry;
-    }
-
-    @Override
-    public void addEntry(String message, int score) {
-
-        while (entries.containsKey(message)) {
-            message = message + ChatColor.RESET;
-        }
-
-        entries.put(message, score);
-    }
-
-    public void addEntry(String message) {
-
-        addEntry(message, MAX_ENTRIES - entries.size());
-    }
-
-    public void addEntries(Collection<String> messages) {
-
-        messages.forEach(this::addEntry);
-    }
-
-    @Override
-    public void removeEntry(String entry) {
-        entries.remove(entry);
-    }
-
-    @Override
-    public void clearEntries() {
-        entries.clear();
-    }
-
-    public static class Builder {
-
-        private String title;
-        private Map<String, Integer> entries;
-
-        public Builder() {
-
-            this.title = "";
-            entries = new HashMap<>(MAX_ENTRIES);
-        }
-
-        public Builder title(String title) {
-
-            this.title = title;
-
-            return this;
-        }
-
-        public Builder addEntry(String message) {
-
-            while (entries.containsKey(message)) {
-                message = message + ChatColor.RESET;
-            }
-
-            entries.put(message, MAX_ENTRIES - entries.size());
-
-            return this;
-        }
-
-        public Builder addEntries(String... messages) {
-
-            Stream.of(messages).forEach(this::addEntry);
-
-            return this;
-        }
-
-        public Builder addEntry(String message, int score) {
-
-            while (entries.containsKey(message)) {
-                message = message + ChatColor.RESET;
-            }
-
-            entries.put(message, score);
-
-            return this;
-        }
-
-        public StaticScoreboard build() {
-            return new StaticScoreboard(this);
-        }
-    }
-
+    
 }
