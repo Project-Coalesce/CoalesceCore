@@ -1,7 +1,6 @@
 package com.coalesce.core.config;
 
 import com.coalesce.core.config.base.BaseConfig;
-import com.coalesce.core.config.common.Entry;
 import com.coalesce.core.plugin.ICoPlugin;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -45,12 +44,6 @@ public class YmlConfig extends BaseConfig {
         }
         
         this.config = YamlConfiguration.loadConfiguration(file);
-        
-        config.getKeys(true).forEach(key -> {
-            if (getEntry(key) == null) {
-                entries.add(new Entry(this, key, config.get(key)));
-            }
-        });
     }
     
     @Override
@@ -61,7 +54,6 @@ public class YmlConfig extends BaseConfig {
     @Override
     public void addEntry(String path, Object value) {
         if (config.get(path) == null) {
-            entries.add(new Entry(this, path, value));
             setValue(path, value);
         }
     }
@@ -69,17 +61,16 @@ public class YmlConfig extends BaseConfig {
     @Override
     public void setEntry(String path, Object value) {
         setValue(path, value);
-        if (value == null || contains(path, true)) {
-            entries.remove(getEntry(path));
-        }
-        if (value != null) {
-            entries.add(new Entry(this, path, value));
-        }
     }
     
     @Override
     public File getFile() {
         return file;
+    }
+    
+    @Override
+    public Object getValue(String path) {
+        return config.get(path);
     }
     
     private void setValue(String path, Object val) {

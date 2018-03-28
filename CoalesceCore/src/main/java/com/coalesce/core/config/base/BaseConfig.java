@@ -10,7 +10,6 @@ public abstract class BaseConfig implements IConfig {
     private final String name;
     private final ICoPlugin plugin;
     private final boolean createNow;
-    protected final Collection<IEntry> entries;
     
     /**
      * Creates a new configuration
@@ -30,7 +29,6 @@ public abstract class BaseConfig implements IConfig {
      * @param createNow If true, the file will be created upon initializing this constructor, false wont create the file right away.
      */
     public BaseConfig(String name, ICoPlugin plugin, boolean createNow) {
-        this.entries = new HashSet<>();
         this.createNow = createNow;
         this.plugin = plugin;
         this.name = name;
@@ -44,10 +42,5 @@ public abstract class BaseConfig implements IConfig {
     @Override
     public String getName() {
         return name;
-    }
-    
-    @Override
-    public Collection<IEntry> getEntries() {
-        return entries;
     }
 }

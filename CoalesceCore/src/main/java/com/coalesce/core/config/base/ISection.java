@@ -3,7 +3,8 @@ package com.coalesce.core.config.base;
 import com.coalesce.core.config.common.Section;
 import com.coalesce.core.plugin.ICoPlugin;
 
-import java.util.HashSet;
+import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -17,29 +18,13 @@ public interface ISection {
      * @return A Set of Keys.
      */
     default Set<String> getKeys(boolean deep) {
-        Set<String> keys = new HashSet<>();
+        
+        Set<String> keys = getConfig().getKeys(true).stream().filter(k -> k.startsWith(getCurrentPath()) && k.contains(".")).collect(Collectors.toSet());
         if (deep) {
-            getConfig().getEntries().stream().filter(e -> e.getPath().startsWith(getCurrentPath() + ".")).forEach(e -> keys.add(e.getPath()));
+            return keys;
         } else {
-            getConfig().getEntries().stream().filter(e -> e.getPath().startsWith(getCurrentPath() + ".")).forEach(e -> {
-                String key = e.getPath().substring(getCurrentPath().length() + 1);
-                int size = key.indexOf(".");
-                if (size < 0) {
-                    size = key.length();
-                }
-                keys.add(key.substring(0, size));
-            });
+            return keys.stream().map(k -> k.replaceFirst(getCurrentPath() + "\\.", "")).map(k -> k.substring(0, (!k.contains(".") ? k.length() : k.indexOf(".")))).collect(Collectors.toSet());
         }
-        return keys;
-    }
-    
-    /**
-     * Gets all the entries that exist in this configuration section.
-     *
-     * @return A set of entries in this section.
-     */
-    default Set<IEntry> getEntries() {
-        return getConfig().getEntries().stream().filter(e -> e.getPath().startsWith(getCurrentPath() + ".")).collect(Collectors.toSet());
     }
     
     /**
@@ -49,7 +34,130 @@ public interface ISection {
      * @return A section of the configuration.
      */
     default ISection getSection(String path) {
-        return new Section(getCurrentPath() + "." + path, getConfig(), getPlugin());
+        String base = getParent() == null ? getCurrentPath() : getCurrentPath() + ".";
+        return new Section(base + path, getConfig());
+    }
+    
+    /**
+     * Gets a list of sections currently in this section
+     *
+     * @param name The path to get a list of sections from.
+     * @return A list of sections from a config section
+     */
+    default List<ISection> getSections(final String name) {//This needs fixed
+        return getSection(name).getKeys(false).stream().filter(k -> getValue(k) == null).map(k -> new Section(name + "." + k, getConfig())).collect(Collectors.toList());
+    }
+    
+    /**
+     * Gets a value from a config entry.
+     *
+     * @param path The path in the configuration.
+     * @return A string from the specified path.
+     */
+    default String getString(String path) {
+        return getValueAs(path, String.class);
+    }
+    
+    /**
+     * Gets a value from a config entry.
+     *
+     * @param path The path in the configuration.
+     * @return A double from the specified path.
+     */
+    default double getDouble(String path) {
+        return getValueAs(path, Double.class);
+    }
+    
+    /**
+     * Gets a value from a config entry.
+     *
+     * @param path The path in the configuration.
+     * @return An integer from the specified path.
+     */
+    default int getInt(String path) {
+        return getValueAs(path, Integer.class);
+    }
+    
+    /**
+     * Gets a value from a config entry.
+     *
+     * @param path The path in the configuration.
+     * @return A long from the specified path.
+     */
+    default long getLong(String path) {
+        return getValueAs(path, Long.class);
+    }
+    
+    /**
+     * Gets a value from a config entry.
+     *
+     * @param path The path in the configuration.
+     * @return A boolean from the specified path.
+     */
+    default boolean getBoolean(String path) {
+        return getValueAs(path, Boolean.class);
+    }
+    
+    /**
+     * Gets a value from a config entry.
+     *
+     * @param path The path in the configuration.
+     * @return A list from the specified path.
+     */
+    default List<?> getList(String path) {
+        return getValueAs(path, List.class);
+    }
+    
+    /**
+     * Gets a value from a config entry.
+     *
+     * @param path The path in the configuration.
+     * @return A flat from the specified path.
+     */
+    default float getFloat(String path) {
+        return getValueAs(path, Float.class);
+    }
+    
+    /**
+     * Gets a specific type of list.
+     *
+     * @param path The path to the list
+     * @param type The type of list to return
+     * @param <E>  The list type
+     * @return The list
+     */
+    @SuppressWarnings( {"unchecked", "unused"} )
+    default <E> List<E> getList(String path, Class<E> type) {
+        return (List<E>)getList(path);
+    }
+    
+    /**
+     * Gets a List of Strings from a path in this config.
+     *
+     * @param path The path to get the strings from.
+     * @return A list from the specified path.
+     */
+    default List<String> getStringList(String path) {
+        return getList(path, String.class);
+    }
+    
+    /**
+     * Gets all the keys which have the matching value
+     * @param value The value needing to be matched
+     * @return The entries found in this search
+     */
+    default Collection<String> getKeysFromValue(Object value) {
+        return getKeys(true).stream().filter(k -> getValue(k).equals(value)).collect(Collectors.toList());
+    }
+    
+    /**
+     * Gets a value from a config entry.
+     *
+     * @param path The path in the configuration.
+     * @return An object from the specified path.
+     */
+    default Object getValue(String path) {
+        return getConfig().getValue(getCurrentPath() + "." + path);
     }
     
     /**
@@ -63,42 +171,67 @@ public interface ISection {
     }
     
     /**
-     * Gets the current path of the configuration section.
-     *
-     * @return The current path
-     */
-    String getCurrentPath();
-    
-    /**
      * The name of the section.
      *
      * @return The name of the section.
      */
     default String getName() {
-        return getCurrentPath().substring(getCurrentPath().lastIndexOf("."));
+        return getCurrentPath().substring(!getCurrentPath().contains(".") ? 0 : getCurrentPath().lastIndexOf("."));
     }
     
     /**
-     * Gets the base configuration of this section.
-     *
-     * @return The current configuration
+     * Get the entry provided as a certain type.
+     * @param path Path to the entry
+     * @param type The type class wanting to be returned
+     * @param <T> The return type
+     * @return Null if the entry doesn't exist, the entry as the provided type otherwise.
      */
-    IConfig getConfig();
+    @SuppressWarnings( "unchecked" )
+    default <T> T getValueAs(String path, Class<T> type) {
+        if (getValue(path) == null) return null;
+        
+        if (type.equals(Long.class)) {
+            return (T)Long.valueOf(getValue(path).toString());
+        }
+        if (type.equals(Byte.class)) {
+            return (T)Byte.valueOf(getValue(path).toString());
+        }
+        if (type.equals(Float.class)) {
+            return (T)Float.valueOf(getValue(path).toString());
+        }
+        if (type.equals(Short.class)) {
+            return (T)Short.valueOf(getValue(path).toString());
+        }
+        if (type.equals(Double.class)) {
+            return (T)Double.valueOf(getValue(path).toString());
+        }
+        if (type.equals(Integer.class)) {
+            return (T)Integer.valueOf(getValue(path).toString());
+        }
+        if (type.isEnum()) {
+            return (T)Enum.valueOf(type.asSubclass(Enum.class), getValue(path).toString().toUpperCase());
+        }
+        return ((T)getValue(path));
+    }
     
     /**
-     * Gets the host plugin.
+     * Checks if this configuration contains a specified path
      *
-     * @return The host plugin.
+     * @param path  The path to look for
+     * @param exact Whether the path to look for needs to be an entry or if it just needs to exist.
+     * @return True if the path exists.
      */
-    ICoPlugin getPlugin();
-    
-    /**
-     * Gets an entry from a section
-     *
-     * @param path The path to the entry. <p>Note: dont use the string provided originally to get this entry</p> //TODO: elaborate more and create getEntry Implementations in Json and yml config.
-     */
-    default IEntry getEntry(String path) {
-        return getConfig().getEntry(getCurrentPath() + "." + path);
+    default boolean contains(String path, boolean exact) {
+        if (exact) {
+            return getValue(path) != null;
+        } else {
+            for (String entry : getKeys(true)) {
+                if (entry.startsWith(path)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
     
     /**
@@ -110,8 +243,51 @@ public interface ISection {
         if (!getCurrentPath().contains(".")) {
             return null;
         } else {
-            return new Section(getCurrentPath().substring(0, getCurrentPath().lastIndexOf(".")), getConfig(), getPlugin());
+            return new Section(getCurrentPath().substring(0, getCurrentPath().lastIndexOf(".")), getConfig());
         }
     }
+    
+    /**
+     * Gets the host plugin.
+     *
+     * @return The host plugin.
+     */
+    default ICoPlugin getPlugin() {
+        return getConfig().getPlugin();
+    }
+    
+    /**
+     * Adds a new entry to the current config.
+     *
+     * @param path  The path in the config.
+     * @param value The value to set this entry to.
+     */
+    void addEntry(String path, Object value);
+    
+    /**
+     * Adds a new entry to the current config. If the
+     * config already has a value at the path location
+     * it will be updated with the new value supplied
+     * from this method.
+     *
+     * @param path  The path in the config.
+     * @param value The value to set the path to.
+     */
+    void setEntry(String path, Object value);
+    
+    /**
+     * Gets the current path of the configuration section.
+     *
+     * @return The current path
+     */
+    String getCurrentPath();
+    
+    /**
+     * Gets the base configuration of this section.
+     *
+     * @return The current configuration
+     */
+    IConfig getConfig();
+    
     
 }

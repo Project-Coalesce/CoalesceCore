@@ -1,6 +1,5 @@
 package com.coalesce.core.config.base;
 
-import com.coalesce.core.config.common.Section;
 import com.coalesce.core.plugin.ICoPlugin;
 
 import java.io.File;
@@ -8,61 +7,34 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @SuppressWarnings({"unused"})
-public interface IConfig {
+public interface IConfig extends ISection {
     
-    /**
-     * Gets the owning plugin
-     *
-     * @return The owning plugin
-     */
-    ICoPlugin getPlugin();
+    @Override
+    String getName();
     
-    /**
-     * Gets all the keys (as strings) in this configuration.
-     *
-     * @return The set of keys.
-     */
+    @Override
     Set<String> getKeys(boolean deep);
     
-    /**
-     * Gets all the entries in a config.
-     *
-     * @return A collection of entries in a config.
-     */
-    Collection<IEntry> getEntries();
+    @Override
+    Object getValue(String path);
     
-    /**
-     * Adds a new entry to the current config.
-     *
-     * @param path  The path in the config.
-     * @param value The value to set this entry to.
-     */
+    @Override
+    ICoPlugin getPlugin();
+    
+    @Override
+    default String getCurrentPath() {
+        return "";
+    }
+    
+    @Override
     void addEntry(String path, Object value);
     
-    /**
-     * Adds a new entry to the current config. If the
-     * config already has a value at the path location
-     * it will be updated with the new value supplied
-     * from this method.
-     *
-     * @param path  The path in the config.
-     * @param value The value to set the path to.
-     */
+    @Override
     void setEntry(String path, Object value);
-    
-    /**
-     * The name of the config
-     *
-     * @return The name of the current config.
-     */
-    String getName();
     
     /**
      * Gets the config file.
@@ -70,65 +42,6 @@ public interface IConfig {
      * @return The file of this config.
      */
     File getFile();
-    
-    /**
-     * Gets a value from a config entry.
-     *
-     * @param path The path in the configuration.
-     * @return An object from the specified path.
-     */
-    default Object getValue(String path) {
-        if (contains(path, true)) {
-            return getEntry(path).getValue();
-        } else {
-            return null;
-        }
-    }
-    
-    /**
-     * Checks if this configuration contains a specified path
-     *
-     * @param path  The path to look for
-     * @param exact Whether the path to look for needs to be an entry or if it just needs to exist.
-     * @return True if the path exists.
-     */
-    default boolean contains(String path, boolean exact) {
-        if (exact) {
-            return getEntry(path) != null;
-        } else {
-            for (IEntry entry : getEntries()) {
-                if (entry.getPath().startsWith(path)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-    
-    /**
-     * Gets a section of the configuration
-     *
-     * @param name The path of this section
-     * @return The section
-     */
-    default ISection getSection(String name) {
-        return new Section(name, this, getPlugin());
-    }
-    
-    /**
-     * Gets an entry from a config.
-     *
-     * @param path The path in the config.
-     * @return The entry that is at that path.
-     */
-    default IEntry getEntry(String path) {
-        for (IEntry entry : getEntries()) {
-            if (entry.getPath().matches(path)) {
-                return entry;
-            }
-        }
-        return null;
-    }
     
     /**
      * Returns this config.
@@ -140,145 +53,46 @@ public interface IConfig {
     }
     
     /**
-     * Gets a value from a config entry.
-     *
-     * @param path The path in the configuration.
-     * @return A string from the specified path.
-     */
-    default String getString(String path) {
-        return getEntry(path).getAs(String.class);
-    }
-    
-    /**
-     * Gets a value from a config entry.
-     *
-     * @param path The path in the configuration.
-     * @return A double from the specified path.
-     */
-    default double getDouble(String path) {
-        return getEntry(path).getAs(Double.class);
-    }
-    
-    /**
-     * Gets a value from a config entry.
-     *
-     * @param path The path in the configuration.
-     * @return An integer from the specified path.
-     */
-    default int getInt(String path) {
-        return getEntry(path).getAs(Integer.class);
-    }
-    
-    /**
-     * Gets a value from a config entry.
-     *
-     * @param path The path in the configuration.
-     * @return A long from the specified path.
-     */
-    default long getLong(String path) {
-        return getEntry(path).getAs(Long.class);
-    }
-    
-    /**
-     * Gets a value from a config entry.
-     *
-     * @param path The path in the configuration.
-     * @return A boolean from the specified path.
-     */
-    default boolean getBoolean(String path) {
-        return getEntry(path).getAs(Boolean.class);
-    }
-    
-    /**
-     * Gets a value from a config entry.
-     *
-     * @param path The path in the configuration.
-     * @return A list from the specified path.
-     */
-    default List<?> getList(String path) {
-        return getEntry(path).getAs(List.class);
-    }
-    
-    /**
-     * Gets a value from a config entry.
-     *
-     * @param path The path in the configuration.
-     * @return A flat from the specified path.
-     */
-    default float getFloat(String path) {
-        return getEntry(path).getAs(Float.class);
-    }
-    
-    /**
-     * Gets a specific type of list.
-     *
-     * @param path The path to the list
-     * @param type The type of list to return
-     * @param <E>  The list type
-     * @return The list
-     */
-    @SuppressWarnings( {"unchecked", "unused"} )
-    default <E> List<E> getList(String path, Class<E> type) {
-        return (List<E>)getList(path);
-    }
-    
-    /**
-     * Gets a List of Strings from a path in this config.
-     *
-     * @param path The path to get the strings from.
-     * @return A list from the specified path.
-     */
-    default List<String> getStringList(String path) {
-        return getList(path, String.class);
-    }
-    
-    /**
-     * Gets an entry based on its value instead of path.
-     *
-     * @param value The value you are looking for.
-     * @return The entry that was found with this value.
-     */
-    default Collection<IEntry> getEntryFromValue(Object value) {
-        return getEntries().stream().filter(e -> e.getValue().equals(value)).collect(Collectors.toSet());
-    }
-    
-    /**
-     * Removes an entry from the config via the Entry Object.
-     *
-     * @param entry The entry to remove.
-     */
-    default void removeEntry(IEntry entry) {
-        entry.remove();
-    }
-    
-    /**
      * Removes an entry from the config via the entry path.
      *
      * @param path The path to this entry.
      */
     default void removeEntry(String path) {
-        getEntry(path).remove();
+        setEntry(path, null);
     }
     
     /**
      * Clears all the entries in this configuration.
      */
     default void clear() {
-        getEntries().forEach(IEntry::remove);
+        getKeys(true).forEach(this::removeEntry);
     }
     
     /**
      * Backs up this configuration.
      */
     @SuppressWarnings( "ResultOfMethodCallIgnored" )
-    default void backup() {
+    default boolean backup() {
         DateFormat format = new SimpleDateFormat("yyyy.dd.MM-hh.mm.ss");
         File file = new File(getDirectory() + File.separator + "backups");
         File bckp = new File(file + File.separator + getName() + format.format(new Date()) + ".yml");
-        if (!file.exists()) {
-            file.mkdir();
+        return backup(file, bckp);
+    }
+    
+    @SuppressWarnings( "ResultOfMethodCallIgnored" )
+    default boolean backup(File location, File newFile) {
+    
+        try {
+            if (!location.exists()) location.mkdirs();
+            if (newFile.exists()) return false;
+            newFile.createNewFile();
+            Files.copy(getFile().toPath(), newFile.toPath());
+            return true;
         }
-        backup(bckp);
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
     
     /**
@@ -286,16 +100,8 @@ public interface IConfig {
      *
      * @param file The file to back the configuration up to.
      */
-    default void backup(File file) {
-        if (!getDirectory().exists() || file.exists() || !getFile().exists()) {
-            return;
-        }
-        try {
-            Files.copy(getFile().toPath(), file.toPath());
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
+    default boolean backup(File file) {
+        return backup(new File(getDirectory() + File.separator + "backups"), file);
     }
     
     /**
@@ -303,6 +109,7 @@ public interface IConfig {
      *
      * @return true if the file was created, false otherwise.
      */
+    @SuppressWarnings("all")
     default boolean create() {
         try {
             return getFile().createNewFile();
