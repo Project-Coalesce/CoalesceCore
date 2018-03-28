@@ -176,7 +176,7 @@ public interface ISection {
      * @return The name of the section.
      */
     default String getName() {
-        return getCurrentPath().substring(!getCurrentPath().contains(".") ? 0 : getCurrentPath().lastIndexOf("."));
+        return getCurrentPath().substring(!getCurrentPath().contains(".") ? 0 : getCurrentPath().lastIndexOf(".") + 1);
     }
     
     /**
