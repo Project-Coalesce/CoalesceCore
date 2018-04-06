@@ -273,6 +273,22 @@ public class CommandContext<C extends CommandContext, T extends TabContext> {
     }
     
     /**
+     * Runs a sub command of this command if the index of the command matches the given argument
+     *
+     * @param index index to look for the specified argument
+     * @param match The argument needed to be matched
+     * @param executor The command method (method reference)
+     * @return true if the arg at the specified index matches the given string
+     */
+    public boolean subCommandAt(int index, String match, CommandExecutor<C> executor) {
+        if (argAt(index).equals(match)) {
+            executor.run((C)this);
+            return true;
+        }
+        return false;
+    }
+    
+    /**
      * Runs a sub command of this command if the index matches the given index and if the sender matches the given sender type
      *
      * @param index      The index needed to run the command
