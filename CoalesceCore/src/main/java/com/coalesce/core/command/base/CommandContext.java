@@ -277,11 +277,12 @@ public class CommandContext<C extends CommandContext, T extends TabContext> {
      *
      * @param index index to look for the specified argument
      * @param match The argument needed to be matched
+     * @param ignoreCase Ignores the case of the given argument
      * @param executor The command method (method reference)
      * @return true if the arg at the specified index matches the given string
      */
-    public boolean subCommandAt(int index, String match, CommandExecutor<C> executor) {
-        if (argAt(index).equals(match)) {
+    public boolean subCommandAt(int index, String match, boolean ignoreCase, CommandExecutor<C> executor) {
+        if ((ignoreCase ? argAt(index).equalsIgnoreCase(match) : argAt(index).equals(match))) {
             executor.run((C)this);
             return true;
         }
