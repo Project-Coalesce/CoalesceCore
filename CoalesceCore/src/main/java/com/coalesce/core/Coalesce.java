@@ -2,6 +2,8 @@ package com.coalesce.core;
 
 import com.coalesce.core.plugin.ICoPlugin;
 import com.coalesce.core.text.*;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.advancement.Advancement;
 import org.bukkit.advancement.AdvancementProgress;
@@ -14,7 +16,9 @@ import java.lang.reflect.InvocationTargetException;
  * Static access to the CoalesceCore API
  */
 public final class Coalesce {
-    
+
+    public static Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+
     private static ICoPlugin coalesce;
     
     private Coalesce() {}
@@ -70,11 +74,14 @@ public final class Coalesce {
         Toast.register(toast);
         Advancement advancement = Bukkit.getAdvancement(toast.getNamespacedKey());
 
-        AdvancementProgress progress = player.getAdvancementProgress(advancement);
-        if (!progress.isDone()) { progress.getRemainingCriteria().forEach(progress::awardCriteria); }
+        AdvancementProgress awardCriteria = player.getAdvancementProgress(advancement);
+        if (!awardCriteria.isDone()) { awardCriteria.getRemainingCriteria().forEach(awardCriteria::awardCriteria); }
 
-        progress = player.getAdvancementProgress(advancement);
-        if (progress.isDone()) { progress.getAwardedCriteria().forEach(progress::revokeCriteria); }
+        Bukkit.getScheduler().runTaskLater(CoPlugin.getProvidingPlugin(CoPlugin.class),
+                () -> {
+                    AdvancementProgress revokeCriteria = player.getAdvancementProgress(advancement);
+                    if (revokeCriteria.isDone()) { revokeCriteria.getAwardedCriteria().forEach(revokeCriteria::revokeCriteria); }
+                }, 20);
 
         Toast.unregister(toast);
     }

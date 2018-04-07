@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
+import static com.coalesce.core.Coalesce.GSON;
+
 @SuppressWarnings({"WeakerAccess", "unused"})
 public abstract class Text {
     
@@ -272,11 +274,29 @@ public abstract class Text {
                 for (TextSection section : getExtra()) {
                     sections.add(section.getJson());
                 }
-                json.add("extra", new GsonBuilder().setPrettyPrinting().create().toJsonTree(sections));
+                json.add("extra", GSON.toJsonTree(sections));
             }
             return json;
         }
-    
+
+        /**
+         * Gets a simplified String that isn't a json object
+         * @return - Formatted String
+         */
+        public String getFormatted() {
+            StringBuilder stringBuilder = new StringBuilder();
+            if (bold) stringBuilder.append(Color.BOLD);
+            if (italics) stringBuilder.append(Color.ITALICS);
+            if (underline) stringBuilder.append(Color.UNDERLINE);
+            if (strikethrough) stringBuilder.append(Color.STRIKE);
+
+            stringBuilder.append(color);
+            stringBuilder.append(text);
+            if (isParent) { getExtra().forEach(textSection -> stringBuilder.append(textSection.getFormatted())); }
+
+            return stringBuilder.toString();
+        }
+
         /**
          * Turns this TextSection into a string.
          * @return The jsonObject to a strign.

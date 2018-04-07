@@ -10,6 +10,7 @@ import org.bukkit.command.CommandMap;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Stream;
 
 @SuppressWarnings({"unused", "WeakerAccess", "u"})
 public class CommandStore {
@@ -49,7 +50,12 @@ public class CommandStore {
             bukkitCommandMap.register(Color.stripColor(plugin.getDisplayName()), register);
         }
     }
-    
+
+    @SafeVarargs //aaa
+    public final void registerCommands(ProcessedCommand<CommandContext, TabContext, DefaultCommandBuilder>... commands) {
+        Stream.of(commands).forEach(this::registerCommand);
+    }
+
     public void registerCommand(ProcessedCommand<CommandContext, TabContext, DefaultCommandBuilder> command) {
         registerCommand(command, new DefaultCommandRegister(command));
     }

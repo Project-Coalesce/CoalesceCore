@@ -8,18 +8,20 @@ import org.bukkit.plugin.Plugin;
 
 import java.util.UUID;
 
-public class Toast {
+import static com.coalesce.core.Coalesce.GSON;
+
+public abstract class Toast {
 
     private static final Plugin INSTANCE = CoPlugin.getProvidingPlugin(CoPlugin.class);
     private static final String FRAME = "goal"; // ehh
 
     /**
      * Creates a new Toast
-     * @param text - Predetermined text for the toast
+     * @param title - Predetermined text for the toast
      * @return a new toaster!
      */
-    public static Toaster of(String text) {
-        return new Toaster().setText(Text.of(text));
+    public static Toaster of(String title) {
+        return new Toaster().setTitle(Text.of(title));
     }
 
     /**
@@ -44,7 +46,7 @@ public class Toast {
      */
     public static class Toaster {
         private String title;
-        private String text;
+        private String text = "";
         private String icon;
 
         // We don't want this to change, do we
@@ -63,7 +65,7 @@ public class Toast {
          * @return this builder
          */
         public Toaster setTitle(Text.TextSection title) {
-            this.title = title.toString();
+            this.title = title.getFormatted();
             return this;
         }
 
@@ -73,7 +75,7 @@ public class Toast {
          * @return this builder
          */
         public Toaster setText(Text.TextSection text) {
-            this.text = text.toString();
+            this.text = text.getFormatted();
             return this;
         }
 
@@ -102,18 +104,21 @@ public class Toast {
          * @return the JsonObject to later send as reward
          */
         public JsonObject getJson() {
+            JsonObject json = new JsonObject();
+
             JsonObject icon = new JsonObject();
             icon.addProperty("item", this.icon);
 
-            JsonObject json = new JsonObject();
-            json.add("icon", icon);
-            json.addProperty("title", this.title);
-            json.addProperty("description", this.text);
-            json.addProperty("background", "minecraft:textures/gui/advancements/backgrounds/adventure.png");
-            json.addProperty("frame", FRAME);
-            json.addProperty("announce_to_chat", this.announce);
-            json.addProperty("show_toast", this.toast);
-            json.addProperty("hidden", true);
+            JsonObject display = new JsonObject();
+            display.add("icon", icon);
+            display.addProperty("title", this.title);
+            display.addProperty("description", this.text);
+            display.addProperty("background", "minecraft:textures/gui/advancements/backgrounds/adventure.png");
+            display.addProperty("frame", FRAME);
+            display.addProperty("announce_to_chat", announce);
+            display.addProperty("show_toast", toast);
+            display.addProperty("hidden", true);
+
             JsonObject criteria = new JsonObject();
             JsonObject trigger = new JsonObject();
 
@@ -121,7 +126,8 @@ public class Toast {
             criteria.add("impossible", trigger);
 
             json.add("criteria", criteria);
-            json.add("display", json);
+            json.add("display", display);
+
             return json;
         }
 
@@ -131,7 +137,7 @@ public class Toast {
          */
         @Override
         public String toString() {
-            return getJson().toString();
+            return GSON.toJson(getJson());
         }
     }
 }

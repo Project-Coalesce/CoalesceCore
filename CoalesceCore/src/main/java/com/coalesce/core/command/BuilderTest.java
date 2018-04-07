@@ -9,6 +9,7 @@ import com.coalesce.core.command.base.TabContext;
 import com.coalesce.core.command.defaults.DefaultCommandBuilder;
 import com.coalesce.core.plugin.ICoPlugin;
 import com.coalesce.core.text.Text;
+import com.coalesce.core.text.Toast;
 import org.bukkit.entity.Player;
 
 public final class BuilderTest {
@@ -24,7 +25,14 @@ public final class BuilderTest {
                 .usage("/test")
                 .description("tests the builder pattern command registration").build();
 
-        plugin.getCommandStore().registerCommand(command);
+        ProcessedCommand<CommandContext, TabContext, DefaultCommandBuilder> toast = ProcessedCommand.builder(plugin, "toast")
+                .permission("core.toast")
+                .executor(this::testToast)
+                .senders(SenderType.PLAYER)
+                .usage("/toast")
+                .description("tests the toast builder").build();
+
+        plugin.getCommandStore().registerCommands(command, toast);
     }
     
     private void testCompletion(TabContext tabContext) {
@@ -64,4 +72,10 @@ public final class BuilderTest {
         Coalesce.sendMessage(context.getSender().as(Player.class), text);
     }
 
+    private void testToast(CommandContext context) {
+        Coalesce.sendToast(context.getSender().as(Player.class),
+                Toast.of("Test toast")
+                        .setText(Text.of("Congratulations! It works :)").setColor(Color.GOLD))
+                        .setIcon("minecraft:red_flower"));
+    }
 }
