@@ -1,11 +1,7 @@
 package com.coalesce.core;
 
 import com.coalesce.core.plugin.ICoPlugin;
-import com.coalesce.core.text.ActionBar;
-import com.coalesce.core.text.BossBar;
-import com.coalesce.core.text.Text;
-import com.coalesce.core.text.Title;
-import com.coalesce.core.text.Toast;
+import com.coalesce.core.text.*;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -69,7 +65,7 @@ public final class Coalesce {
     }
     
     public static void sendToast(Player player, Toast toast) {
-    
+
     }
     
     public static Class<?> getNMSClass(String className) {
