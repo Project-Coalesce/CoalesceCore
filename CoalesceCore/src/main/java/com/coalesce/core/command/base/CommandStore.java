@@ -15,7 +15,7 @@ import java.util.Map;
 @SuppressWarnings({"unused", "WeakerAccess", "u"})
 public class CommandStore {
     
-    private final Map<String, ProcessedCommand<? extends CommandContext, ? extends TabContext, ? extends DefaultCommandBuilder>> commandMap;
+    private final Map<String, ProcessedCommand<? extends CommandContext, ? extends TabContext, ? extends CommandBuilder>> commandMap;
     private final ICoPlugin plugin;
     private CommandMap bukkitCommandMap;
     
@@ -48,6 +48,7 @@ public class CommandStore {
         }
         if (!isRegistered(command.getName())) {
             bukkitCommandMap.register(Color.stripColor(plugin.getDisplayName()), register);
+            commandMap.put(command.getName(), command);
         }
     }
     
@@ -93,7 +94,7 @@ public class CommandStore {
      * @param name The name of the command to get.
      * @return The command if exists.
      */
-    public ProcessedCommand<? extends CommandContext, ? extends TabContext, ? extends DefaultCommandBuilder> getCommand(String name) {
+    public ProcessedCommand<? extends CommandContext, ? extends TabContext, ? extends CommandBuilder> getCommand(String name) {
         return commandMap.get(name);
     }
 }

@@ -9,18 +9,19 @@ import com.coalesce.core.wrappers.CoSender;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 @SuppressWarnings({"unused", "unchecked", "WeakerAccess"})
 public abstract class ProcessedCommand<C extends CommandContext, T extends TabContext, B extends CommandBuilder> {
     
+    private Set<String> aliases = new HashSet<>();
     private CommandExecutor<C> commandExecutor;
     private TabExecutor<T> tabExecutor;
     private String description = "";
     private final ICoPlugin plugin;
     private SenderType[] senders;
-    private Set<String> aliases;
     private String[] permission;
     private final String name;
     private String usage = "";
