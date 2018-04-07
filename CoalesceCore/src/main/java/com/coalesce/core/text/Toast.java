@@ -2,6 +2,7 @@ package com.coalesce.core.text;
 
 import com.coalesce.core.CoPlugin;
 import com.google.gson.JsonObject;
+import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.plugin.Plugin;
 
@@ -12,12 +13,34 @@ public class Toast {
     private static final Plugin INSTANCE = CoPlugin.getProvidingPlugin(CoPlugin.class);
     private static final String FRAME = "goal"; // ehh
 
+    /**
+     * Creates a new Toast
+     * @param text - Predetermined text for the toast
+     * @return a new toaster!
+     */
     public static Toaster of(String text) {
         return new Toaster().setText(Text.of(text));
     }
 
     /**
-     * Represents the toaster who provides all proprieties for the toast
+     * Registers an advancement in Bukkit's super safe API
+     * @param toaster - Toaster where we'll get our properties
+     * @throws IllegalArgumentException - If there's an advancement with the same name
+     */
+    public static void register(Toaster toaster) throws IllegalArgumentException {
+        Bukkit.getUnsafe().loadAdvancement(toaster.getNamespacedKey(), toaster.toString());
+    }
+
+    /**
+     * Unregisters an already used toast
+     * @param toaster - Toast to be removed
+     */
+    public static void unregister(Toaster toaster) {
+        Bukkit.getUnsafe().removeAdvancement(toaster.getNamespacedKey());
+    }
+
+    /**
+     * Represents the toaster who provides all properties for the toast
      */
     public static class Toaster {
         private String title;
@@ -110,14 +133,5 @@ public class Toast {
         public String toString() {
             return getJson().toString();
         }
-    }
-
-    /**
-     * Turns this Toast object into a JSON string
-     * @return - Json string
-     */
-    @Override
-    public String toString() {
-        return super.toString();
     }
 }

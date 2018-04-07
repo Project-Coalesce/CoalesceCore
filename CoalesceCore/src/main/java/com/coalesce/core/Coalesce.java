@@ -3,6 +3,8 @@ package com.coalesce.core;
 import com.coalesce.core.plugin.ICoPlugin;
 import com.coalesce.core.text.*;
 import org.bukkit.Bukkit;
+import org.bukkit.advancement.Advancement;
+import org.bukkit.advancement.AdvancementProgress;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.Constructor;
@@ -57,15 +59,24 @@ public final class Coalesce {
     }
     
     public static void sendActionBar(Player player, ActionBar actionBar) {
-    
+
     }
     
     public static void sendBossBar(Player player, BossBar bossBar) {
     
     }
     
-    public static void sendToast(Player player, Toast toast) {
+    public static void sendToast(Player player, Toast.Toaster toast) {
+        Toast.register(toast);
+        Advancement advancement = Bukkit.getAdvancement(toast.getNamespacedKey());
 
+        AdvancementProgress progress = player.getAdvancementProgress(advancement);
+        if (!progress.isDone()) { progress.getRemainingCriteria().forEach(progress::awardCriteria); }
+
+        progress = player.getAdvancementProgress(advancement);
+        if (progress.isDone()) { progress.getAwardedCriteria().forEach(progress::revokeCriteria); }
+
+        Toast.unregister(toast);
     }
     
     public static Class<?> getNMSClass(String className) {
