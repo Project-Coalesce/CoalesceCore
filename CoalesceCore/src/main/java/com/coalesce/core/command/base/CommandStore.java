@@ -5,6 +5,7 @@ import com.coalesce.core.command.defaults.DefaultCommandBuilder;
 import com.coalesce.core.command.defaults.DefaultCommandRegister;
 import com.coalesce.core.plugin.ICoPlugin;
 import org.bukkit.Bukkit;
+import org.bukkit.command.Command;
 import org.bukkit.command.CommandMap;
 
 import java.lang.reflect.Field;
@@ -52,6 +53,25 @@ public class CommandStore {
     
     public void registerCommand(ProcessedCommand<CommandContext, TabContext, DefaultCommandBuilder> command) {
         registerCommand(command, new DefaultCommandRegister(command));
+    }
+    
+    @SuppressWarnings("unchecked")
+    public void unregisterCommand(String name) {
+        try {
+            Field commandField = bukkitCommandMap.getClass().getDeclaredField("knownCommands");
+            commandField.setAccessible(true);
+            Map<String, Command> commands = (Map<String, Command>)commandField.get(bukkitCommandMap);
+            commands.remove(name);
+            for (String alias : getCommand(name).getAliases()) {
+                if (commands.containsKey(alias) && commands.get(alias).toString().contains(name)) {
+                    commands.remove(alias);
+                }
+            }
+            commandMap.remove(name);
+        }
+        catch (NoSuchFieldException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
     }
     
     /**
