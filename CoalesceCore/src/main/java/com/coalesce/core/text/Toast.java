@@ -9,6 +9,7 @@ import org.bukkit.plugin.Plugin;
 import java.util.UUID;
 
 import static com.coalesce.core.Coalesce.GSON;
+import static com.coalesce.core.Color.translate;
 
 public abstract class Toast {
 
@@ -61,11 +62,31 @@ public abstract class Toast {
 
         /**
          * Sets the title of the toast
+         * @param title String which will be translated for this title
+         * @return this builder
+         */
+        public Toaster setTitle(String title) {
+            this.title = translate(title);
+            return this;
+        }
+
+        /**
+         * Sets the title of the toast
          * @param title - TextSelection formatted for this title.
          * @return this builder
          */
         public Toaster setTitle(Text.TextSection title) {
             this.title = title.getFormatted();
+            return this;
+        }
+
+        /**
+         * Sets the text for this toast
+         * @param text String which will be translated for this title
+         * @return this builder
+         */
+        public Toaster setText(String text) {
+            this.text = translate(text);
             return this;
         }
 
