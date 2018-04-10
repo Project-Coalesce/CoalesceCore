@@ -215,6 +215,23 @@ public class TabContext<C extends CommandContext, T extends TabContext, B extend
     }
     
     /**
+     * Runs a sub completion of this completion if the index of the command matches the given argument
+     *
+     * @param index index to look for the specified argument
+     * @param match The argument needed to be matched
+     * @param ignoreCase Ignores the case of the given argument
+     * @param executor The completion method (method reference)
+     * @return true if the arg at the specified index matches the given string
+     */
+    public boolean subCompletionAt(int index, String match, boolean ignoreCase, TabExecutor<T> executor) {
+        if (ignoreCase ? argAt(index).equalsIgnoreCase(match) : argAt(index).equals(match)) {
+            executor.run((T)this);
+            return true;
+        }
+        return false;
+    }
+    
+    /**
      * Runs a sub completion of this completion if the index of the completion matches the given index
      *
      * @param index    The index needed to run the completion
