@@ -1,11 +1,11 @@
 package com.coalesce.core.chat;
 
-import static com.coalesce.core.Color.*;
-
 import com.coalesce.core.plugin.ICoPlugin;
 
 import java.util.Arrays;
 import java.util.List;
+
+import static com.coalesce.core.Color.*;
 
 public final class CoFormatter {
     
@@ -17,7 +17,7 @@ public final class CoFormatter {
     public CoFormatter(ICoPlugin plugin) {
         this.plugin = plugin;
     }
-    
+
     /**
      * Formats a plugin message
      *
@@ -134,4 +134,5 @@ public final class CoFormatter {
         }
         return translate('&', returnValue.toString());
     }
+
 }

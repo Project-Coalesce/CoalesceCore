@@ -1,12 +1,12 @@
 package com.coalesce.core;
 
 import com.coalesce.core.plugin.ICoPlugin;
-import com.coalesce.core.text.ActionBar;
-import com.coalesce.core.text.BossBar;
-import com.coalesce.core.text.Text;
-import com.coalesce.core.text.Title;
-import com.coalesce.core.text.Toast;
+import com.coalesce.core.text.*;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.bukkit.Bukkit;
+import org.bukkit.advancement.Advancement;
+import org.bukkit.advancement.AdvancementProgress;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.Constructor;
@@ -16,7 +16,9 @@ import java.lang.reflect.InvocationTargetException;
  * Static access to the CoalesceCore API
  */
 public final class Coalesce {
-    
+
+    public static Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+
     private static ICoPlugin coalesce;
     
     private Coalesce() {}
@@ -61,15 +63,27 @@ public final class Coalesce {
     }
     
     public static void sendActionBar(Player player, ActionBar actionBar) {
-    
+
     }
     
     public static void sendBossBar(Player player, BossBar bossBar) {
     
     }
     
-    public static void sendToast(Player player, Toast toast) {
-    
+    public static void sendToast(Player player, Toast.Toaster toast) {
+        Toast.register(toast);
+        Advancement advancement = Bukkit.getAdvancement(toast.getNamespacedKey());
+
+        AdvancementProgress awardCriteria = player.getAdvancementProgress(advancement);
+        if (!awardCriteria.isDone()) { awardCriteria.getRemainingCriteria().forEach(awardCriteria::awardCriteria); }
+
+        Bukkit.getScheduler().runTaskLater(CoPlugin.getProvidingPlugin(CoPlugin.class),
+                () -> {
+                    AdvancementProgress revokeCriteria = player.getAdvancementProgress(advancement);
+                    if (revokeCriteria.isDone()) { revokeCriteria.getAwardedCriteria().forEach(revokeCriteria::revokeCriteria); }
+                }, 20);
+
+        Toast.unregister(toast);
     }
     
     public static Class<?> getNMSClass(String className) {

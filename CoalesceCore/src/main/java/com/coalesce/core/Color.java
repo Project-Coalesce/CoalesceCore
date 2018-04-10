@@ -121,7 +121,15 @@ public enum Color {
     public String getAnsi() {
         return ansi;
     }
-    
+
+    /**
+     * @param message The message to be translated with the default prefix '&'
+     * @return The translated message
+     */
+    public static String translate(String message) {
+        return translate('&', message);
+    }
+
     /**
      * @param prefix  The prefix of the color codes indicating a color code
      * @param message The message to be translated

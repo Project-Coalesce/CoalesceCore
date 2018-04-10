@@ -104,8 +104,7 @@ public abstract class CoPlugin extends JavaPlugin implements ICoPlugin, Listener
     
     //
     //
-    
-    
+
     @Override
     public Color getPluginColor() {
         return pluginColor;
@@ -210,8 +209,7 @@ public abstract class CoPlugin extends JavaPlugin implements ICoPlugin, Listener
     
     //
     //
-    
-    
+
     @Override
     public final void updateCheck(String repositoryOwner, String repositoryName, boolean autoUpdate) {
         Bukkit.getScheduler().runTaskAsynchronously(this, new UpdateLookup(this, Core.getInstaller(), repositoryOwner, repositoryName, getVersion(), autoUpdate));
@@ -219,7 +217,7 @@ public abstract class CoPlugin extends JavaPlugin implements ICoPlugin, Listener
     
     //
     //
-    
+
     @Override
     public ConsoleReader getConsoleReader() {
         return Core.getReader();
@@ -227,8 +225,7 @@ public abstract class CoPlugin extends JavaPlugin implements ICoPlugin, Listener
     
     //
     //
-    
-    
+
     @Override
     public File getPluginJar() {
         return getFile();
