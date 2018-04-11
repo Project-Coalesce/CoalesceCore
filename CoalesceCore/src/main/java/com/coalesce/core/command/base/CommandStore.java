@@ -11,6 +11,7 @@ import org.bukkit.command.CommandMap;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Stream;
 
 @SuppressWarnings({"unused", "WeakerAccess", "u"})
 public class CommandStore {
@@ -51,7 +52,12 @@ public class CommandStore {
             commandMap.put(command.getName(), command);
         }
     }
-    
+
+    @SafeVarargs //aaa
+    public final void registerCommands(ProcessedCommand<CommandContext, TabContext, DefaultCommandBuilder>... commands) {
+        Stream.of(commands).forEach(this::registerCommand);
+    }
+
     public void registerCommand(ProcessedCommand<CommandContext, TabContext, DefaultCommandBuilder> command) {
         registerCommand(command, new DefaultCommandRegister(command));
     }
