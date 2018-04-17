@@ -3,6 +3,7 @@ package com.coalesce.core.config.base;
 import com.coalesce.core.config.common.Section;
 import com.coalesce.core.plugin.ICoPlugin;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -105,7 +106,8 @@ public interface ISection {
      * @return A list from the specified path.
      */
     default List<?> getList(String path) {
-        return getValueAs(path, List.class);
+        Object v = getValue(path);
+        return v instanceof List ? (List<?>)v : null;
     }
     
     /**
@@ -128,7 +130,19 @@ public interface ISection {
      */
     @SuppressWarnings( {"unchecked", "unused"} )
     default <E> List<E> getList(String path, Class<E> type) {
-        return (List<E>)getList(path);
+        List<?> list = getList(path);
+        
+        if (list == null) {
+            return new ArrayList<>();
+        }
+        
+        List<E> r = new ArrayList<>();
+        
+        for (Object o : list) {
+            if (type.isInstance(o)) r.add((E)o);
+        }
+        
+        return r;
     }
     
     /**
