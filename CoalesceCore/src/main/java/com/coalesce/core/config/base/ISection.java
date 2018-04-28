@@ -2,6 +2,7 @@ package com.coalesce.core.config.base;
 
 import com.coalesce.core.config.common.Section;
 import com.coalesce.core.plugin.ICoPlugin;
+import org.bukkit.configuration.MemorySection;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -35,18 +36,41 @@ public interface ISection {
      * @return A section of the configuration.
      */
     default ISection getSection(String path) {
-        String base = getParent() == null ? getCurrentPath() : getCurrentPath() + ".";
-        return new Section(base + path, getConfig());
+        String base = getCurrentPath().equals("") ? getCurrentPath() : getCurrentPath() + ".";
+        if (!(getValue(path) instanceof MemorySection)) {
+            return null;
+        }
+        else return new Section(base + path, getConfig());
+    }
+    
+    /**
+     * Gets a list of sections from a section specified. Section specified must be contained within the current section
+     *
+     * @param name The path to get a list of sections from.
+     * @return A list of sections from a config section
+     */
+    default List<ISection> getSections(final String name) {
+        if (!hasSection(name)) return null;
+        ISection s = getSection(name);
+        return s.getKeys(false).stream().filter(s::hasSection).map(s::getSection).collect(Collectors.toList());
     }
     
     /**
      * Gets a list of sections currently in this section
      *
-     * @param name The path to get a list of sections from.
      * @return A list of sections from a config section
      */
-    default List<ISection> getSections(final String name) {//This needs fixed
-        return getSection(name).getKeys(false).stream().filter(k -> getValue(k) == null).map(k -> new Section(name + "." + k, getConfig())).collect(Collectors.toList());
+    default List<ISection> getSections() {
+        return getKeys(false).stream().filter(this::hasSection).map(this::getSection).collect(Collectors.toList());
+    }
+    
+    /**
+     * Checks if this section contains the given section
+     * @param name The section to look for
+     * @return True if the section exists, false otherwise.
+     */
+    default boolean hasSection(String name) {
+        return getSection(name) != null;
     }
     
     /**
@@ -130,7 +154,7 @@ public interface ISection {
      */
     @SuppressWarnings( {"unchecked", "unused"} )
     default <E> List<E> getList(String path, Class<E> type) {
-        List<?> list = getList(path);
+        List<?> list = (List<?>)getValue(path);
         
         if (list == null) {
             return new ArrayList<>();
@@ -167,11 +191,12 @@ public interface ISection {
     /**
      * Gets a value from a config entry.
      *
-     * @param path The path in the configuration.
+     * @param path The path in the configuration relative to where you currently are in the configuration.
      * @return An object from the specified path.
      */
     default Object getValue(String path) {
-        return getConfig().getValue(getCurrentPath() + "." + path);
+        String base = getCurrentPath().equals("") ? getCurrentPath() : getCurrentPath() + ".";
+        return getConfig().getValue(base + path);
     }
     
     /**
