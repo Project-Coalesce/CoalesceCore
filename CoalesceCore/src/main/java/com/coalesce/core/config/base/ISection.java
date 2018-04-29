@@ -154,7 +154,7 @@ public interface ISection {
      */
     @SuppressWarnings( {"unchecked", "unused"} )
     default <E> List<E> getList(String path, Class<E> type) {
-        List<?> list = (List<?>)getValue(path);
+        List<?> list = getList(path);
         
         if (list == null) {
             return new ArrayList<>();
