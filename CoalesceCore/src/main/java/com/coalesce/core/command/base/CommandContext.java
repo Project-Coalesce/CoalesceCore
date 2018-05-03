@@ -229,6 +229,7 @@ public class CommandContext<C extends CommandContext, T extends TabContext> {
         Text.TextSection pluginMessage = Text.of("[").setColor(Color.GRAY);
         pluginMessage.append(Color.stripColor(plugin.getDisplayName())).setColor(plugin.getPluginColor());
         pluginMessage.append("] ").setColor(Color.GRAY);
+        text.getSections().forEach(pluginMessage::append);
         send(pluginMessage);
     }
     
