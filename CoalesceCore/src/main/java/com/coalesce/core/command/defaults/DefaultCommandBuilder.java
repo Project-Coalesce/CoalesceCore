@@ -6,7 +6,7 @@ import com.coalesce.core.command.base.ProcessedCommand;
 import com.coalesce.core.command.base.TabContext;
 import com.coalesce.core.plugin.ICoPlugin;
 
-public final class DefaultCommandBuilder extends CommandBuilder<CommandContext, TabContext, DefaultCommandBuilder, ProcessedCommand<CommandContext, TabContext, DefaultCommandBuilder>>{
+public final class DefaultCommandBuilder extends CommandBuilder<CommandContext, TabContext, DefaultCommandBuilder, DefaultProcessedCommand>{
     
     /**
      * Creates a new CommandBuilder
@@ -16,5 +16,10 @@ public final class DefaultCommandBuilder extends CommandBuilder<CommandContext, 
      */
     public DefaultCommandBuilder(ICoPlugin plugin, String name) {
         super(plugin, name, new DefaultProcessedCommand(plugin, name));
+    }
+    
+    @Override
+    public DefaultProcessedCommand build() {
+        return command;
     }
 }

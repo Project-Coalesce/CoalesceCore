@@ -129,8 +129,6 @@ public abstract class CommandBuilder<C extends CommandContext, T extends TabCont
      *
      * @return A new ProcessedCommand.
      */
-    public P build() {
-        return command;
-    }
+    public abstract P build();
     
 }

@@ -10,4 +10,9 @@ public class DefaultProcessedCommand extends ProcessedCommand<CommandContext, Ta
     public DefaultProcessedCommand(ICoPlugin plugin, String name) {
         super(plugin, name);
     }
+    
+    public static DefaultCommandBuilder builder(ICoPlugin plugin, String name) {
+        return new DefaultCommandBuilder(plugin, name);
+    }
+    
 }

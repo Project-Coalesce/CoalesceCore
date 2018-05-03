@@ -1,10 +1,14 @@
 package com.coalesce.core.command.base;
 
+import com.coalesce.core.Coalesce;
 import com.coalesce.core.Color;
 import com.coalesce.core.SenderType;
+import com.coalesce.core.chat.CoFormatter;
 import com.coalesce.core.command.builder.interfaces.CommandExecutor;
 import com.coalesce.core.plugin.ICoPlugin;
+import com.coalesce.core.text.Text;
 import com.coalesce.core.wrappers.CoSender;
+import org.bukkit.entity.Player;
 
 import java.util.Arrays;
 import java.util.List;
@@ -175,6 +179,28 @@ public class CommandContext<C extends CommandContext, T extends TabContext> {
     }
     
     /**
+     * Sends a message to the player/console
+     * @param text The text object to send
+     * @param objects The placeholders to use
+     */
+    public void send(Text.TextSection text, Object... objects) {
+        final CoFormatter formatter = plugin.getCoFormatter();
+        if (getSender().getType().equals(SenderType.PLAYER)) Coalesce.sendRawMessage(getSender().as(Player.class), formatter.formatString(text.toString(), objects));
+        else send(formatter.format(text.toUnformatted(), objects));
+    }
+    
+    /**
+     * Sends a text object to the sender
+     * @param text The text to send
+     */
+    public void send(Text.TextSection text) {
+        if (getSender().getType().equals(SenderType.PLAYER)) {
+            Coalesce.sendMessage(getSender().as(Player.class), text);
+        }
+        else send(text.toUnformatted());
+    }
+    
+    /**
      * Sends a formatted plguin message.
      * <p>
      * <p>Ex. [PlguinName] MESSAGE FROM THE PARAMETER</p>
@@ -196,6 +222,32 @@ public class CommandContext<C extends CommandContext, T extends TabContext> {
     }
     
     /**
+     * Sends a text message to the sender.
+     * @param text The text to send
+     */
+    public void pluginMessage(Text.TextSection text) {
+        Text.TextSection pluginMessage = Text.of("[").setColor(Color.GRAY);
+        pluginMessage.append(Color.stripColor(plugin.getDisplayName())).setColor(plugin.getPluginColor());
+        pluginMessage.append("] ").setColor(Color.GRAY);
+        send(pluginMessage);
+    }
+    
+    /**
+     * Sends a formatted message to the sender
+     * @param text The text object to use
+     * @param objects The object to replace the placeholders with
+     */
+    public void pluginMessage(Text.TextSection text, Object... objects) {
+        final CoFormatter formatter = plugin.getCoFormatter();
+        Text.TextSection pluginMessage = Text.of("[").setColor(Color.GRAY);
+        pluginMessage.append(Color.stripColor(plugin.getDisplayName())).setColor(plugin.getPluginColor());
+        pluginMessage.append("] ").setColor(Color.GRAY);
+        text.getSections().forEach(pluginMessage::append);
+        if (getSender().getType().equals(SenderType.PLAYER)) Coalesce.sendRawMessage(getSender().as(Player.class), formatter.formatString(pluginMessage.toString(), objects));
+        else send(formatter.format(pluginMessage.toUnformatted(), objects));
+    }
+    
+    /**
      * Sends the sender the default, formatted, noPermissions message
      *
      * @param permissionsNeeded The permissions required to run this command
@@ -211,7 +263,7 @@ public class CommandContext<C extends CommandContext, T extends TabContext> {
      * @param given The amount given
      */
     public void tooManyArgs(int max, int given) {
-        send(plugin.getCoFormatter().format(Color.RED + "Too many arguments supplied to run command!" + Color.RED + "Maximum: " + Color.SILVER + max + Color.RED + "Given: " + Color.SILVER + given));
+        send(plugin.getCoFormatter().format(Color.RED + "Too many arguments supplied to run command! " + Color.RED + "Maximum: " + Color.SILVER + max + Color.RED + " Given: " + Color.SILVER + given));
     }
     
     /**
@@ -221,7 +273,7 @@ public class CommandContext<C extends CommandContext, T extends TabContext> {
      * @param given The amount given
      */
     public void notEnoughArgs(int min, int given) {
-        send(plugin.getCoFormatter().format(Color.RED + "Not enough arguments supplied to run command!" + Color.RED + "Minimum: " + Color.SILVER + min + Color.RED + "Given: " + Color.SILVER + given));
+        send(plugin.getCoFormatter().format(Color.RED + "Not enough arguments supplied to run command! " + Color.RED + "Minimum: " + Color.SILVER + min + Color.RED + " Given: " + Color.SILVER + given));
     }
     
     /**

@@ -7,6 +7,7 @@ import com.coalesce.core.command.base.CommandContext;
 import com.coalesce.core.command.base.ProcessedCommand;
 import com.coalesce.core.command.base.TabContext;
 import com.coalesce.core.command.defaults.DefaultCommandBuilder;
+import com.coalesce.core.command.defaults.DefaultProcessedCommand;
 import com.coalesce.core.plugin.ICoPlugin;
 import com.coalesce.core.text.Text;
 import com.coalesce.core.text.Toast;
@@ -15,34 +16,60 @@ import org.bukkit.entity.Player;
 public final class BuilderTest {
 
     public BuilderTest(ICoPlugin plugin) {
-
-        ProcessedCommand<CommandContext, TabContext, DefaultCommandBuilder> command = ProcessedCommand.builder(plugin, "test2")
+    
+        DefaultProcessedCommand command = DefaultProcessedCommand.builder(plugin, "test2")
                 .permission("core.test1")
                 .executor(this::testCommand2)
                 .completer(this::testCompletion)
                 .minArgs(1)
                 .senders(SenderType.PLAYER)
-                .usage("/test")
+                .usage("/test2")
                 .description("tests the builder pattern command registration").build();
 
-        ProcessedCommand<CommandContext, TabContext, DefaultCommandBuilder> toast = ProcessedCommand.builder(plugin, "toast")
+        DefaultProcessedCommand command1 = DefaultProcessedCommand.builder(plugin, "test1")
+                .permission("core.test2")
+                .executor(this::testCommand1)
+                .senders(SenderType.PLAYER)
+                .usage("/test1")
+                .description("Testing the text class and the placeholder replacement for the command context")
+                .build();
+        
+        DefaultProcessedCommand toast = DefaultProcessedCommand.builder(plugin, "toast")
                 .permission("core.toast")
                 .executor(this::testToast)
                 .senders(SenderType.PLAYER)
                 .usage("/toast")
                 .description("tests the toast builder").build();
 
-        plugin.getCommandStore().registerCommands(command, toast);
+        plugin.getCommandStore().registerCommands(command, toast, command1);
     }
     
     private void testCompletion(TabContext tabContext) {
         tabContext.completion("hi", "hello");
     }
     
+    private void testCommand1(CommandContext context) {
+        
+        Text.TextSection text = Text.of("This is a test for {0}")
+                .setColor(Color.PURPLE)
+                .setBold(true)
+                .setUnderlined(true)
+                .clickEvent(e -> {
+                    e.action(Text.ClickAction.SUGGEST_COMMAND);
+                    e.click("{1}");
+                })
+                .hoverEvent(e -> {
+                    e.action(Text.HoverAction.SHOW_TEXT);
+                    e.hover(s -> s.setText("{0} and {1} and {2}"));
+                });
+        
+        context.pluginMessage(text, context.getSender().getName(), context.getSender().getType(), context.getPlugin().getDisplayName());
+    }
+    
     private void testCommand2(CommandContext context) {
         System.out.println(Color.toConsoleColor('&', context.joinArgs()));
         
-        Text text = Text.of("Hello")
+        Text.TextSection text = Text.of("Hello")
                 .setColor(Color.BLUE)
                 .setBold(true)
                 .setItalics(true)
@@ -55,6 +82,7 @@ public final class BuilderTest {
                     e.hover((s) -> s.setText("hover"));
                 })
                 .shiftClickEvent("insert");
+        
         text.append((s) -> {
             s.setText(" im poo")
                     .setBold(true)

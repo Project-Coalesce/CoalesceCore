@@ -34,7 +34,11 @@ public final class Coalesce {
         player.sendTitle(title.getTitle(), title.getSubTitle(), title.fadeInTicks(), title.durationTicks(), title.fadeOutTicks());
     }
     
-    public static void sendMessage(Player player, Text text) {
+    public static void sendMessage(Player player, Text.TextSection text) {
+        sendRawMessage(player, text.toString());
+    }
+    
+    public static void sendRawMessage(Player player, String rawJson) {
         try {
             Object craftPlayer = player.getClass().getMethod("getHandle").invoke(player);
             Object connection = craftPlayer.getClass().getField("playerConnection").get(craftPlayer);
@@ -43,7 +47,7 @@ public final class Coalesce {
             Class<?> chatPacket = getNMSClass("PacketPlayOutChat");
             Constructor packet = chatPacket.getConstructor(baseComponent, getNMSClass("ChatMessageType"));
         
-            Object component = serializer.getDeclaredMethod("a", String.class).invoke(null, text.toString());
+            Object component = serializer.getDeclaredMethod("a", String.class).invoke(null, rawJson);
             connection.getClass().getMethod("sendPacket", getNMSClass("Packet")).invoke(connection, packet.newInstance(component, getChatMessageType((byte)0)));
         }
         catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException | NoSuchFieldException | InstantiationException e) {

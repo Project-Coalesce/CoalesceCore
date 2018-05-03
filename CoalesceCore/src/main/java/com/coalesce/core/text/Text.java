@@ -1,7 +1,6 @@
 package com.coalesce.core.text;
 
 import com.coalesce.core.Color;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
@@ -12,38 +11,14 @@ import static com.coalesce.core.Coalesce.GSON;
 
 @SuppressWarnings({"WeakerAccess", "unused"})
 public abstract class Text {
-    
-    private static TextSection parent;
- 
+
     /**
      * Creates a new Text.
      * @param text The beginning text
      * @return A new Text Section. This will clear all existing text sections.
      */
     public static TextSection of(String text) {
-        parent = new TextSection(true, true, null).setText(text);
-        return parent;
-    }
-    
-    /**
-     * Adds a text section to the current Text
-     * @param text The text to append to this current section
-     * @return The newly created text section
-     */
-    public final TextSection append(String text) {
-        TextSection section = new TextSection(true, false, parent).setText(text);
-        parent.getExtra().add(section);
-        return section;
-    }
-    
-    /**
-     * Adds a text section to the current text
-     * @param consumer The text to append to this current section
-     */
-    public final void append(Consumer<TextSection> consumer) {
-        TextSection section = new TextSection(true, false, parent);
-        consumer.accept(section);
-        section.getExtra().add(section);
+        return new TextSection(true, true, null).setText(text);
     }
     
     /**
@@ -53,17 +28,17 @@ public abstract class Text {
         
         private String text = "";
         private String insertion;
+        private boolean isParent;
         private TextSection parent;
         private HoverEvent hoverEvent;
         private ClickEvent clickEvent;
+        private boolean canHaveEvents;
         private Color color = Color.RESET;
-        private static List<TextSection> extra;
+        private List<TextSection> extra;
         private boolean bold = false;
         private boolean italics = false;
-        private boolean isParent = false;
         private boolean underline = false;
         private boolean obfuscated = false;
-        private boolean canHaveEvents = true;
         private boolean strikethrough = false;
         
         private TextSection(boolean events, boolean isParent, TextSection parent) {
@@ -74,6 +49,37 @@ public abstract class Text {
             } else extra = new ArrayList<>();
         }
     
+        /**
+         * Adds a text section to the current Text
+         * @param text The text to append to this current section
+         * @return The newly created text section
+         */
+        public final TextSection append(String text) {
+            TextSection section = new TextSection(true, false, parent).setText(text);
+            getExtra().add(section);
+            return section;
+        }
+    
+        /**
+         * Adds a text section to the current text
+         * @param consumer The text to append to this current section
+         */
+        public final void append(Consumer<TextSection> consumer) {
+            TextSection section = new TextSection(true, false, parent);
+            consumer.accept(section);
+            getExtra().add(section);
+        }
+    
+        /**
+         * Adds a text section to the current text.
+         * @param textSection The text to append to this current section
+         */
+        public final void append(TextSection textSection) {
+            textSection.setParent(parent);
+            if (textSection.isParent) textSection.isParent = false;
+            getExtra().add(textSection);
+        }
+        
         /**
          * Set the text of this TextSection
          * @param text The text
@@ -220,8 +226,21 @@ public abstract class Text {
          * @return all the additional text sections.
          */
         public List<TextSection> getExtra() {
-            if (isParent()) return extra;
+            if (isParent) return extra;
             else return getParent().getExtra();
+        }
+    
+        /**
+         * Get the text currently represented by this section
+         * @return The section text
+         */
+        public String getText() {
+            return text;
+        }
+        
+        //Set the sections parent
+        private void setParent(TextSection p) {
+            parent = p;
         }
         
         /**
@@ -229,7 +248,8 @@ public abstract class Text {
          * @return The parent TextSection
          */
         public final TextSection getParent() {
-            return parent;
+            if (isParent) return this;
+            else return parent;
         }
         
         /**
@@ -244,7 +264,7 @@ public abstract class Text {
                 List<JsonObject> val = new ArrayList<>();
                 val.add(hoverEvent.getHover().getJson());
                 hover.addProperty("action", hoverEvent.getAction().toString().toLowerCase());
-                hover.add("value", new GsonBuilder().setPrettyPrinting().create().toJsonTree(val));
+                hover.add("value", GSON.toJsonTree(val));
             }
     
             JsonObject click = null;
@@ -269,9 +289,9 @@ public abstract class Text {
             if (click != null) {
                 json.add("clickEvent", click);
             }
-            if (isParent) {
+            if (isParent && !extra.isEmpty()) {
                 List<JsonObject> sections = new ArrayList<>();
-                for (TextSection section : getExtra()) {
+                for (TextSection section : extra) {
                     sections.add(section.getJson());
                 }
                 json.add("extra", GSON.toJsonTree(sections));
@@ -292,19 +312,35 @@ public abstract class Text {
 
             stringBuilder.append(color);
             stringBuilder.append(text);
-            if (isParent) { getExtra().forEach(textSection -> stringBuilder.append(textSection.getFormatted())); }
+            if (isParent) {
+                if (!extra.isEmpty()) getExtra().forEach(textSection -> stringBuilder.append(textSection.getFormatted()));
+            }
 
             return stringBuilder.toString();
         }
-
+    
         /**
-         * Turns this TextSection into a string.
-         * @return The jsonObject to a strign.
+         * Turns this text object into the proper JSON format
+         * @return Json string
          */
         @Override
         public String toString() {
-            return getJson().toString();
+            if (isParent) return getJson().toString();
+            return parent.getJson().toString();
         }
+    
+        public String toUnformatted() {
+            StringBuilder builder = new StringBuilder();
+            getParent().getSections().stream().map(TextSection::getText).forEach(builder::append);
+            return builder.toString();
+        }
+    
+        public List<TextSection> getSections() {
+            List<TextSection> sections = new ArrayList<>(getParent().getExtra());
+            sections.add(0, getParent());
+            return sections;
+        }
+        
     }
     
     /**
@@ -402,14 +438,5 @@ public abstract class Text {
          */
         CHANGE_PAGE
     
-    }
-    
-    /**
-     * Turns this text object into the proper JSON format
-     * @return Json string
-     */
-    @Override
-    public String toString() {
-        return parent.getJson().toString();
     }
 }
