@@ -55,7 +55,7 @@ public abstract class Text {
          * @return The newly created text section
          */
         public final TextSection append(String text) {
-            TextSection section = new TextSection(true, false, parent).setText(text);
+            TextSection section = new TextSection(true, false, getParent()).setText(text);
             getExtra().add(section);
             return section;
         }
@@ -64,20 +64,23 @@ public abstract class Text {
          * Adds a text section to the current text
          * @param consumer The text to append to this current section
          */
-        public final void append(Consumer<TextSection> consumer) {
-            TextSection section = new TextSection(true, false, parent);
+        public final TextSection append(Consumer<TextSection> consumer) {
+            TextSection section = new TextSection(true, false, getParent());
             consumer.accept(section);
             getExtra().add(section);
+            return this;
         }
     
         /**
          * Adds a text section to the current text.
          * @param textSection The text to append to this current section
          */
-        public final void append(TextSection textSection) {
-            textSection.setParent(parent);
+        public final TextSection append(TextSection textSection) {
+            textSection.setParent(getParent());
             if (textSection.isParent) textSection.isParent = false;
             getExtra().add(textSection);
+            //getExtra().addAll(textSection.getExtra());
+            return textSection;
         }
         
         /**
@@ -352,7 +355,7 @@ public abstract class Text {
         private TextSection text;
         
         public HoverEvent(TextSection parent) {
-            this.text = new TextSection(false, false, parent);
+            this.text = new TextSection(false, true, null);
         }
         
         public final void action(HoverAction action) {
