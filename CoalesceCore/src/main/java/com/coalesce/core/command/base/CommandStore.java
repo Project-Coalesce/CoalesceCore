@@ -1,8 +1,8 @@
 package com.coalesce.core.command.base;
 
 import com.coalesce.core.Color;
-import com.coalesce.core.command.defaults.DefaultCommandBuilder;
 import com.coalesce.core.command.defaults.DefaultCommandRegister;
+import com.coalesce.core.command.defaults.DefaultProcessedCommand;
 import com.coalesce.core.plugin.ICoPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -43,7 +43,7 @@ public class CommandStore {
      *
      * @param command The command info.
      */
-    public <C extends CommandContext, T extends TabContext, B extends CommandBuilder, R extends CommandRegister<C, T, B>> void registerCommand(ProcessedCommand<C, T, B> command, R register) {
+    public <C extends CommandContext, T extends TabContext, B extends CommandBuilder, P extends ProcessedCommand<C, T, B>, R extends CommandRegister<C, T, B, P>> void registerCommand(ProcessedCommand<C, T, B> command, R register) {
         if (this.bukkitCommandMap == null) {
             throw new RuntimeException("Bukkit CommandMap could not be found");
         }
@@ -53,12 +53,12 @@ public class CommandStore {
         }
     }
 
-    @SafeVarargs //aaa
-    public final void registerCommands(ProcessedCommand<CommandContext, TabContext, DefaultCommandBuilder>... commands) {
+    //@SafeVarargs //aaa
+    public final void registerCommands(DefaultProcessedCommand... commands) {
         Stream.of(commands).forEach(this::registerCommand);
     }
 
-    public void registerCommand(ProcessedCommand<CommandContext, TabContext, DefaultCommandBuilder> command) {
+    public void registerCommand(DefaultProcessedCommand command) {
         registerCommand(command, new DefaultCommandRegister(command));
     }
     

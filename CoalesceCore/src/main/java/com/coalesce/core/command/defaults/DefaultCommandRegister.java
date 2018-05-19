@@ -2,7 +2,6 @@ package com.coalesce.core.command.defaults;
 
 import com.coalesce.core.command.base.CommandContext;
 import com.coalesce.core.command.base.CommandRegister;
-import com.coalesce.core.command.base.ProcessedCommand;
 import com.coalesce.core.command.base.TabContext;
 import com.coalesce.core.wrappers.CoSender;
 import org.bukkit.command.CommandSender;
@@ -10,9 +9,9 @@ import org.bukkit.command.CommandSender;
 import java.util.List;
 
 @SuppressWarnings("WeakerAccess")
-public final class DefaultCommandRegister extends CommandRegister<CommandContext, TabContext, DefaultCommandBuilder> {
+public final class DefaultCommandRegister extends CommandRegister<CommandContext, TabContext, DefaultCommandBuilder, DefaultProcessedCommand> {
     
-    public DefaultCommandRegister(ProcessedCommand<CommandContext, TabContext, DefaultCommandBuilder> command) {
+    public DefaultCommandRegister(DefaultProcessedCommand command) {
         super(command, command.getPlugin());
     }
     

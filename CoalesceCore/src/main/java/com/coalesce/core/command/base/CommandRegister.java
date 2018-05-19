@@ -10,12 +10,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 @SuppressWarnings("WeakerAccess")
-public abstract class CommandRegister<C extends CommandContext, T extends TabContext, B extends CommandBuilder> extends Command implements PluginIdentifiableCommand {
+public abstract class CommandRegister<C extends CommandContext, T extends TabContext, B extends CommandBuilder, P extends ProcessedCommand<C, T, B>> extends Command implements PluginIdentifiableCommand {
     
     protected final ICoPlugin plugin;
-    protected final ProcessedCommand<C, T, B> command;
+    protected final P command;
     
-    public CommandRegister(ProcessedCommand<C, T, B> command, ICoPlugin plugin) {
+    public CommandRegister(P command, ICoPlugin plugin) {
         super(command.getName());
         this.command = command;
         this.plugin = plugin;
