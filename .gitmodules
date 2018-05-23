@@ -1,4 +1,0 @@
-[submodule "Coalescing"]
-    path = "Coalescing"
-    url = https://github.com/Project-Coalesce/Coalescing
-    branch = master
