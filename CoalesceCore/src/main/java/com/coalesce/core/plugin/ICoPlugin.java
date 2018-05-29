@@ -3,6 +3,10 @@ package com.coalesce.core.plugin;
 import com.coalesce.core.Color;
 import com.coalesce.core.chat.CoFormatter;
 import com.coalesce.core.command.base.CommandStore;
+import com.coalesce.core.config.base.IConfig;
+import com.coalesce.core.i18n.CoLang;
+import com.coalesce.core.i18n.LocaleStore;
+import com.coalesce.core.i18n.Translatable;
 import com.coalesce.core.session.SessionStore;
 import org.bukkit.craftbukkit.libs.jline.console.ConsoleReader;
 import org.bukkit.plugin.Plugin;
@@ -11,10 +15,11 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 @SuppressWarnings( {"unused", "unchecked"} )
-public interface ICoPlugin extends Plugin {
+public interface ICoPlugin<M extends Enum & Translatable> extends Plugin {
     
     /**
      * Gets a map of all the current CoPlugins loaded on the server
@@ -220,6 +225,20 @@ public interface ICoPlugin extends Plugin {
      * @return The plugin jar file.
      */
     File getPluginJar();
+    
+    LocaleStore<M> getLocaleStore();
+    
+    default void loadCoLang(CoLang<M> coLang) {
+        getLocaleStore().loadCoLang(coLang);
+    }
+    
+    default void loadCoLang(IConfig file, Locale locale) {
+        getLocaleStore().loadCoLang(new CoLang<>(file, locale));
+    }
+    
+    default CoLang<M> getCoLang(Locale locale) {
+        return getLocaleStore().getCoLang(locale);
+    }
     
     ConsoleReader getConsoleReader();
     

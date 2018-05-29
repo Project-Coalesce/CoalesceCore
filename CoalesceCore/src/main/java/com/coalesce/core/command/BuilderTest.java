@@ -2,6 +2,7 @@ package com.coalesce.core.command;
 
 import com.coalesce.core.Coalesce;
 import com.coalesce.core.Color;
+import com.coalesce.core.Core;
 import com.coalesce.core.SenderType;
 import com.coalesce.core.command.base.CommandContext;
 import com.coalesce.core.command.base.ProcessedCommand;
@@ -15,7 +16,7 @@ import org.bukkit.entity.Player;
 
 public final class BuilderTest {
 
-    public BuilderTest(ICoPlugin plugin) {
+    public BuilderTest(Core plugin) {
     
         DefaultProcessedCommand command = DefaultProcessedCommand.builder(plugin, "test2")
                 .permission("core.test1")
@@ -40,7 +41,7 @@ public final class BuilderTest {
                 .senders(SenderType.PLAYER)
                 .usage("/toast")
                 .description("tests the toast builder").build();
-
+        
         plugin.getCommandStore().registerCommands(command, toast, command1);
     }
     

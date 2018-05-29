@@ -2,6 +2,8 @@ package com.coalesce.core;
 
 import com.coalesce.core.chat.CoFormatter;
 import com.coalesce.core.command.base.CommandStore;
+import com.coalesce.core.i18n.LocaleStore;
+import com.coalesce.core.i18n.Translatable;
 import com.coalesce.core.plugin.CoLogger;
 import com.coalesce.core.plugin.ICoModule;
 import com.coalesce.core.plugin.ICoPlugin;
@@ -18,11 +20,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-public abstract class CoPlugin extends JavaPlugin implements ICoPlugin, Listener{
+public abstract class CoPlugin<T extends Enum & Translatable> extends JavaPlugin implements ICoPlugin<T>, Listener{
     
     private final SessionStore sessionStore = new SessionStore();
     private final List<ICoModule> modules = new LinkedList<>();
     private CommandStore commandStore;
+    private LocaleStore<T> localeStore;
     private Color pluginColor = Color.WHITE;
     private CoFormatter formatter;
     private String displayName;
@@ -34,6 +37,7 @@ public abstract class CoPlugin extends JavaPlugin implements ICoPlugin, Listener
         logger = new CoLogger(this);
         formatter = new CoFormatter(this);
         commandStore = new CommandStore(this);
+        localeStore = new LocaleStore<>();
         Core.addCoPlugin(getRealName(), this);
         Core.addSessionStore(this, sessionStore);
         
@@ -229,5 +233,10 @@ public abstract class CoPlugin extends JavaPlugin implements ICoPlugin, Listener
     @Override
     public File getPluginJar() {
         return getFile();
+    }
+    
+    @Override
+    public LocaleStore<T> getLocaleStore() {
+        return localeStore;
     }
 }

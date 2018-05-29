@@ -1,7 +1,6 @@
 package com.coalesce.core;
 
 import com.coalesce.core.command.BuilderTest;
-import com.coalesce.core.config.YmlConfig;
 import com.coalesce.core.plugin.ICoPlugin;
 import com.coalesce.core.session.SessionStore;
 import com.coalesce.core.update.InstallerStartup;
@@ -17,6 +16,7 @@ public class Core extends CoPlugin {
     private static final Map<String, ICoPlugin> PLUGINS = new HashMap<>();
     private static InstallerStartup installer;
     private static ConsoleReader consoleReader;
+    private static CoreConfig config;
     
     @Override
     public void onPluginEnable() throws Exception {
@@ -25,8 +25,8 @@ public class Core extends CoPlugin {
         setDisplayName("CoalesceCore");
         setPluginColor(Color.YELLOW);
         registerListener(this);
+        config = new CoreConfig(this);
         new BuilderTest(this);
-        new YmlConfig("groups", this);
     }
     
     @Override
@@ -38,6 +38,10 @@ public class Core extends CoPlugin {
     @Override
     public void onPluginDisable() throws Exception {
         installer.start();
+    }
+    
+    static CoreConfig getCoreConfig() {
+        return config;
     }
     
     static void addSessionStore(ICoPlugin plugin, SessionStore sessionStore) {
