@@ -235,6 +235,9 @@ public abstract class CoPlugin<T extends Enum & Translatable> extends JavaPlugin
         return getFile();
     }
     
+    //
+    //
+    
     @Override
     public LocaleStore<T> getLocaleStore() {
         return localeStore;

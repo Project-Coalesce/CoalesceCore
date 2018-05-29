@@ -12,6 +12,10 @@ import org.bukkit.craftbukkit.libs.jline.console.ConsoleReader;
 import org.bukkit.plugin.Plugin;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -238,6 +242,69 @@ public interface ICoPlugin<M extends Enum & Translatable> extends Plugin {
     
     default CoLang<M> getCoLang(Locale locale) {
         return getLocaleStore().getCoLang(locale);
+    }
+    
+    //Install files of a directory to another directory
+    //install specific file to a directory
+    
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    default void installFile(String pathInJar, File installationDir) {
+        if (!pathInJar.contains(".")) {
+            throw new IllegalArgumentException("The resource \"" + pathInJar + "\" does not contain a file type. Please specify a file type.");
+        }
+        if (!installationDir.exists()) installationDir.mkdirs();
+        
+    }
+    
+    /**
+     * Moves a file or directory from a
+     * @param pathInJar The path to the file in the jar file. MUST HAVE EXTENSION
+     * @param destination where you want this file moved to. MUST HAVE EXTENSION
+     */
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    default void installFile(String pathInJar, String destination) {
+        if (!destination.contains(".")) throw new RuntimeException("File type must be specified.");
+        try {
+            File path;
+            File file;
+    
+            if (!destination.contains(File.separator)) {
+                path = getPluginFolder();
+                file = new File(path.getAbsolutePath() + File.separator + destination);
+            }
+            else {
+                int last = destination.lastIndexOf(File.separator);
+                String fileName = destination.substring(last + 1);
+                String directory = destination.substring(0, last);
+                path = new File(getPluginFolder().getAbsolutePath() + File.separator + directory);
+                file = new File(path + File.separator + fileName);
+            }
+            
+            if (!path.exists()) path.mkdirs();
+            if (!file.exists()) file.createNewFile();
+            
+            InputStream stream;
+            OutputStream resStreamOut;
+    
+            stream = this.getClass().getResourceAsStream(pathInJar);
+            
+            if (stream == null) {
+                throw new RuntimeException("the path specified could not be found in the jar file.");
+            }
+    
+            int readBytes;
+            byte[] buffer = new byte[4096];
+            resStreamOut = new FileOutputStream(file);
+            while ((readBytes = stream.read(buffer)) > 0) {
+                resStreamOut.write(buffer, 0, readBytes);
+            }
+            stream.close();
+            resStreamOut.close();
+            
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    
     }
     
     ConsoleReader getConsoleReader();
