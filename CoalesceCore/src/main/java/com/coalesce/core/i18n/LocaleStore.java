@@ -51,12 +51,11 @@ public final class LocaleStore<M extends Enum & Translatable> {
     }
     
     public void loadCoLang(File file, Locale locale) {
-        String name = file.getAbsolutePath();
-        loadCoLang(name.contains(".") ? name.substring(0, name.lastIndexOf(".")) : name, locale);
+        loadCoLang(file.getAbsolutePath(), locale);
     }
     
     public void loadCoLang(String file, Locale locale) {
-        loadCoLang(new YmlConfig(file, plugin), locale);
+        loadCoLang(new YmlConfig(file.contains(".") ? file.substring(0, file.lastIndexOf(".")) : file, plugin), locale);
     }
     
     /**
