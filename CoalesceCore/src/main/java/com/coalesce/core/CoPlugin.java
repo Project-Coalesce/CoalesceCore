@@ -37,7 +37,7 @@ public abstract class CoPlugin<T extends Enum & Translatable> extends JavaPlugin
         logger = new CoLogger(this);
         formatter = new CoFormatter(this);
         commandStore = new CommandStore(this);
-        localeStore = new LocaleStore<>();
+        localeStore = new LocaleStore<>(this);
         Core.addCoPlugin(getRealName(), this);
         Core.addSessionStore(this, sessionStore);
         

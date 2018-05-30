@@ -31,8 +31,10 @@ public interface Translatable {
      */
     default String format(String string) {
         String formatted = string;
-        for (int i = 0; getHolders().length > i; i++) {
-            formatted = formatted.replaceAll(getHolders()[i], "{" + i + "}");
+        if (getHolders() != null) {
+            for (int i = 0; getHolders().length > i; i++) {
+                formatted = formatted.replace(getHolders()[i], "{" + i + "}");
+            }
         }
         return formatted;
     }

@@ -108,11 +108,11 @@ public interface ICoPlugin<M extends Enum & Translatable> extends Plugin {
      * Gets a module by class.
      *
      * @param clazz The class that extends CoModule
-     * @param <M>   A module class
+     * @param <T>   A module class
      * @return The module.
      */
-    default <M extends ICoModule> M getModule(Class<M> clazz) {
-        return getModules().stream().filter(module -> module.getClass().equals(clazz)).map(module -> ((M)module)).iterator().next();
+    default <T extends ICoModule> T getModule(Class<T> clazz) {
+        return getModules().stream().filter(module -> module.getClass().equals(clazz)).map(module -> ((T)module)).iterator().next();
     }
     
     /**
@@ -232,28 +232,28 @@ public interface ICoPlugin<M extends Enum & Translatable> extends Plugin {
     
     LocaleStore<M> getLocaleStore();
     
+    default void setLocaleClassType(Class<M> cls) {
+        getLocaleStore().setClassType(cls);
+    }
+    
     default void loadCoLang(CoLang<M> coLang) {
         getLocaleStore().loadCoLang(coLang);
     }
     
     default void loadCoLang(IConfig file, Locale locale) {
-        getLocaleStore().loadCoLang(new CoLang<>(file, locale));
+        getLocaleStore().loadCoLang(new CoLang<>(file, getLocaleStore(), locale));
+    }
+    
+    default void loadCoLang(File file, Locale locale) {
+        getLocaleStore().loadCoLang(file, locale);
+    }
+    
+    default void loadCoLang(String file, Locale locale) {
+        getLocaleStore().loadCoLang(file, locale);
     }
     
     default CoLang<M> getCoLang(Locale locale) {
         return getLocaleStore().getCoLang(locale);
-    }
-    
-    //Install files of a directory to another directory
-    //install specific file to a directory
-    
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-    default void installFile(String pathInJar, File installationDir) {
-        if (!pathInJar.contains(".")) {
-            throw new IllegalArgumentException("The resource \"" + pathInJar + "\" does not contain a file type. Please specify a file type.");
-        }
-        if (!installationDir.exists()) installationDir.mkdirs();
-        
     }
     
     /**
