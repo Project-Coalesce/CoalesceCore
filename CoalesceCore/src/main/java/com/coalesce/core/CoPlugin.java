@@ -18,6 +18,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public abstract class CoPlugin<T extends Enum & Translatable> extends JavaPlugin implements ICoPlugin<T>, Listener{

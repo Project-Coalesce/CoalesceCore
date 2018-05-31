@@ -16,14 +16,15 @@ public class CoLang<M extends Enum & Translatable> {
     private Locale locale;
     
     public CoLang(IConfig langfile, LocaleStore<M> localeStore, Locale locale) {
-        super();
         this.keyMap = new HashMap<>();
         this.langfile = langfile;
         this.colorChar = '&';
         this.locale = locale;
         Class<M> type = localeStore.getKeysClass();
-        
-        Stream.of(type.getEnumConstants()).forEach(k -> keyMap.put(k, k.format(langfile.getString(k.getKey()))));
+        Stream.of(type.getEnumConstants()).forEach(k -> {
+            if (!langfile.contains(k.getKey(), true)) langfile.getPlugin().getCoLogger().warn("Could not find key \"" + k.getKey() + "\" in " + langfile.getName());
+            else keyMap.put(k, k.format(langfile.getString(k.getKey())));
+        });
     }
 
     public Locale getLocale() {

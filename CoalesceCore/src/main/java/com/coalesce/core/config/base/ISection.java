@@ -248,7 +248,12 @@ public interface ISection {
             return (T)Integer.valueOf(getValue(path).toString());
         }
         if (type.isEnum()) {
-            return (T)Enum.valueOf(type.asSubclass(Enum.class), getValue(path).toString().toUpperCase());
+            try {
+                return (T)Enum.valueOf(type.asSubclass(Enum.class), getValue(path).toString().toUpperCase());
+            }
+            catch (IllegalArgumentException | NullPointerException e) {
+                return null;
+            }
         }
         return ((T)getValue(path));
     }

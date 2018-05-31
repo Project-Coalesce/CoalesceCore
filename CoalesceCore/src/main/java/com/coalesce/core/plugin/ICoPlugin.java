@@ -206,7 +206,7 @@ public interface ICoPlugin<M extends Enum & Translatable> extends Plugin {
      *
      * @return The command store.
      */
-    CommandStore getCommandStore();
+    CommandStore<M> getCommandStore();
     
     /**
      * Gets the current plugins data folder.
@@ -231,6 +231,10 @@ public interface ICoPlugin<M extends Enum & Translatable> extends Plugin {
     File getPluginJar();
     
     LocaleStore<M> getLocaleStore();
+    
+    default void setLocale(Locale locale) {
+        getLocaleStore().setDefaultLocale(locale);
+    }
     
     default void setLocaleClassType(Class<M> cls) {
         getLocaleStore().setClassType(cls);
@@ -282,7 +286,10 @@ public interface ICoPlugin<M extends Enum & Translatable> extends Plugin {
             
             if (!path.exists()) path.mkdirs();
             if (!file.exists()) file.createNewFile();
-            
+            else {
+                file.delete();
+                file.createNewFile();
+            }
             InputStream stream;
             OutputStream resStreamOut;
     
