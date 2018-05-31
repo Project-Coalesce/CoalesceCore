@@ -1,5 +1,6 @@
 package com.coalesce.core.command.base;
 
+import com.coalesce.core.i18n.Translatable;
 import com.coalesce.core.plugin.ICoPlugin;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -9,13 +10,14 @@ import org.bukkit.plugin.Plugin;
 import java.util.ArrayList;
 import java.util.List;
 
+//holy mother of generics
 @SuppressWarnings("WeakerAccess")
-public abstract class CommandRegister<C extends CommandContext, T extends TabContext, B extends CommandBuilder, P extends ProcessedCommand<C, T, B>> extends Command implements PluginIdentifiableCommand {
+public abstract class CommandRegister<C extends CommandContext<C, T, M, B, P>, T extends TabContext<C, T, M, B, P>, M extends Enum & Translatable, B extends CommandBuilder<C, T, M, B, P>, P extends ProcessedCommand<C, T, M, B, P>> extends Command implements PluginIdentifiableCommand {
     
-    protected final ICoPlugin plugin;
+    protected final ICoPlugin<M> plugin;
     protected final P command;
     
-    public CommandRegister(P command, ICoPlugin plugin) {
+    public CommandRegister(P command, ICoPlugin<M> plugin) {
         super(command.getName());
         this.command = command;
         this.plugin = plugin;

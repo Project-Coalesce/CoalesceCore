@@ -1,12 +1,10 @@
 package com.coalesce.core.command.defaults;
 
 import com.coalesce.core.command.base.CommandBuilder;
-import com.coalesce.core.command.base.CommandContext;
-import com.coalesce.core.command.base.ProcessedCommand;
-import com.coalesce.core.command.base.TabContext;
+import com.coalesce.core.i18n.Translatable;
 import com.coalesce.core.plugin.ICoPlugin;
 
-public final class DefaultCommandBuilder extends CommandBuilder<CommandContext, TabContext, DefaultCommandBuilder, DefaultProcessedCommand>{
+public final class DefaultCommandBuilder<M extends Enum & Translatable> extends CommandBuilder<DefaultCContext<M>, DefaultTContext<M>, M, DefaultCommandBuilder<M>, DefaultProcessedCommand<M>>{
     
     /**
      * Creates a new CommandBuilder
@@ -14,12 +12,12 @@ public final class DefaultCommandBuilder extends CommandBuilder<CommandContext, 
      * @param plugin The plugin the command is registered to
      * @param name   The name of the command
      */
-    public DefaultCommandBuilder(ICoPlugin plugin, String name) {
-        super(plugin, name, new DefaultProcessedCommand(plugin, name));
+    public DefaultCommandBuilder(ICoPlugin<M> plugin, String name) {
+        super(plugin, name, new DefaultProcessedCommand<>(plugin, name));
     }
     
     @Override
-    public DefaultProcessedCommand build() {
+    public DefaultProcessedCommand<M> build() {
         return command;
     }
 }

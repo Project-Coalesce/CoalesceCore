@@ -2,6 +2,7 @@ package com.coalesce.core.command.base;
 
 import com.coalesce.core.SenderType;
 import com.coalesce.core.command.builder.interfaces.TabExecutor;
+import com.coalesce.core.i18n.Translatable;
 import com.coalesce.core.wrappers.CoSender;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -13,15 +14,15 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @SuppressWarnings({"WeakerAccess", "unused", "unchecked"})
-public class TabContext<C extends CommandContext, T extends TabContext, B extends CommandBuilder> {
+public abstract class TabContext<C extends CommandContext<C, T, M, B, P>, T extends TabContext<C, T, M, B, P>, M extends Enum & Translatable, B extends CommandBuilder<C, T, M, B, P>, P extends ProcessedCommand<C, T, M, B, P>> {
     
-    private final ProcessedCommand<C, T, B> command;
+    private final ProcessedCommand<C, T, M, B, P> command;
     private final List<String> possible;
     private final CoSender sender;
     private final String[] args;
     private final C context;
     
-    public TabContext(C context, ProcessedCommand<C, T, B> command, String[] args) {
+    public TabContext(C context, ProcessedCommand<C, T, M, B, P> command, String[] args) {
         this.possible = new ArrayList<>();
         this.sender = context.getSender();
         this.command = command;
@@ -72,7 +73,7 @@ public class TabContext<C extends CommandContext, T extends TabContext, B extend
      *
      * @return The command context
      */
-    public CommandContext getCommandContext() {
+    public C getCommandContext() {
         return context;
     }
     
@@ -269,7 +270,7 @@ public class TabContext<C extends CommandContext, T extends TabContext, B extend
      * @param executor  The completion method (method reference)
      * @return true if the predicate passed. False otherwise
      */
-    public boolean subCompletion(Predicate<TabContext<C, T, B>> predicate, TabExecutor<T> executor) {
+    public boolean subCompletion(Predicate<TabContext<C, T, M, B, P>> predicate, TabExecutor<T> executor) {
         if (predicate.test(this)) {
             executor.run((T)this);
             return true;

@@ -3,7 +3,7 @@ package com.coalesce.core.command.base;
 import com.coalesce.core.SenderType;
 import com.coalesce.core.command.builder.interfaces.CommandExecutor;
 import com.coalesce.core.command.builder.interfaces.TabExecutor;
-import com.coalesce.core.command.defaults.DefaultCommandBuilder;
+import com.coalesce.core.i18n.Translatable;
 import com.coalesce.core.plugin.ICoPlugin;
 import com.coalesce.core.wrappers.CoSender;
 
@@ -14,13 +14,13 @@ import java.util.List;
 import java.util.Set;
 
 @SuppressWarnings({"unused", "unchecked", "WeakerAccess"})
-public abstract class ProcessedCommand<C extends CommandContext, T extends TabContext, B extends CommandBuilder> {
+public abstract class ProcessedCommand<C extends CommandContext<C, T, M, B, P>, T extends TabContext<C, T, M, B, P>, M extends Enum & Translatable, B extends CommandBuilder<C, T, M, B, P>, P extends ProcessedCommand<C, T, M, B, P>> {
     
     private Set<String> aliases = new HashSet<>();
-    private CommandExecutor<C> commandExecutor;
+    private CommandExecutor<C, T, M, B, P> commandExecutor;
     private TabExecutor<T> tabExecutor;
     private String description = "";
-    private final ICoPlugin plugin;
+    private final ICoPlugin<M> plugin;
     private SenderType[] senders;
     private String[] permission;
     private final String name;
@@ -28,20 +28,9 @@ public abstract class ProcessedCommand<C extends CommandContext, T extends TabCo
     private int min = -1;
     private int max = -1;
     
-    public ProcessedCommand(ICoPlugin plugin, String name) {
+    public ProcessedCommand(ICoPlugin<M> plugin, String name) {
         this.name = name;
         this.plugin = plugin;
-    }
-    
-    /**
-     * The ProcessedCommand Builder
-     *
-     * @param plugin The plugin registering the command
-     * @param name   The name of the command
-     * @return The command builder
-     */
-    public static DefaultCommandBuilder builder(ICoPlugin plugin, String name) {
-        return new DefaultCommandBuilder(plugin, name);
     }
     
     /**
@@ -49,7 +38,7 @@ public abstract class ProcessedCommand<C extends CommandContext, T extends TabCo
      *
      * @return The command executor
      */
-    public CommandExecutor<C> getCommandExecutor() {
+    public CommandExecutor<C, T, M, B, P> getCommandExecutor() {
         return commandExecutor;
     }
     
@@ -58,7 +47,7 @@ public abstract class ProcessedCommand<C extends CommandContext, T extends TabCo
      *
      * @param commandExecutor The command executor
      */
-    public void setCommandExecutor(CommandExecutor<C> commandExecutor) {
+    public void setCommandExecutor(CommandExecutor<C, T, M, B, P> commandExecutor) {
         this.commandExecutor = commandExecutor;
     }
     
@@ -220,7 +209,7 @@ public abstract class ProcessedCommand<C extends CommandContext, T extends TabCo
      *
      * @return The host plugin
      */
-    public ICoPlugin getPlugin() {
+    public ICoPlugin<M> getPlugin() {
         return plugin;
     }
     
@@ -229,7 +218,7 @@ public abstract class ProcessedCommand<C extends CommandContext, T extends TabCo
     public boolean run(C context) {
         
         CoSender sender = context.getSender();
-        String[] args = (String[])context.getArgs().toArray(new String[0]);
+        String[] args = context.getArgs().toArray(new String[0]);
         
         boolean senderType = false;
         
@@ -280,7 +269,7 @@ public abstract class ProcessedCommand<C extends CommandContext, T extends TabCo
         if (tabExecutor != null) {
             tabExecutor.run(context);
             
-            for (String completion : (List<String>)context.currentPossibleCompletion()) {
+            for (String completion : context.currentPossibleCompletion()) {
                 if (completion.toLowerCase().startsWith(startString)) {
                     sub.add(completion);
                 }

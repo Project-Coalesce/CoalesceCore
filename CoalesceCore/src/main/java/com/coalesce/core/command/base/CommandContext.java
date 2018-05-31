@@ -5,6 +5,7 @@ import com.coalesce.core.Color;
 import com.coalesce.core.SenderType;
 import com.coalesce.core.chat.CoFormatter;
 import com.coalesce.core.command.builder.interfaces.CommandExecutor;
+import com.coalesce.core.i18n.Translatable;
 import com.coalesce.core.plugin.ICoPlugin;
 import com.coalesce.core.text.Text;
 import com.coalesce.core.wrappers.CoSender;
@@ -12,18 +13,19 @@ import org.bukkit.entity.Player;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 @SuppressWarnings({"unused", "unchecked", "WeakerAccess"})
-public class CommandContext<C extends CommandContext, T extends TabContext> {
+public abstract class CommandContext<C extends CommandContext<C, T, M, B, P>, T extends TabContext<C, T, M, B, P>, M extends Enum & Translatable, B extends CommandBuilder<C, T, M, B, P>, P extends ProcessedCommand<C, T, M, B, P>> {
     
-    private ICoPlugin plugin;
+    private ICoPlugin<M> plugin;
     private final String alias;
     private final CoSender sender;
     private final List<String> args;
     
-    public CommandContext(CoSender sender, String alias, String[] args, ICoPlugin plugin) {
+    public CommandContext(CoSender sender, String alias, String[] args, ICoPlugin<M> plugin) {
         this.alias = alias;
         this.plugin = plugin;
         this.sender = sender;
@@ -92,7 +94,7 @@ public class CommandContext<C extends CommandContext, T extends TabContext> {
      *
      * @return The plugin
      */
-    public ICoPlugin getPlugin() {
+    public ICoPlugin<M> getPlugin() {
         return plugin;
     }
     
@@ -179,14 +181,29 @@ public class CommandContext<C extends CommandContext, T extends TabContext> {
     }
     
     /**
-     * Sends a message to the player/console
-     * @param text The text object to send
+     * Sends the sender a regular message with placeholder parsing
+     *
+     * @param message The message to send
      * @param objects The placeholders to use
      */
-    public void send(Text.TextSection text, Object... objects) {
-        final CoFormatter formatter = plugin.getCoFormatter();
-        if (getSender().getType().equals(SenderType.PLAYER)) Coalesce.sendRawMessage(getSender().as(Player.class), formatter.formatString(text.toString(), objects));
-        else send(formatter.format(text.toUnformatted(), objects));
+    public void send(String message, Object... objects) {
+        send(plugin.getCoFormatter().formatString(message, objects));
+    }
+    
+    public void send(M messageKey) {
+        send(messageKey, plugin.getLocaleStore().getDefaultLocale());
+    }
+    
+    public void send(M messageKey, Locale locale) {
+        send(plugin.getLocaleStore().translate(messageKey, locale));
+    }
+    
+    public void send(M messageKey, Object... objects) {
+        send(messageKey, plugin.getLocaleStore().getDefaultLocale(), objects);
+    }
+    
+    public void send(M messageKey, Locale locale, Object... objects) {
+        send(plugin.getLocaleStore().translate(messageKey, locale, objects));
     }
     
     /**
@@ -194,10 +211,21 @@ public class CommandContext<C extends CommandContext, T extends TabContext> {
      * @param text The text to send
      */
     public void send(Text.TextSection text) {
-        if (getSender().getType().equals(SenderType.PLAYER)) {
-            Coalesce.sendMessage(getSender().as(Player.class), text);
+        if (sender.getType().equals(SenderType.PLAYER)) {
+            Coalesce.sendMessage(sender.as(Player.class), text);
         }
         else send(text.toUnformatted());
+    }
+    
+    /**
+     * Sends a message to the player/console
+     * @param text The text object to send
+     * @param objects The placeholders to use
+     */
+    public void send(Text.TextSection text, Object... objects) {
+        final CoFormatter formatter = plugin.getCoFormatter();
+        if (sender.getType().equals(SenderType.PLAYER)) Coalesce.sendRawMessage(getSender().as(Player.class), formatter.formatString(text.toString(), objects));
+        else send(formatter.format(text.toUnformatted(), objects));
     }
     
     /**
@@ -219,6 +247,22 @@ public class CommandContext<C extends CommandContext, T extends TabContext> {
      */
     public void pluginMessage(String message, Object... objects) {
         send(plugin.getCoFormatter().format(message, objects));
+    }
+    
+    public void pluginMessage(M messageKey) {
+        pluginMessage(messageKey, plugin.getLocaleStore().getDefaultLocale());
+    }
+    
+    public void pluginMessage(M messageKey, Locale locale) {
+        send(plugin.getCoFormatter().format(plugin.getLocaleStore().translate(messageKey, locale)));
+    }
+    
+    public void pluginMessage(M messageKey, Object... objects) {
+        pluginMessage(messageKey, plugin.getLocaleStore().getDefaultLocale(), objects);
+    }
+    
+    public void pluginMessage(M messageKey, Locale locale, Object... objects) {
+        send(plugin.getCoFormatter().format(plugin.getLocaleStore().translate(messageKey, locale, objects)));
     }
     
     /**
@@ -286,23 +330,13 @@ public class CommandContext<C extends CommandContext, T extends TabContext> {
     }
     
     /**
-     * Sends the sender a regular message with placeholder parsing
-     *
-     * @param message The message to send
-     * @param objects The placeholders to use
-     */
-    public void send(String message, Object... objects) {
-        send(plugin.getCoFormatter().formatString(message, objects));
-    }
-    
-    /**
      * Runs a sub command of this command if the sender matches the given sender type
      *
      * @param senderType The type of sender needed to run the subCommand
      * @param executor   The command method (method reference)
      * @return true if the senderType passed. False otherwise
      */
-    public boolean subCommand(SenderType senderType, CommandExecutor<C> executor) {
+    public boolean subCommand(SenderType senderType, CommandExecutor<C, T, M, B, P> executor) {
         if (getSender().getType() == senderType) {
             executor.run((C)this);
             return true;
@@ -317,7 +351,7 @@ public class CommandContext<C extends CommandContext, T extends TabContext> {
      * @param executor The command method (method reference)
      * @return true if the index passed. False otherwise.
      */
-    public boolean subCommandAt(int index, CommandExecutor<C> executor) {
+    public boolean subCommandAt(int index, CommandExecutor<C, T, M, B, P> executor) {
         if (getArgs().size() - 1 == index) {
             executor.run((C)this);
             return true;
@@ -334,7 +368,7 @@ public class CommandContext<C extends CommandContext, T extends TabContext> {
      * @param executor The command method (method reference)
      * @return true if the arg at the specified index matches the given string
      */
-    public boolean subCommandAt(int index, String match, boolean ignoreCase, CommandExecutor<C> executor) {
+    public boolean subCommandAt(int index, String match, boolean ignoreCase, CommandExecutor<C, T, M, B, P> executor) {
         if ((ignoreCase ? argAt(index).equalsIgnoreCase(match) : argAt(index).equals(match))) {
             executor.run((C)this);
             return true;
@@ -350,7 +384,7 @@ public class CommandContext<C extends CommandContext, T extends TabContext> {
      * @param executor   The command method (method reference)
      * @return true if the index and the senderType passed. False otherwise
      */
-    public boolean subCommandAt(int index, SenderType senderType, CommandExecutor<C> executor) {
+    public boolean subCommandAt(int index, SenderType senderType, CommandExecutor<C, T, M, B, P> executor) {
         if (getArgs().size() - 1 == index && getSender().getType() == senderType) {
             executor.run((C)this);
             return true;
@@ -365,7 +399,7 @@ public class CommandContext<C extends CommandContext, T extends TabContext> {
      * @param executor  The command method (method reference)
      * @return true if the predicate passed. False otherwise
      */
-    public boolean subCommand(Predicate<CommandContext<C, T>> predicate, CommandExecutor<C> executor) {
+    public boolean subCommand(Predicate<CommandContext<C, T, M, B, P>> predicate, CommandExecutor<C, T, M, B, P> executor) {
         if (predicate.test(this)) {
             executor.run((C)this);
             return true;

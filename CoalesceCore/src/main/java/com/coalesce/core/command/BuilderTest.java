@@ -4,12 +4,10 @@ import com.coalesce.core.Coalesce;
 import com.coalesce.core.Color;
 import com.coalesce.core.Core;
 import com.coalesce.core.SenderType;
-import com.coalesce.core.command.base.CommandContext;
-import com.coalesce.core.command.base.ProcessedCommand;
-import com.coalesce.core.command.base.TabContext;
-import com.coalesce.core.command.defaults.DefaultCommandBuilder;
+import com.coalesce.core.command.defaults.DefaultCContext;
 import com.coalesce.core.command.defaults.DefaultProcessedCommand;
-import com.coalesce.core.plugin.ICoPlugin;
+import com.coalesce.core.command.defaults.DefaultTContext;
+import com.coalesce.core.i18n.DummyLang;
 import com.coalesce.core.text.Text;
 import com.coalesce.core.text.Toast;
 import org.bukkit.entity.Player;
@@ -18,16 +16,17 @@ public final class BuilderTest {
 
     public BuilderTest(Core plugin) {
     
-        DefaultProcessedCommand command = DefaultProcessedCommand.builder(plugin, "test2")
+        DefaultProcessedCommand<DummyLang> command = DefaultProcessedCommand.builder(plugin, "test2")
                 .permission("core.test1")
                 .executor(this::testCommand2)
                 .completer(this::testCompletion)
                 .minArgs(1)
                 .senders(SenderType.PLAYER)
                 .usage("/test2")
-                .description("tests the builder pattern command registration").build();
-
-        DefaultProcessedCommand command1 = DefaultProcessedCommand.builder(plugin, "test1")
+                .description("tests the builder pattern command registration")
+                .build();
+        
+        DefaultProcessedCommand<DummyLang> command1 = DefaultProcessedCommand.builder(plugin, "test1")
                 .permission("core.test2")
                 .executor(this::testCommand1)
                 .senders(SenderType.PLAYER)
@@ -35,21 +34,21 @@ public final class BuilderTest {
                 .description("Testing the text class and the placeholder replacement for the command context")
                 .build();
         
-        DefaultProcessedCommand toast = DefaultProcessedCommand.builder(plugin, "toast")
+        DefaultProcessedCommand<DummyLang> toast = DefaultProcessedCommand.builder(plugin, "toast")
                 .permission("core.toast")
                 .executor(this::testToast)
                 .senders(SenderType.PLAYER)
                 .usage("/toast")
                 .description("tests the toast builder").build();
-        
+
         plugin.getCommandStore().registerCommands(command, toast, command1);
     }
     
-    private void testCompletion(TabContext tabContext) {
+    private void testCompletion(DefaultTContext tabContext) {
         tabContext.completion("hi", "hello");
     }
     
-    private void testCommand1(CommandContext context) {
+    private void testCommand1(DefaultCContext context) {
         
         Text.TextSection text = Text.of("This is a test for {0}")
                 .setColor(Color.PURPLE)
@@ -67,7 +66,7 @@ public final class BuilderTest {
         context.pluginMessage(text, context.getSender().getName(), context.getSender().getType(), context.getPlugin().getDisplayName());
     }
     
-    private void testCommand2(CommandContext context) {
+    private void testCommand2(DefaultCContext context) {
         System.out.println(Color.toConsoleColor('&', context.joinArgs()));
         
         Text.TextSection text = Text.of("Hello")
@@ -101,7 +100,7 @@ public final class BuilderTest {
         Coalesce.sendMessage(context.getSender().as(Player.class), text);
     }
 
-    private void testToast(CommandContext context) {
+    private void testToast(DefaultCContext context) {
         Coalesce.sendToast(context.getSender().as(Player.class),
                 Toast.of("Test toast")
                         .setText(Text.of("Congratulations! It works :)").setColor(Color.GOLD))

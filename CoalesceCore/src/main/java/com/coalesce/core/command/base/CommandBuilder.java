@@ -3,6 +3,7 @@ package com.coalesce.core.command.base;
 import com.coalesce.core.SenderType;
 import com.coalesce.core.command.builder.interfaces.CommandExecutor;
 import com.coalesce.core.command.builder.interfaces.TabExecutor;
+import com.coalesce.core.i18n.Translatable;
 import com.coalesce.core.plugin.ICoPlugin;
 
 import java.util.Set;
@@ -10,7 +11,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @SuppressWarnings({"unused", "unchecked"})
-public abstract class CommandBuilder<C extends CommandContext, T extends TabContext, B extends CommandBuilder<C, T, B, P>, P extends ProcessedCommand<C, T, B>> {
+public abstract class CommandBuilder<C extends CommandContext<C, T, M, B, P>, T extends TabContext<C, T, M, B, P>, M extends Enum & Translatable, B extends CommandBuilder<C, T, M, B, P>, P extends ProcessedCommand<C, T, M, B, P>> {
     
     protected P command;
     
@@ -20,7 +21,7 @@ public abstract class CommandBuilder<C extends CommandContext, T extends TabCont
      * @param plugin The plugin the command is registered to
      * @param name   The name of the command
      */
-    public CommandBuilder(ICoPlugin plugin, String name, P command) {
+    public CommandBuilder(ICoPlugin<M> plugin, String name, P command) {
         this.command = command;
     }
     
@@ -29,7 +30,7 @@ public abstract class CommandBuilder<C extends CommandContext, T extends TabCont
      *
      * @param executor The method of this command. Should be this::method_name
      */
-    public B executor(CommandExecutor<C> executor) {
+    public B executor(CommandExecutor<C, T, M, B, P> executor) {
         command.setCommandExecutor(executor);
         return (B)this;
     }

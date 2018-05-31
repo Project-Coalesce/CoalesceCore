@@ -1,6 +1,7 @@
 package com.coalesce.core;
 
 import com.coalesce.core.command.BuilderTest;
+import com.coalesce.core.i18n.DummyLang;
 import com.coalesce.core.plugin.ICoPlugin;
 import com.coalesce.core.session.SessionStore;
 import com.coalesce.core.update.InstallerStartup;
@@ -10,7 +11,7 @@ import org.bukkit.craftbukkit.libs.jline.console.ConsoleReader;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Core extends CoPlugin {
+public class Core extends CoPlugin<DummyLang> {
     
     private static final Map<ICoPlugin, SessionStore> SESSION_STORES = new HashMap<>();
     private static final Map<String, ICoPlugin> PLUGINS = new HashMap<>();

@@ -24,7 +24,7 @@ public abstract class CoPlugin<T extends Enum & Translatable> extends JavaPlugin
     
     private final SessionStore sessionStore = new SessionStore();
     private final List<ICoModule> modules = new LinkedList<>();
-    private CommandStore commandStore;
+    private CommandStore<T> commandStore;
     private LocaleStore<T> localeStore;
     private Color pluginColor = Color.WHITE;
     private CoFormatter formatter;
@@ -36,7 +36,7 @@ public abstract class CoPlugin<T extends Enum & Translatable> extends JavaPlugin
         displayName = getName();
         logger = new CoLogger(this);
         formatter = new CoFormatter(this);
-        commandStore = new CommandStore(this);
+        commandStore = new CommandStore<>(this);
         localeStore = new LocaleStore<>(this);
         Core.addCoPlugin(getRealName(), this);
         Core.addSessionStore(this, sessionStore);
@@ -183,7 +183,7 @@ public abstract class CoPlugin<T extends Enum & Translatable> extends JavaPlugin
     //
     
     @Override
-    public CommandStore getCommandStore() {
+    public CommandStore<T> getCommandStore() {
         return commandStore;
     }
     
