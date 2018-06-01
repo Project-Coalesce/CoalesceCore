@@ -3,16 +3,19 @@ package com.coalesce.core.command.base;
 import com.coalesce.core.SenderType;
 import com.coalesce.core.command.builder.interfaces.CommandExecutor;
 import com.coalesce.core.command.builder.interfaces.TabExecutor;
+import com.coalesce.core.i18n.Translatable;
 import com.coalesce.core.plugin.ICoPlugin;
 
+import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @SuppressWarnings({"unused", "unchecked"})
-public abstract class CommandBuilder<C extends CommandContext, T extends TabContext, B extends CommandBuilder<C, T, B, P>, P extends ProcessedCommand<C, T, B>> {
+public abstract class CommandBuilder<C extends CommandContext<C, T, M, B, P>, T extends TabContext<C, T, M, B, P>, M extends Enum & Translatable, B extends CommandBuilder<C, T, M, B, P>, P extends ProcessedCommand<C, T, M, B, P>> {
     
     protected P command;
+    private ICoPlugin<M> plugin;
     
     /**
      * Creates a new CommandBuilder
@@ -20,7 +23,7 @@ public abstract class CommandBuilder<C extends CommandContext, T extends TabCont
      * @param plugin The plugin the command is registered to
      * @param name   The name of the command
      */
-    public CommandBuilder(ICoPlugin plugin, String name, P command) {
+    public CommandBuilder(ICoPlugin<M> plugin, String name, P command) {
         this.command = command;
     }
     
@@ -29,7 +32,7 @@ public abstract class CommandBuilder<C extends CommandContext, T extends TabCont
      *
      * @param executor The method of this command. Should be this::method_name
      */
-    public B executor(CommandExecutor<C> executor) {
+    public B executor(CommandExecutor<C, T, M, B, P> executor) {
         command.setCommandExecutor(executor);
         return (B)this;
     }
@@ -75,12 +78,50 @@ public abstract class CommandBuilder<C extends CommandContext, T extends TabCont
     }
     
     /**
+     * The command description with the current language (Only if the plugin supports translation)
+     * @param message The key to translate to the description
+     */
+    public B description(M message) {
+        command.setDescription(plugin.getLocaleStore().translate(message));
+        return (B)this;
+    }
+    
+    /**
+     * The command description with the desired language (Only if the plugin supports translation)
+     * @param message The key to translate to the description
+     * @param locale The desired locale
+     */
+    public B description(M message, Locale locale) {
+        command.setDescription(plugin.getLocaleStore().translate(message, locale));
+        return (B)this;
+    }
+    
+    /**
      * The command usage.
      *
      * @param usage The command usage.
      */
     public B usage(String usage) {
         command.setUsage(usage);
+        return (B)this;
+    }
+    
+    /**
+     * The command description with the current language (Only if the plugin supports translation)
+     * @param message The key to translate to the usage
+     */
+    public B usage(M message) {
+        command.setUsage(plugin.getLocaleStore().translate(message));
+        return (B)this;
+    }
+    
+    /**
+     * The command usage with the desired language (Only if the plugin supports translation)
+     * @param message The key to translate to the usage
+     * @param locale The desired locale
+     */
+    public B usage(M message, Locale locale) {
+        command.setUsage(plugin.getLocaleStore().translate(message, locale));
         return (B)this;
     }
     
@@ -125,12 +166,17 @@ public abstract class CommandBuilder<C extends CommandContext, T extends TabCont
     }
     
     /**
+     * Sets the sender types allowed to PLAYER, ENTITY, and BLOCK due to their ability to have a location.
+     */
+    public B locatableSenders() {
+        return senders(SenderType.PLAYER, SenderType.ENTITY, SenderType.BLOCK);
+    }
+    
+    /**
      * This builds the ProcessedCommand
      *
      * @return A new ProcessedCommand.
      */
-    public P build() {
-        return command;
-    }
+    public abstract P build();
     
 }

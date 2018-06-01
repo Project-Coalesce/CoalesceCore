@@ -2,9 +2,11 @@ package com.coalesce.core.wrappers;
 
 import com.coalesce.core.SenderType;
 import com.coalesce.core.plugin.ICoPlugin;
+import org.bukkit.Location;
 import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 public class CoSender {
@@ -108,6 +110,9 @@ public class CoSender {
         }
         if (sender instanceof Player) {
             return SenderType.PLAYER;
+        }
+        if (sender instanceof Entity) {
+            return SenderType.ENTITY;
         } else {
             return SenderType.OTHER;
         }
@@ -144,6 +149,26 @@ public class CoSender {
      */
     public <E extends CommandSender> E as(Class<E> type) {
         return (E)sender;
+    }
+    
+    /**
+     * Returns the location of the sender.
+     *
+     *<p>
+     *     Sender must be a Block, Player or an Entity.
+     *
+     * @return The location of the sender only if the sender is one of the allowed types.
+     */
+    public Location getLocation() {
+        switch (getType()) {
+        case BLOCK:
+            return ((BlockCommandSender)sender).getBlock().getLocation();
+        case PLAYER:
+        case ENTITY:
+            return ((Entity)sender).getLocation();
+        default:
+            return null;
+        }
     }
     
     /**

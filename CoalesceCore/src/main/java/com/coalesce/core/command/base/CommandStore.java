@@ -1,8 +1,9 @@
 package com.coalesce.core.command.base;
 
 import com.coalesce.core.Color;
-import com.coalesce.core.command.defaults.DefaultCommandBuilder;
 import com.coalesce.core.command.defaults.DefaultCommandRegister;
+import com.coalesce.core.command.defaults.DefaultProcessedCommand;
+import com.coalesce.core.i18n.Translatable;
 import com.coalesce.core.plugin.ICoPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -13,15 +14,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 
-@SuppressWarnings({"unused", "WeakerAccess", "u"})
-public class CommandStore {
+@SuppressWarnings({"unused", "WeakerAccess"})
+public final class CommandStore<M extends Enum & Translatable> {
     
-    private final Map<String, ProcessedCommand<? extends CommandContext, ? extends TabContext, ? extends CommandBuilder>> commandMap;
-    private final ICoPlugin plugin;
+    private final Map<String, ProcessedCommand<? extends CommandContext, ? extends TabContext, M, ? extends CommandBuilder, ? extends ProcessedCommand>> commandMap;
+    private final ICoPlugin<M> plugin;
     private CommandMap bukkitCommandMap;
     
     
-    public CommandStore(ICoPlugin plugin) {
+    public CommandStore(ICoPlugin<M> plugin) {
         this.plugin = plugin;
         this.commandMap = new HashMap<>();
     
@@ -43,7 +44,7 @@ public class CommandStore {
      *
      * @param command The command info.
      */
-    public <C extends CommandContext, T extends TabContext, B extends CommandBuilder, R extends CommandRegister<C, T, B>> void registerCommand(ProcessedCommand<C, T, B> command, R register) {
+    public <C extends CommandContext<C, T, M, B, P>, T extends TabContext<C, T, M, B, P>, B extends CommandBuilder<C, T, M, B, P>, P extends ProcessedCommand<C, T, M, B, P>, R extends CommandRegister<C, T, M, B, P>> void registerCommand(ProcessedCommand<C, T, M, B, P> command, R register) {
         if (this.bukkitCommandMap == null) {
             throw new RuntimeException("Bukkit CommandMap could not be found");
         }
@@ -53,15 +54,28 @@ public class CommandStore {
         }
     }
 
-    @SafeVarargs //aaa
-    public final void registerCommands(ProcessedCommand<CommandContext, TabContext, DefaultCommandBuilder>... commands) {
+    /**
+     * Registers an array of commands
+     * @param commands The commands to register
+     */
+    @SafeVarargs
+    public final void registerCommands(DefaultProcessedCommand<M>... commands) {
         Stream.of(commands).forEach(this::registerCommand);
     }
-
-    public void registerCommand(ProcessedCommand<CommandContext, TabContext, DefaultCommandBuilder> command) {
-        registerCommand(command, new DefaultCommandRegister(command));
+    
+    /**
+     * Registers a command
+     * @param command The command to register
+     */
+    @SuppressWarnings("unchecked")
+    public void registerCommand(DefaultProcessedCommand<M> command) {
+        registerCommand(command, new DefaultCommandRegister<>(command));
     }
     
+    /**
+     * Unregisters a command via name
+     * @param name The name of the command to unregister
+     */
     @SuppressWarnings("unchecked")
     public void unregisterCommand(String name) {
         try {
@@ -100,7 +114,7 @@ public class CommandStore {
      * @param name The name of the command to get.
      * @return The command if exists.
      */
-    public ProcessedCommand<? extends CommandContext, ? extends TabContext, ? extends CommandBuilder> getCommand(String name) {
+    public ProcessedCommand<? extends CommandContext, ? extends TabContext, M, ? extends CommandBuilder, ? extends ProcessedCommand> getCommand(String name) {
         return commandMap.get(name);
     }
 }

@@ -3,7 +3,7 @@ package com.coalesce.core.chat;
 import java.util.HashMap;
 import java.util.Map;
 
-public class FontInfo {
+public final class FontInfo {
 
     private static Map<Character, Integer> charSizes;
 
@@ -135,7 +135,6 @@ public class FontInfo {
         charSizes.put('.', 1);
         charSizes.put(',', 1);
         charSizes.put(' ', 3);
-        charSizes.put('a', 4);
     }
 
 }

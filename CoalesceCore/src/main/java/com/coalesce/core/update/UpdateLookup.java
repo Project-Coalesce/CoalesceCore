@@ -10,6 +10,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @SuppressWarnings("WeakerAccess")
 public class UpdateLookup implements Runnable {
@@ -58,7 +59,7 @@ public class UpdateLookup implements Runnable {
         try {
             UpdateData data = new Gson().fromJson(stringData, UpdateData.class);
         
-            if (currentVersion == null || !currentVersion.matches(data.getVersion())) {
+            if (currentVersion == null || needsUpdate(currentVersion, data.getVersion())) {
                 
                 
                 
@@ -71,7 +72,7 @@ public class UpdateLookup implements Runnable {
                     } else if (javaAssets.size() == 1) {
                         Asset download = javaAssets.get(0);
                         
-                        installer.addUpdate(plugin.getPluginJar().getName(), download.assetName);
+                        installer.addUpdate(plugin, plugin.getPluginJar().getName(), download.assetName);
                     
                         new DownloadThread(plugin, new URL(download.downloadURL), downloadLocation, download.assetName).start();
                         return;
@@ -99,6 +100,24 @@ public class UpdateLookup implements Runnable {
         catch (Exception e) {
             plugin.getCoLogger().error("There was an error checking for updates.");
         }
+    }
+    
+    private boolean needsUpdate(String oldVersion, String newVersion) {
+        String[] curVer = oldVersion.split("\\D+");
+        String[] newVer = newVersion.split("\\D+");
+        
+        int[] curNum = Stream.of(curVer).filter(s -> !s.isEmpty()).mapToInt(Integer::valueOf).toArray();//1.1.0
+        int[] newNum = Stream.of(newVer).filter(s -> !s.isEmpty()).mapToInt(Integer::valueOf).toArray();//1.0.0
+        
+        for (int a = 0; curVer.length > a; a++) {
+            if (curNum.length <= a && newNum.length <= a) {
+                return false;
+            }
+            if (curNum[a] == newNum[a]) continue;
+            if (a > 3) break;
+            else return curNum[a] < newNum[a];
+        }
+        return false;
     }
     
     @SuppressWarnings("unused")

@@ -7,6 +7,7 @@ public enum SenderType {
     
     PLAYER,
     CONSOLE,
+    ENTITY,
     BLOCK,
     OTHER,
     ALL

@@ -3,18 +3,27 @@ package com.coalesce.core.plugin;
 import com.coalesce.core.Color;
 import com.coalesce.core.chat.CoFormatter;
 import com.coalesce.core.command.base.CommandStore;
+import com.coalesce.core.config.base.IConfig;
+import com.coalesce.core.i18n.CoLang;
+import com.coalesce.core.i18n.LocaleStore;
+import com.coalesce.core.i18n.Translatable;
 import com.coalesce.core.session.SessionStore;
 import org.bukkit.craftbukkit.libs.jline.console.ConsoleReader;
 import org.bukkit.plugin.Plugin;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 @SuppressWarnings( {"unused", "unchecked"} )
-public interface ICoPlugin extends Plugin {
+public interface ICoPlugin<M extends Enum & Translatable> extends Plugin {
     
     /**
      * Gets a map of all the current CoPlugins loaded on the server
@@ -99,11 +108,11 @@ public interface ICoPlugin extends Plugin {
      * Gets a module by class.
      *
      * @param clazz The class that extends CoModule
-     * @param <M>   A module class
+     * @param <T>   A module class
      * @return The module.
      */
-    default <M extends ICoModule> M getModule(Class<M> clazz) {
-        return getModules().stream().filter(module -> module.getClass().equals(clazz)).map(module -> ((M)module)).iterator().next();
+    default <T extends ICoModule> T getModule(Class<T> clazz) {
+        return getModules().stream().filter(module -> module.getClass().equals(clazz)).map(module -> ((T)module)).iterator().next();
     }
     
     /**
@@ -197,7 +206,7 @@ public interface ICoPlugin extends Plugin {
      *
      * @return The command store.
      */
-    CommandStore getCommandStore();
+    CommandStore<M> getCommandStore();
     
     /**
      * Gets the current plugins data folder.
@@ -220,6 +229,140 @@ public interface ICoPlugin extends Plugin {
      * @return The plugin jar file.
      */
     File getPluginJar();
+    
+    /**
+     * Gets this plugins locale store.
+     *
+     * @return The plugin locale store.
+     */
+    LocaleStore<M> getLocaleStore();
+    
+    /**
+     * Sets the current plugin locale.
+     *
+     * @param locale The locale the plugin will use
+     */
+    default void setLocale(Locale locale) {
+        getLocaleStore().setDefaultLocale(locale);
+    }
+    
+    /**
+     * Sets the enum class to get the messages from.
+     * <p>========================================
+     * <p>
+     *     Example: If I have this enum for my plugins translatable messages,
+     *
+     *     <pre> {@code
+     *      public enum MyCustomMessages implements Translatable
+     *     }</pre>
+     *
+     * Then I will use "{@code setLocaleClassType(MyCustomMessages.class);}" In my onEnable method.
+     * <p>========================================
+     * <p>THIS NEEDS TO BE SET BEFORE YOU REGISTER COMMANDS IF YOU USE TRANSLATIONS FOR THE DESCRIPTIONS OR USAGES!
+     *
+     * @param cls The class to use.
+     */
+    default void setLocaleClassType(Class<M> cls) {
+        getLocaleStore().setClassType(cls);
+    }
+    
+    /**
+     * Loads a new language into the LocaleStore
+     * @param coLang The CoLang to load
+     */
+    default void loadCoLang(CoLang<M> coLang) {
+        getLocaleStore().loadCoLang(coLang);
+    }
+    
+    /**
+     * Loads a new language into the LocaleStore
+     * @param file The config file of the lang file
+     * @param locale The locale being used
+     */
+    default void loadCoLang(IConfig file, Locale locale) {
+        getLocaleStore().loadCoLang(new CoLang<>(file, getLocaleStore(), locale));
+    }
+    
+    /**
+     * Loads a new language into the LocaleStore
+     * @param file The path to the config file
+     * @param locale The locale being used
+     */
+    default void loadCoLang(File file, Locale locale) {
+        getLocaleStore().loadCoLang(file, locale);
+    }
+    
+    /**
+     * Loads a new language into the LocaleStore
+     * @param file The path to the config file
+     * @param locale The locale being used
+     */
+    default void loadCoLang(String file, Locale locale) {
+        getLocaleStore().loadCoLang(file, locale);
+    }
+    
+    /**
+     * Attempts to get a loaded CoLang
+     * @param locale The locale to lookup
+     * @return The desired CoLang, null if it doesn't exist.
+     */
+    default CoLang<M> getCoLang(Locale locale) {
+        return getLocaleStore().getCoLang(locale);
+    }
+    
+    /**
+     * Moves a file or directory from a
+     * @param pathInJar The path to the file in the jar file. MUST HAVE EXTENSION
+     * @param destination where you want this file moved to. MUST HAVE EXTENSION
+     */
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    default void installFile(String pathInJar, String destination) {
+        if (!destination.contains(".")) throw new RuntimeException("File type must be specified.");
+        try {
+            File path;
+            File file;
+    
+            if (!destination.contains(File.separator)) {
+                path = getPluginFolder();
+                file = new File(path.getAbsolutePath() + File.separator + destination);
+            }
+            else {
+                int last = destination.lastIndexOf(File.separator);
+                String fileName = destination.substring(last + 1);
+                String directory = destination.substring(0, last);
+                path = new File(getPluginFolder().getAbsolutePath() + File.separator + directory);
+                file = new File(path + File.separator + fileName);
+            }
+            
+            if (!path.exists()) path.mkdirs();
+            if (!file.exists()) file.createNewFile();
+            else {
+                file.delete();
+                file.createNewFile();
+            }
+            InputStream stream;
+            OutputStream resStreamOut;
+    
+            stream = this.getClass().getResourceAsStream(pathInJar);
+            
+            if (stream == null) {
+                throw new RuntimeException("the path specified could not be found in the jar file.");
+            }
+    
+            int readBytes;
+            byte[] buffer = new byte[4096];
+            resStreamOut = new FileOutputStream(file);
+            while ((readBytes = stream.read(buffer)) > 0) {
+                resStreamOut.write(buffer, 0, readBytes);
+            }
+            stream.close();
+            resStreamOut.close();
+            
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    
+    }
     
     ConsoleReader getConsoleReader();
     

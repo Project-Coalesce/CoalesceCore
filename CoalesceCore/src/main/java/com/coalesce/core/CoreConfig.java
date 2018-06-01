@@ -1,17 +1,26 @@
 package com.coalesce.core;
 
 import com.coalesce.core.config.YmlConfig;
-import com.coalesce.core.plugin.ICoPlugin;
 
 public final class CoreConfig extends YmlConfig {
 
-    public CoreConfig(ICoPlugin plugin) {
+    public CoreConfig(Core plugin) {
         super("config", plugin);
         addEntry("debug", false);
-        addEntry("logprocess", true);
+        addEntry("locale.overridePluginLocales", true);
+        addEntry("locale.masterLocale", "en_us");
     }
 
     public boolean isDebugEnabled() {
         return getBoolean("debug");
     }
+    
+    public boolean overridePluginLocales() {
+        return getBoolean("locale.overridePluginLocales");
+    }
+    
+    public String getMasterLocale() {
+        return getString("locale.masterLocale");
+    }
+    
 }

@@ -1,7 +1,5 @@
 package com.coalesce.core.plugin;
 
-import java.util.concurrent.Executors;
-
 public interface ICoModule {
     
     /**
