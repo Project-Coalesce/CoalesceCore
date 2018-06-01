@@ -230,32 +230,82 @@ public interface ICoPlugin<M extends Enum & Translatable> extends Plugin {
      */
     File getPluginJar();
     
+    /**
+     * Gets this plugins locale store.
+     *
+     * @return The plugin locale store.
+     */
     LocaleStore<M> getLocaleStore();
     
+    /**
+     * Sets the current plugin locale.
+     *
+     * @param locale The locale the plugin will use
+     */
     default void setLocale(Locale locale) {
         getLocaleStore().setDefaultLocale(locale);
     }
     
+    /**
+     * Sets the enum class to get the messages from.
+     * <p>========================================
+     * <p>
+     *     Example: If I have this enum for my plugins translatable messages,
+     *
+     *     <pre> {@code
+     *      public enum MyCustomMessages implements Translatable
+     *     }</pre>
+     *
+     * Then I will use "{@code setLocaleClassType(MyCustomMessages.class);}" In my onEnable method.
+     * <p>========================================
+     * <p>THIS NEEDS TO BE SET BEFORE YOU REGISTER COMMANDS IF YOU USE TRANSLATIONS FOR THE DESCRIPTIONS OR USAGES!
+     *
+     * @param cls The class to use.
+     */
     default void setLocaleClassType(Class<M> cls) {
         getLocaleStore().setClassType(cls);
     }
     
+    /**
+     * Loads a new language into the LocaleStore
+     * @param coLang The CoLang to load
+     */
     default void loadCoLang(CoLang<M> coLang) {
         getLocaleStore().loadCoLang(coLang);
     }
     
+    /**
+     * Loads a new language into the LocaleStore
+     * @param file The config file of the lang file
+     * @param locale The locale being used
+     */
     default void loadCoLang(IConfig file, Locale locale) {
         getLocaleStore().loadCoLang(new CoLang<>(file, getLocaleStore(), locale));
     }
     
+    /**
+     * Loads a new language into the LocaleStore
+     * @param file The path to the config file
+     * @param locale The locale being used
+     */
     default void loadCoLang(File file, Locale locale) {
         getLocaleStore().loadCoLang(file, locale);
     }
     
+    /**
+     * Loads a new language into the LocaleStore
+     * @param file The path to the config file
+     * @param locale The locale being used
+     */
     default void loadCoLang(String file, Locale locale) {
         getLocaleStore().loadCoLang(file, locale);
     }
     
+    /**
+     * Attempts to get a loaded CoLang
+     * @param locale The locale to lookup
+     * @return The desired CoLang, null if it doesn't exist.
+     */
     default CoLang<M> getCoLang(Locale locale) {
         return getLocaleStore().getCoLang(locale);
     }

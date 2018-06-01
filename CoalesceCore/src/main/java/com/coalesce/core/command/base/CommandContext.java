@@ -9,6 +9,10 @@ import com.coalesce.core.i18n.Translatable;
 import com.coalesce.core.plugin.ICoPlugin;
 import com.coalesce.core.text.Text;
 import com.coalesce.core.wrappers.CoSender;
+import org.bukkit.Location;
+import org.bukkit.command.BlockCommandSender;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import java.util.Arrays;
@@ -108,6 +112,88 @@ public abstract class CommandContext<C extends CommandContext<C, T, M, B, P>, T 
     }
     
     /**
+     * Checks if the sender is the console.
+     * @return True if the sender is the console, false otherwise.
+     */
+    public boolean isConsole() {
+        return getSender().getType() == SenderType.CONSOLE;
+    }
+    
+    /**
+     * Checks if the sender is a block
+     * @return True if the sender is a block sender, false otherwise.
+     */
+    public boolean isBlock() {
+        return getSender().getType() == SenderType.BLOCK;
+    }
+    
+    /**
+     * Checks if the sender is a player.
+     * @return True if the sender is a player, false otherwise.
+     */
+    public boolean isPlayer() {
+        return getSender().getType() == SenderType.PLAYER;
+    }
+    
+    /**
+     * Checks if the sender is an entity.
+     * @return True if the sender is an entity, false otherwise.
+     */
+    public boolean isEntity() {
+        return getSender().getType() == SenderType.ENTITY;
+    }
+    
+    /**
+     * Checks if the sender is locatable.
+     * @return True if the sender is a block, a player, or an entity. False otherwise.
+     */
+    public boolean isLocatable() {
+        return isBlock() || isPlayer() || isEntity();
+    }
+    
+    /**
+     * Gets the sender as a player
+     * @return The player if the sender is a player, null otherwise.
+     */
+    public Player asPlayer() {
+        return isPlayer() ? as(Player.class) : null;
+    }
+    
+    /**
+     * Gets the sender as an entity
+     * @return The entity if the sender is an entity, null otherwise.
+     */
+    public Entity asEntity() {
+        return isEntity() ? as(Entity.class) : null;
+    }
+    
+    /**
+     * Gets the sender as a block sender
+     * @return The block sender if the sender is a block sender, null otherwise.
+     */
+    public BlockCommandSender asBlock() {
+        return isBlock() ? as(BlockCommandSender.class) : null;
+    }
+    
+    /**
+     * Gets the sender as the desired type
+     * @param type The type class.
+     * @param <S> The class specified must extend CommandSender
+     * @return The sender as the desired type.
+     */
+    public <S extends CommandSender> S as(Class<S> type) {
+        return getSender().as(type);
+    }
+    
+    /**
+     * Gets the location of the sender.
+     * @return The location of the sender if it is locatable. Null otherwise.
+     */
+    public Location getLocation() {
+        return isLocatable() ? getSender().getLocation() : null;
+    }
+    
+    /**
      * Gets a list of arguments from the command
      *
      * @return The command arguments.
@@ -141,8 +227,8 @@ public abstract class CommandContext<C extends CommandContext<C, T, M, B, P>, T 
     /**
      * Joins arguments from one index of the command to another.
      *
-     * @param start  The start index
-     * @param finish The end index
+     * @param start  The start index (inclusive)
+     * @param finish The end index (exclusive)
      * @return One string combining the strings between the two index's
      */
     public String joinArgs(int start, int finish) {
@@ -155,7 +241,7 @@ public abstract class CommandContext<C extends CommandContext<C, T, M, B, P>, T 
     /**
      * Joins all the arguments after a specific index.
      *
-     * @param start Where to join the strings at
+     * @param start Where to join the strings at (inclusive)
      * @return One string combining all the strings after the index
      */
     public String joinArgs(int start) {
@@ -190,18 +276,38 @@ public abstract class CommandContext<C extends CommandContext<C, T, M, B, P>, T 
         send(plugin.getCoFormatter().formatString(message, objects));
     }
     
+    /**
+     * Sends a translated message to the sender in the current language. (Only if supported by the plugin)
+     * @param messageKey The key needing to be sent
+     */
     public void send(M messageKey) {
         send(messageKey, plugin.getLocaleStore().getDefaultLocale());
     }
     
+    /**
+     * Sends a translated message to the sender in the desired language. (Only if supported by the plugin)
+     * @param messageKey The key needing to be sent
+     * @param locale The desired locale.
+     */
     public void send(M messageKey, Locale locale) {
         send(plugin.getLocaleStore().translate(messageKey, locale));
     }
     
+    /**
+     * Sends a translated message to the sender in the current language. (Only if supported by the plugin)
+     * @param messageKey The key needing to be sent
+     * @param objects The placeholder objects to use
+     */
     public void send(M messageKey, Object... objects) {
         send(messageKey, plugin.getLocaleStore().getDefaultLocale(), objects);
     }
     
+    /**
+     * Sends a translated message to the sender in the desired language. (Only if supported by the plugin)
+     * @param messageKey The key needing to be sent
+     * @param locale The desired locale.
+     * @param objects The placeholder objects to use
+     */
     public void send(M messageKey, Locale locale, Object... objects) {
         send(plugin.getLocaleStore().translate(messageKey, locale, objects));
     }
@@ -249,18 +355,38 @@ public abstract class CommandContext<C extends CommandContext<C, T, M, B, P>, T 
         send(plugin.getCoFormatter().format(message, objects));
     }
     
+    /**
+     * Sends a formatted plugin message in the current language. (Only if supported by the plugin)
+     * @param messageKey The message key to send
+     */
     public void pluginMessage(M messageKey) {
         pluginMessage(messageKey, plugin.getLocaleStore().getDefaultLocale());
     }
     
+    /**
+     * Sends a formatted plugin message in the desired language. (Only if supported by the plugin)
+     * @param messageKey The message key to send
+     * @param locale The desired locale
+     */
     public void pluginMessage(M messageKey, Locale locale) {
         send(plugin.getCoFormatter().format(plugin.getLocaleStore().translate(messageKey, locale)));
     }
     
+    /**
+     * Sends a formatted plugin message in the current language. (Only if supported by the plugin)
+     * @param messageKey The message key to send
+     * @param objects The placeholder objects to use
+     */
     public void pluginMessage(M messageKey, Object... objects) {
         pluginMessage(messageKey, plugin.getLocaleStore().getDefaultLocale(), objects);
     }
     
+    /**
+     * Sends a formatted plugin message in the desired language. (Only if supported by the plugin)
+     * @param messageKey The message key to send
+     * @param locale The desired locale
+     * @param objects The placeholder objects to use
+     */
     public void pluginMessage(M messageKey, Locale locale, Object... objects) {
         send(plugin.getCoFormatter().format(plugin.getLocaleStore().translate(messageKey, locale, objects)));
     }

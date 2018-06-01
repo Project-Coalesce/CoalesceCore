@@ -6,6 +6,7 @@ import com.coalesce.core.command.builder.interfaces.TabExecutor;
 import com.coalesce.core.i18n.Translatable;
 import com.coalesce.core.plugin.ICoPlugin;
 
+import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -14,6 +15,7 @@ import java.util.stream.Stream;
 public abstract class CommandBuilder<C extends CommandContext<C, T, M, B, P>, T extends TabContext<C, T, M, B, P>, M extends Enum & Translatable, B extends CommandBuilder<C, T, M, B, P>, P extends ProcessedCommand<C, T, M, B, P>> {
     
     protected P command;
+    private ICoPlugin<M> plugin;
     
     /**
      * Creates a new CommandBuilder
@@ -76,12 +78,50 @@ public abstract class CommandBuilder<C extends CommandContext<C, T, M, B, P>, T 
     }
     
     /**
+     * The command description with the current language (Only if the plugin supports translation)
+     * @param message The key to translate to the description
+     */
+    public B description(M message) {
+        command.setDescription(plugin.getLocaleStore().translate(message));
+        return (B)this;
+    }
+    
+    /**
+     * The command description with the desired language (Only if the plugin supports translation)
+     * @param message The key to translate to the description
+     * @param locale The desired locale
+     */
+    public B description(M message, Locale locale) {
+        command.setDescription(plugin.getLocaleStore().translate(message, locale));
+        return (B)this;
+    }
+    
+    /**
      * The command usage.
      *
      * @param usage The command usage.
      */
     public B usage(String usage) {
         command.setUsage(usage);
+        return (B)this;
+    }
+    
+    /**
+     * The command description with the current language (Only if the plugin supports translation)
+     * @param message The key to translate to the usage
+     */
+    public B usage(M message) {
+        command.setUsage(plugin.getLocaleStore().translate(message));
+        return (B)this;
+    }
+    
+    /**
+     * The command usage with the desired language (Only if the plugin supports translation)
+     * @param message The key to translate to the usage
+     * @param locale The desired locale
+     */
+    public B usage(M message, Locale locale) {
+        command.setUsage(plugin.getLocaleStore().translate(message, locale));
         return (B)this;
     }
     
@@ -123,6 +163,13 @@ public abstract class CommandBuilder<C extends CommandContext<C, T, M, B, P>, T 
     public B senders(SenderType... allowedSenders) {
         command.setSenders(allowedSenders);
         return (B)this;
+    }
+    
+    /**
+     * Sets the sender types allowed to PLAYER, ENTITY, and BLOCK due to their ability to have a location.
+     */
+    public B locatableSenders() {
+        return senders(SenderType.PLAYER, SenderType.ENTITY, SenderType.BLOCK);
     }
     
     /**

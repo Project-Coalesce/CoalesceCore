@@ -82,7 +82,7 @@ public abstract class TabContext<C extends CommandContext<C, T, M, B, P>, T exte
      *
      * @return The command info
      */
-    public ProcessedCommand getCommand() {
+    public ProcessedCommand<C, T, M, B, P> getCommand() {
         return command;
     }
     
@@ -120,7 +120,7 @@ public abstract class TabContext<C extends CommandContext<C, T, M, B, P>, T exte
      * @return The previous arg
      */
     public String getPrevious() {
-        return getLength() == 0 ? null : (String)context.getArgs().get(getLength() - 1);
+        return getLength() == 0 ? null : context.getArgs().get(getLength() - 1);
     }
     
     /**

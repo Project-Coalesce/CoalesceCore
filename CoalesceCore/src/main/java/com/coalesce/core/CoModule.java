@@ -17,19 +17,23 @@ public abstract class CoModule implements Listener, ICoModule {
         this.plugin = plugin;
         this.name = name;
     }
-
+    
+    @Override
     public boolean isEnabled() {
         return isEnabled;
     }
-
+    
+    @Override
     public String getName() {
         return name;
     }
-
+    
+    @Override
     public ICoPlugin getPlugin() {
         return plugin;
     }
 
+    @Override
     public void enable() {
         if (isEnabled) {
             throw new IllegalStateException("Module " + getName() + " is already disabled.");
@@ -45,6 +49,7 @@ public abstract class CoModule implements Listener, ICoModule {
         }
     }
 
+    @Override
     public void disable() {
         if (!isEnabled) {
             throw new IllegalStateException("Module " + getName() + " isn't enabled.");
@@ -68,8 +73,10 @@ public abstract class CoModule implements Listener, ICoModule {
     public void onPostEnable() throws Exception {
     }
 
+    @Override
     public abstract void onEnable() throws Exception;
 
+    @Override
     public abstract void onDisable() throws Exception;
 
 }

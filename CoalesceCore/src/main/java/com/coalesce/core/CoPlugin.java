@@ -18,7 +18,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 public abstract class CoPlugin<T extends Enum & Translatable> extends JavaPlugin implements ICoPlugin<T>, Listener{
@@ -37,8 +36,8 @@ public abstract class CoPlugin<T extends Enum & Translatable> extends JavaPlugin
         displayName = getName();
         logger = new CoLogger(this);
         formatter = new CoFormatter(this);
-        commandStore = new CommandStore<>(this);
         localeStore = new LocaleStore<>(this);
+        commandStore = new CommandStore<>(this);
         Core.addCoPlugin(getRealName(), this);
         Core.addSessionStore(this, sessionStore);
         

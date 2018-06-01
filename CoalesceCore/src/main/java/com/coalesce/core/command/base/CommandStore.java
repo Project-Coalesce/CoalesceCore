@@ -54,16 +54,28 @@ public final class CommandStore<M extends Enum & Translatable> {
         }
     }
 
+    /**
+     * Registers an array of commands
+     * @param commands The commands to register
+     */
     @SafeVarargs
     public final void registerCommands(DefaultProcessedCommand<M>... commands) {
         Stream.of(commands).forEach(this::registerCommand);
     }
     
+    /**
+     * Registers a command
+     * @param command The command to register
+     */
     @SuppressWarnings("unchecked")
     public void registerCommand(DefaultProcessedCommand<M> command) {
         registerCommand(command, new DefaultCommandRegister<>(command));
     }
     
+    /**
+     * Unregisters a command via name
+     * @param name The name of the command to unregister
+     */
     @SuppressWarnings("unchecked")
     public void unregisterCommand(String name) {
         try {
