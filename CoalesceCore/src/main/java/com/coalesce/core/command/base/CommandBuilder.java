@@ -25,6 +25,7 @@ public abstract class CommandBuilder<C extends CommandContext<C, T, M, B, P>, T 
      */
     public CommandBuilder(ICoPlugin<M> plugin, String name, P command) {
         this.command = command;
+        this.plugin = plugin;
     }
     
     /**

@@ -109,12 +109,46 @@ public final class CommandStore<M extends Enum & Translatable> {
     }
     
     /**
+     * Quickly gets a command of the correct ProcessedCommand type
+     * @param cls The class type of the command
+     * @param commandName The name of the command (or alias)
+     * @param <P> The type of ProcessedCommand to return
+     * @return The command if it exists, null otherwise.
+     */
+    public <P extends ProcessedCommand<? extends CommandContext, ? extends TabContext, M, ? extends CommandBuilder, ? extends ProcessedCommand>> P getCommand(Class<P> cls, String commandName) {
+        ProcessedCommand<? extends CommandContext, ? extends TabContext, M, ? extends CommandBuilder, ? extends ProcessedCommand> command = getCommand(commandName);
+        return cls.isInstance(command) ? (P)command : null;
+    }
+    
+    /**
      * Gets a command from the plugins command map.
      *
-     * @param name The name of the command to get.
+     * @param name The name of the command to get. (or alias)
      * @return The command if exists.
      */
     public ProcessedCommand<? extends CommandContext, ? extends TabContext, M, ? extends CommandBuilder, ? extends ProcessedCommand> getCommand(String name) {
-        return commandMap.get(name);
+        if (commandMap.get(name) == null) {
+            for (ProcessedCommand<? extends CommandContext, ? extends TabContext, M, ? extends CommandBuilder, ? extends ProcessedCommand> c : commandMap.values()) {
+                if (c.getAliases().contains(name)) return c;
+            }
+            return null;
+        } else return commandMap.get(name);
     }
+    
+    /**
+     * Returns the custom command map CoalesceCore uses for this particular plugin.
+     * @return The plugins CoalesceCore command map.
+     */
+    public Map<String, ProcessedCommand<? extends CommandContext, ? extends TabContext, M, ? extends CommandBuilder, ? extends ProcessedCommand>> getCoCommandMap() {
+        return commandMap;
+    }
+    
+    /**
+     * Gives access to the Bukkit CommandMap.
+     * @return The Bukkit CommandMap
+     */
+    public CommandMap getBukkitCommandMap() {
+        return bukkitCommandMap;
+    }
+    
 }
