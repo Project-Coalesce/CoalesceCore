@@ -8,7 +8,7 @@ import org.bukkit.command.CommandSender;
 import java.util.List;
 
 @SuppressWarnings("WeakerAccess")
-public final class DefaultCommandRegister<M extends Enum & Translatable> extends CommandRegister<DefaultCContext<M>, DefaultTContext<M>, M, DefaultCommandBuilder<M>, DefaultProcessedCommand<M>> {
+public class DefaultCommandRegister<M extends Enum & Translatable> extends CommandRegister<DefaultCContext<M>, DefaultTContext<M>, M, DefaultCommandBuilder<M>, DefaultProcessedCommand<M>> {
     
     public DefaultCommandRegister(DefaultProcessedCommand<M> command) {
         super(command, command.getPlugin());

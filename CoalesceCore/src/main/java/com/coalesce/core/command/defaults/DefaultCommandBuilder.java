@@ -4,7 +4,7 @@ import com.coalesce.core.command.base.CommandBuilder;
 import com.coalesce.core.i18n.Translatable;
 import com.coalesce.core.plugin.ICoPlugin;
 
-public final class DefaultCommandBuilder<M extends Enum & Translatable> extends CommandBuilder<DefaultCContext<M>, DefaultTContext<M>, M, DefaultCommandBuilder<M>, DefaultProcessedCommand<M>>{
+public class DefaultCommandBuilder<M extends Enum & Translatable> extends CommandBuilder<DefaultCContext<M>, DefaultTContext<M>, M, DefaultCommandBuilder<M>, DefaultProcessedCommand<M>>{
     
     /**
      * Creates a new CommandBuilder
