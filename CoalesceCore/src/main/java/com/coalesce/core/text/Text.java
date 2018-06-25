@@ -76,11 +76,8 @@ public abstract class Text {
          * @param textSection The text to append to this current section
          */
         public final TextSection append(TextSection textSection) {
-            textSection.setParent(getParent());
-            if (textSection.isParent) textSection.isParent = false;
-            getExtra().add(textSection);
-            //getExtra().addAll(textSection.getExtra());
-            return textSection;
+            getExtra().add(textSection.getParent());
+            return this;
         }
         
         /**
