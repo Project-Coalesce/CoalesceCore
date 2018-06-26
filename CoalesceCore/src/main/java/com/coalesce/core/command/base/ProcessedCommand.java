@@ -191,7 +191,7 @@ public abstract class ProcessedCommand<C extends CommandContext<C, T, M, B, P>, 
      *
      * @param senders The senders to allow
      */
-    public void setSenders(SenderType[] senders) {
+    public void setSenders(SenderType... senders) {
         this.senders = senders;
     }
     
