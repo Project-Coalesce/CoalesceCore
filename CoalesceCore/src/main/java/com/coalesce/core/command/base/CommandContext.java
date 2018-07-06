@@ -399,7 +399,7 @@ public abstract class CommandContext<C extends CommandContext<C, T, M, B, P>, T 
         Text.TextSection pluginMessage = Text.of("[").setColor(Color.GRAY);
         pluginMessage.append(Color.stripColor(plugin.getDisplayName())).setColor(plugin.getPluginColor());
         pluginMessage.append("] ").setColor(Color.GRAY);
-        text.getSections().forEach(pluginMessage::append);
+        pluginMessage.append(text);
         send(pluginMessage);
     }
     
